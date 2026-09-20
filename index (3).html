@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PenaltyMind</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+    <header class="topbar">
+      <div>
+        <h1>⚽ PenaltyMind</h1>
+        <p id="modeLabel">Mode Solo</p>
+      </div>
+      <div class="stats">
+        <span>Tir <b id="shotNumber">1</b>/10</span>
+        <span>Score <b id="score">0</b></span>
+        <span>Combo <b id="combo">0</b></span>
+      </div>
+    </header>
+
+    <section class="stadium">
+      <div class="crowd"></div>
+      <div class="goal">
+        <div class="net"></div>
+        <div id="keeper" class="keeper">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="arm left"></div>
+          <div class="arm right"></div>
+          <div class="leg left"></div>
+          <div class="leg right"></div>
+        </div>
+      </div>
+
+      <div id="ball" class="ball">⚽</div>
+      <div class="penalty-spot"></div>
+      <div class="message" id="message">Choisis une direction</div>
+    </section>
+
+    <section class="controls" id="controls">
+      <button class="shot-btn" data-direction="left">⬅️ Gauche</button>
+      <button class="shot-btn" data-direction="center">⬆️ Centre</button>
+      <button class="shot-btn" data-direction="right">➡️ Droite</button>
+    </section>
+
+    <section class="result hidden" id="result">
+      <h2 id="resultTitle">Fin de partie</h2>
+      <p>Score : <strong id="finalScore">0</strong></p>
+      <p>Record : <strong id="bestScore">0</strong></p>
+      <button id="restartBtn">Rejouer</button>
+    </section>
+
+    <footer>
+      <small>Le gardien analyse tes 5 derniers tirs.</small>
+    </footer>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
