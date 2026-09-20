@@ -1,0 +1,290 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: Inter, Arial, sans-serif;
+  color: #fff;
+  background: #08130d;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, #173c27 0, #08130d 55%, #050905 100%);
+}
+
+.game {
+  width: min(100%, 900px);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 6vw, 48px);
+}
+
+.topbar p {
+  margin: 5px 0 0;
+  opacity: .7;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.stats span {
+  background: #ffffff12;
+  padding: 10px 13px;
+  border-radius: 12px;
+}
+
+.stadium {
+  position: relative;
+  height: 500px;
+  margin-top: 20px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    linear-gradient(to bottom, #243d2b 0 43%, #13783d 43% 100%);
+  border: 2px solid #ffffff20;
+  box-shadow: 0 20px 60px #0008;
+}
+
+.crowd {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 43%;
+  opacity: .35;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #fff 0 4px,
+      transparent 4px 12px
+    );
+}
+
+.goal {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 70px;
+  height: 260px;
+  border: 8px solid white;
+  border-bottom-width: 10px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 24px, #fff5 25px 26px),
+    repeating-linear-gradient(90deg, transparent 0 24px, #fff5 25px 26px);
+  box-shadow: 0 8px 20px #0007;
+}
+
+.net {
+  position: absolute;
+  inset: 0;
+  opacity: .35;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, #fff 15px 16px),
+    repeating-linear-gradient(-45deg, transparent 0 14px, #fff 15px 16px);
+}
+
+.keeper {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 70px;
+  height: 150px;
+  transform: translateX(-50%);
+  transition: left .35s ease, transform .35s ease;
+  z-index: 3;
+}
+
+.keeper .head {
+  position: absolute;
+  left: 22px;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0bd8b;
+}
+
+.keeper .body {
+  position: absolute;
+  left: 15px;
+  top: 25px;
+  width: 40px;
+  height: 65px;
+  border-radius: 12px 12px 6px 6px;
+  background: #f2d34f;
+}
+
+.keeper .arm,
+.keeper .leg {
+  position: absolute;
+  background: #f0bd8b;
+  border-radius: 10px;
+  transform-origin: top center;
+}
+
+.keeper .arm {
+  top: 30px;
+  width: 12px;
+  height: 65px;
+}
+
+.keeper .arm.left {
+  left: 9px;
+  transform: rotate(35deg);
+}
+
+.keeper .arm.right {
+  right: 9px;
+  transform: rotate(-35deg);
+}
+
+.keeper .leg {
+  top: 85px;
+  width: 13px;
+  height: 65px;
+}
+
+.keeper .leg.left {
+  left: 18px;
+  transform: rotate(8deg);
+}
+
+.keeper .leg.right {
+  right: 18px;
+  transform: rotate(-8deg);
+}
+
+.ball {
+  position: absolute;
+  left: 50%;
+  bottom: 65px;
+  font-size: 36px;
+  transform: translateX(-50%);
+  transition: left .45s ease, bottom .45s ease, transform .45s ease;
+  z-index: 5;
+}
+
+.penalty-spot {
+  position: absolute;
+  left: 50%;
+  bottom: 65px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  transform: translateX(-50%);
+}
+
+.message {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: #0009;
+  padding: 8px 15px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  color: #07110b;
+  background: #f4f4f4;
+  transition: transform .12s ease, opacity .12s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result {
+  margin-top: 18px;
+  padding: 25px;
+  text-align: center;
+  background: #ffffff12;
+  border-radius: 20px;
+}
+
+.result h2 {
+  margin-top: 0;
+}
+
+.result button {
+  margin-top: 10px;
+  background: #4ade80;
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  text-align: center;
+  margin-top: 18px;
+  opacity: .5;
+}
+
+@media (max-width: 600px) {
+  .game {
+    padding: 12px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stats {
+    justify-content: flex-start;
+  }
+
+  .stadium {
+    height: 420px;
+  }
+
+  .goal {
+    left: 7%;
+    right: 7%;
+    height: 225px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}
