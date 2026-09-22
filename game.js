@@ -1,7 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-    "use strict";
 
-    console.log("PenaltyMind : nouveau game.js chargé");
+    console.log("PenaltyMind game.js OK");
+
+    var currentScreen = null;
+
+    var score = 0;
+    var shots = 0;
+    var combo = 0;
+    var trainingMode = false;
+    var gameFinished = false;
+
+    var xp = Number(localStorage.getItem("pm_xp")) || 0;
+    var bestScore = Number(localStorage.getItem("pm_best_score")) || 0;
+    var totalGoals = Number(localStorage.getItem("pm_goals")) || 0;
+    var totalSaves = Number(localStorage.getItem("pm_saves")) || 0;
+    var totalShots = Number(localStorage.getItem("pm_shots")) || 0;
+    var bestCombo = Number(localStorage.getItem("pm_best_combo")) || 0;
+    var trainingGoals = Number(localStorage.getItem("pm_training_goals")) || 0;
+    var trainingShots = Number(localStorage.getItem("pm_training_shots")) || 0;
+
+    var soundEnabled =
+        localStorage.getItem("pm_sound") !== "off";
+
 
     /* =========================
        OUTILS
@@ -11,967 +31,729 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.getElementById(id);
     }
 
-    function onClick(id, callback) {
-        const element = get(id);
+    function showScreen(id) {
 
-        if (!element) {
-            console.warn("Bouton absent :", id);
-            return;
+        var screens = document.querySelectorAll(".screen");
+
+        for (var i = 0; i < screens.length; i++) {
+            screens[i].classList.remove("active");
         }
 
-        element.addEventListener("click", callback);
-    }
-
-    function show(id) {
-        document.querySelectorAll(".screen").forEach(function (screen) {
-            screen.classList.add("hidden-screen");
-        });
-
-        const screen = get(id);
+        var screen = get(id);
 
         if (screen) {
-            screen.classList.remove("hidden-screen");
+            screen.classList.add("active");
+            currentScreen = id;
         }
     }
 
-    /* =========================
-       ÉTAT
-    ========================= */
-
-    let score = 0;
-    let shots = 0;
-    let combo = 0;
-    let bestCombo = 0;
-    let trainingMode = false;
-    let shooting = false;
-
-    const MAX_SHOTS = 10;
 
     /* =========================
-       STATS
+       SAUVEGARDE
     ========================= */
 
-    let totalGoals =
-        Number(localStorage.getItem("pm_goals")) || 0;
+    function saveData() {
 
-    let totalShots =
-        Number(localStorage.getItem("pm_shots")) || 0;
-
-    let totalSaves =
-        Number(localStorage.getItem("pm_saves")) || 0;
-
-    let globalBestCombo =
-        Number(localStorage.getItem("pm_best_combo")) || 0;
-
-    function saveStats() {
+        localStorage.setItem("pm_xp", xp);
+        localStorage.setItem("pm_best_score", bestScore);
         localStorage.setItem("pm_goals", totalGoals);
-        localStorage.setItem("pm_shots", totalShots);
         localStorage.setItem("pm_saves", totalSaves);
-        localStorage.setItem("pm_best_combo", globalBestCombo);
+        localStorage.setItem("pm_shots", totalShots);
+        localStorage.setItem("pm_best_combo", bestCombo);
+        localStorage.setItem("pm_training_goals", trainingGoals);
+        localStorage.setItem("pm_training_shots", trainingShots);
     }
 
+
     /* =========================
-       XP
+       XP / NIVEAU
     ========================= */
 
-    let xp =
-        Number(localStorage.getItem("pm_xp")) || 0;
+    function getLevel() {
+        return Math.floor(xp / 500) + 1;
+    }
 
-    let level =
-        Number(localStorage.getItem("pm_level")) || 1;
+    function updateXP() {
 
-    function saveXP() {
-        localStorage.setItem("pm_xp", xp);
-        localStorage.setItem("pm_level", level);
+        var level = getLevel();
+        var currentXP = xp % 500;
+        var percent = (currentXP / 500) * 100;
+
+        if (get("menuLevel")) {
+            get("menuLevel").textContent = level;
+        }
+
+        if (get("menuXP")) {
+            get("menuXP").textContent = currentXP;
+        }
+
+        if (get("menuXPNeeded")) {
+            get("menuXPNeeded").textContent = "500";
+        }
+
+        if (get("menuXPFill")) {
+            get("menuXPFill").style.width = percent + "%";
+        }
     }
 
     function addXP(amount) {
         xp += amount;
-
-        const needed = level * 500;
-
-        if (xp >= needed) {
-            xp -= needed;
-            level++;
-
-            playSound("level");
-        }
-
-        saveXP();
+        saveData();
         updateXP();
     }
 
-    function updateXP() {
-        const levelElements = [
-            get("levelText"),
-            get("menuLevel"),
-            get("levelValue")
-        ];
-
-        levelElements.forEach(function (element) {
-            if (element) {
-                element.textContent = "Niveau " + level;
-            }
-        });
-
-        const xpElements = [
-            get("xpText"),
-            get("menuXP"),
-            get("xpValue")
-        ];
-
-        xpElements.forEach(function (element) {
-            if (element) {
-                element.textContent = xp + " XP";
-            }
-        });
-
-        const bars = [
-            get("xpBar"),
-            get("xpProgress")
-        ];
-
-        bars.forEach(function (bar) {
-            if (bar) {
-                const percentage =
-                    Math.min(
-                        100,
-                        (xp / (level * 500)) * 100
-                    );
-
-                bar.style.width =
-                    percentage + "%";
-            }
-        });
-    }
-
-    /* =========================
-       AUDIO
-    ========================= */
-
-    let audioContext = null;
-
-    let audioEnabled =
-        localStorage.getItem("pm_audio") !== "off";
-
-    function startAudio() {
-        if (!audioEnabled) {
-            return;
-        }
-
-        if (!audioContext) {
-            const AudioContext =
-                window.AudioContext ||
-                window.webkitAudioContext;
-
-            if (AudioContext) {
-                audioContext =
-                    new AudioContext();
-            }
-        }
-
-        if (
-            audioContext &&
-            audioContext.state === "suspended"
-        ) {
-            audioContext.resume();
-        }
-    }
-
-    function tone(frequency, duration) {
-        if (!audioEnabled || !audioContext) {
-            return;
-        }
-
-        try {
-            const oscillator =
-                audioContext.createOscillator();
-
-            const gain =
-                audioContext.createGain();
-
-            oscillator.frequency.value =
-                frequency;
-
-            oscillator.type = "sine";
-
-            gain.gain.value = 0.06;
-
-            oscillator.connect(gain);
-            gain.connect(audioContext.destination);
-
-            oscillator.start();
-
-            oscillator.stop(
-                audioContext.currentTime +
-                duration
-            );
-        } catch (error) {
-            console.log("Audio indisponible");
-        }
-    }
-
-    function playSound(type) {
-        startAudio();
-
-        if (type === "goal") {
-            tone(500, 0.12);
-
-            setTimeout(function () {
-                tone(700, 0.15);
-            }, 100);
-        }
-
-        if (type === "save") {
-            tone(160, 0.2);
-        }
-
-        if (type === "kick") {
-            tone(100, 0.08);
-        }
-
-        if (type === "level") {
-            tone(500, 0.1);
-
-            setTimeout(function () {
-                tone(700, 0.1);
-            }, 100);
-
-            setTimeout(function () {
-                tone(900, 0.15);
-            }, 200);
-        }
-    }
-
-    /* =========================
-       ELEMENTS DU JEU
-    ========================= */
-
-    const goal = get("goal");
-    const ball = get("ball");
-    const keeper = get("keeper");
-
-    /* =========================
-       AFFICHAGE JEU
-    ========================= */
-
-    function updateGame() {
-        if (get("scoreText")) {
-            get("scoreText").textContent =
-                score;
-        }
-
-        if (get("shotText")) {
-            get("shotText").textContent =
-                shots + "/" + MAX_SHOTS;
-        }
-
-        if (get("comboText")) {
-            get("comboText").textContent =
-                "Combo : " + combo;
-        }
-    }
-
-    /* =========================
-       RESET
-    ========================= */
-
-    function resetGame(training) {
-        score = 0;
-        shots = 0;
-        combo = 0;
-        bestCombo = 0;
-        shooting = false;
-        trainingMode = !!training;
-
-        hideResult();
-
-        resetBall();
-        resetKeeper();
-
-        updateGame();
-
-        if (trainingMode) {
-            show("trainingScreen");
-        } else {
-            show("gameScreen");
-        }
-    }
-
-    function resetBall() {
-        if (!ball) {
-            return;
-        }
-
-        ball.style.transform =
-            "translate(-50%, 0)";
-
-        ball.classList.remove(
-            "shooting",
-            "goal",
-            "miss"
-        );
-    }
-
-    function resetKeeper() {
-        if (!keeper) {
-            return;
-        }
-
-        keeper.style.transform =
-            "translateX(-50%)";
-
-        keeper.classList.remove(
-            "dive",
-            "save"
-        );
-    }
-
-    /* =========================
-       TIR
-    ========================= */
-
-    function shoot(direction) {
-        if (shooting) {
-            return;
-        }
-
-        if (shots >= MAX_SHOTS) {
-            finishGame();
-            return;
-        }
-
-        shooting = true;
-
-        startAudio();
-        playSound("kick");
-
-        shots++;
-        totalShots++;
-
-        let keeperDirection =
-            Math.floor(Math.random() * 3);
-
-        const keeperNames = [
-            "left",
-            "center",
-            "right"
-        ];
-
-        keeperDirection =
-            keeperNames[keeperDirection];
-
-        let chance = 0.72;
-
-        if (
-            direction === keeperDirection
-        ) {
-            chance = 0.30;
-        }
-
-        const scored =
-            Math.random() < chance;
-
-        animateShot(
-            direction,
-            keeperDirection,
-            scored
-        );
-    }
-
-    function animateShot(
-        direction,
-        keeperDirection,
-        scored
-    ) {
-        if (ball) {
-            let x = "-50%";
-
-            if (direction === "left") {
-                x = "-120%";
-            }
-
-            if (direction === "right") {
-                x = "20%";
-            }
-
-            ball.style.transform =
-                "translate(" +
-                x +
-                ", -300px)";
-        }
-
-        if (keeper) {
-            let x = "-50%";
-
-            if (keeperDirection === "left") {
-                x = "-140%";
-            }
-
-            if (keeperDirection === "right") {
-                x = "40%";
-            }
-
-            keeper.style.transform =
-                "translateX(" +
-                x +
-                ")";
-        }
-
-        setTimeout(function () {
-            if (scored) {
-                goalScored();
-            } else {
-                goalSaved();
-            }
-        }, 600);
-    }
-
-    /* =========================
-       BUT
-    ========================= */
-
-    function goalScored() {
-        const points =
-            100 + combo * 25;
-
-        score += points;
-
-        combo++;
-
-        bestCombo =
-            Math.max(
-                bestCombo,
-                combo
-            );
-
-        totalGoals++;
-
-        globalBestCombo =
-            Math.max(
-                globalBestCombo,
-                combo
-            );
-
-        addXP(50);
-
-        playSound("goal");
-
-        if (ball) {
-            ball.classList.add("goal");
-        }
-
-        updateGame();
-
-        showResult(
-            "⚽ BUT !",
-            "+" + points + " points"
-        );
-
-        saveStats();
-
-        setTimeout(function () {
-            nextShot();
-        }, 900);
-    }
-
-    /* =========================
-       ARRÊT
-    ========================= */
-
-    function goalSaved() {
-        combo = 0;
-
-        totalSaves++;
-
-        playSound("save");
-
-        if (ball) {
-            ball.classList.add("miss");
-        }
-
-        if (keeper) {
-            keeper.classList.add("dive");
-        }
-
-        updateGame();
-
-        showResult(
-            "🧤 ARRÊT !",
-            "Le gardien a arrêté ton tir."
-        );
-
-        saveStats();
-
-        setTimeout(function () {
-            nextShot();
-        }, 900);
-    }
-
-    /* =========================
-       TIR SUIVANT
-    ========================= */
-
-    function nextShot() {
-        hideResult();
-
-        resetBall();
-        resetKeeper();
-
-        shooting = false;
-
-        if (shots >= MAX_SHOTS) {
-            finishGame();
-            return;
-        }
-
-        updateGame();
-    }
-
-    /* =========================
-       FIN
-    ========================= */
-
-    function finishGame() {
-        shooting = true;
-
-        saveStats();
-
-        addXP(
-            Math.max(
-                50,
-                score
-            )
-        );
-
-        showResult(
-            "🏆 MATCH TERMINÉ",
-            "Score final : " + score
-        );
-    }
-
-    /* =========================
-       RESULTAT
-    ========================= */
-
-    function showResult(title, message) {
-        const result = get("result");
-
-        if (!result) {
-            return;
-        }
-
-        if (get("resultTitle")) {
-            get("resultTitle").textContent =
-                title;
-        }
-
-        if (get("resultText")) {
-            get("resultText").textContent =
-                message;
-        }
-
-        result.classList.remove("hidden");
-    }
-
-    function hideResult() {
-        const result = get("result");
-
-        if (result) {
-            result.classList.add("hidden");
-        }
-    }
-
-    /* =========================
-       CLIC SUR LE BUT
-    ========================= */
-
-    if (goal) {
-        goal.addEventListener(
-            "pointerdown",
-            function (event) {
-                event.preventDefault();
-
-                const rectangle =
-                    goal.getBoundingClientRect();
-
-                const position =
-                    (
-                        event.clientX -
-                        rectangle.left
-                    ) / rectangle.width;
-
-                let direction =
-                    "center";
-
-                if (position < 0.33) {
-                    direction = "left";
-                }
-
-                if (position > 0.66) {
-                    direction = "right";
-                }
-
-                shoot(direction);
-            }
-        );
-    }
 
     /* =========================
        MENU
     ========================= */
 
-    onClick(
-        "playButton",
-        function () {
-            resetGame(false);
-        }
-    );
+    function updateMenu() {
 
-    onClick(
-        "trainingButton",
-        function () {
-            resetGame(true);
-        }
-    );
+        updateXP();
 
-    onClick(
-        "dailyButton",
-        function () {
-            renderDaily();
-            show("dailyScreen");
+        if (get("menuBestScore")) {
+            get("menuBestScore").textContent = bestScore;
         }
-    );
+    }
 
-    onClick(
-        "statsButton",
-        function () {
-            updateStats();
-            show("statsScreen");
-        }
-    );
-
-    onClick(
-        "settingsButton",
-        function () {
-            show("settingsScreen");
-        }
-    );
 
     /* =========================
-       RETOUR MENU
+       JEU
     ========================= */
 
-    document
-        .querySelectorAll(
-            "[data-back-menu]"
-        )
-        .forEach(function (button) {
-            button.addEventListener(
-                "click",
-                function () {
-                    hideResult();
-                    show("menuScreen");
+    function startGame(training) {
+
+        trainingMode = training;
+        gameFinished = false;
+
+        score = 0;
+        shots = 0;
+        combo = 0;
+
+        if (get("gameSubtitle")) {
+
+            if (trainingMode) {
+                get("gameSubtitle").textContent =
+                    "Entraînement : tirs illimités";
+            } else {
+                get("gameSubtitle").textContent =
+                    "10 tirs pour faire le meilleur score";
+            }
+        }
+
+        if (get("result")) {
+            get("result").classList.remove("active");
+        }
+
+        updateGameDisplay();
+        resetField();
+
+        showScreen("gameScreen");
+    }
+
+
+    function updateGameDisplay() {
+
+        if (get("shotNumber")) {
+            get("shotNumber").textContent =
+                trainingMode ? shots + 1 : Math.min(shots + 1, 10);
+        }
+
+        if (get("score")) {
+            get("score").textContent = score;
+        }
+
+        if (get("combo")) {
+            get("combo").textContent = combo;
+        }
+    }
+
+
+    function resetField() {
+
+        if (get("ball")) {
+            get("ball").style.left = "50%";
+            get("ball").style.bottom = "25px";
+        }
+
+        if (get("keeper")) {
+            get("keeper").style.left = "50%";
+        }
+
+        if (get("message")) {
+            get("message").textContent =
+                "Vise la cage pour tirer ⚽";
+        }
+    }
+
+
+    /* =========================
+       TIR
+    ========================= */
+
+    function shoot(event) {
+
+        if (gameFinished) {
+            return;
+        }
+
+        if (event && event.target) {
+
+            if (
+                event.target.closest("button") ||
+                event.target.closest(".result-card")
+            ) {
+                return;
+            }
+        }
+
+        var goal = get("goal");
+
+        if (!goal) {
+            return;
+        }
+
+        var rect = goal.getBoundingClientRect();
+
+        var clickX = event
+            ? event.clientX - rect.left
+            : rect.width / 2;
+
+        var clickY = event
+            ? event.clientY - rect.top
+            : rect.height / 2;
+
+        var percentX =
+            (clickX / rect.width) * 100;
+
+        var percentY =
+            (clickY / rect.height) * 100;
+
+        if (percentX < 0) {
+            percentX = 0;
+        }
+
+        if (percentX > 100) {
+            percentX = 100;
+        }
+
+        if (percentY < 0) {
+            percentY = 0;
+        }
+
+        if (percentY > 100) {
+            percentY = 100;
+        }
+
+        shots++;
+        totalShots++;
+
+        var keeperPositions = [
+            20,
+            50,
+            80
+        ];
+
+        var keeperPosition =
+            keeperPositions[
+                Math.floor(
+                    Math.random() * keeperPositions.length
+                )
+            ];
+
+        var distance =
+            Math.abs(percentX - keeperPosition);
+
+        var isGoal = distance > 16;
+
+        if (get("ball")) {
+
+            get("ball").style.left =
+                percentX + "%";
+
+            get("ball").style.bottom =
+                "55%";
+        }
+
+        if (get("keeper")) {
+
+            get("keeper").style.left =
+                keeperPosition + "%";
+        }
+
+        if (get("message")) {
+            get("message").textContent =
+                "Tir en cours...";
+        }
+
+        setTimeout(function () {
+
+            if (isGoal) {
+
+                var points = 100 + combo * 25;
+
+                score += points;
+                combo++;
+
+                totalGoals++;
+
+                if (combo > bestCombo) {
+                    bestCombo = combo;
                 }
-            );
-        });
 
-    onClick(
-        "backButton",
-        function () {
-            hideResult();
-            show("menuScreen");
-        }
-    );
+                addXP(25);
 
-    onClick(
-        "backMenuButton",
-        function () {
-            hideResult();
-            show("menuScreen");
-        }
-    );
+                if (get("message")) {
+                    get("message").textContent =
+                        "BUT ! +" + points + " points ⚽";
+                }
+
+                showResult(
+                    "BUT ! ⚽",
+                    "+" + points + " points"
+                );
+
+            } else {
+
+                combo = 0;
+                totalSaves++;
+
+                if (get("message")) {
+                    get("message").textContent =
+                        "ARRÊT ! 🧤";
+                }
+
+                showResult(
+                    "ARRÊT ! 🧤",
+                    "Le gardien a arrêté ton tir."
+                );
+            }
+
+            saveData();
+            updateGameDisplay();
+
+            if (!trainingMode && shots >= 10) {
+
+                setTimeout(function () {
+                    finishGame();
+                }, 900);
+            }
+
+        }, 500);
+    }
+
 
     /* =========================
-       RESTART
+       RESULTAT
     ========================= */
 
-    onClick(
-        "restartButton",
-        function () {
-            resetGame(trainingMode);
-        }
-    );
+    function showResult(title, text) {
 
-    onClick(
-        "nextButton",
-        function () {
-            nextShot();
-        }
-    );
-
-    /* =========================
-       SON
-    ========================= */
-
-    function updateSoundButton() {
-        const text =
-            audioEnabled
-                ? "🔊 Son : ON"
-                : "🔇 Son : OFF";
-
-        if (get("soundButton")) {
-            get("soundButton").textContent =
-                text;
+        if (get("resultTitle")) {
+            get("resultTitle").textContent = title;
         }
 
-        if (get("audioButton")) {
-            get("audioButton").textContent =
-                text;
+        if (get("finalScore")) {
+            get("finalScore").textContent = score;
+        }
+
+        if (get("bestScore")) {
+            get("bestScore").textContent =
+                Math.max(bestScore, score);
+        }
+
+        if (get("result")) {
+            get("result").classList.add("active");
         }
     }
 
-    function toggleAudio() {
-        audioEnabled =
-            !audioEnabled;
 
-        localStorage.setItem(
-            "pm_audio",
-            audioEnabled
-                ? "on"
-                : "off"
-        );
+    function hideResult() {
 
-        if (audioEnabled) {
-            startAudio();
+        if (get("result")) {
+            get("result").classList.remove("active");
         }
 
-        updateSoundButton();
+        resetField();
     }
 
-    onClick(
-        "soundButton",
-        toggleAudio
-    );
 
-    onClick(
-        "audioButton",
-        toggleAudio
-    );
+    function finishGame() {
+
+        gameFinished = true;
+
+        if (score > bestScore) {
+            bestScore = score;
+        }
+
+        saveData();
+
+        if (get("finalScore")) {
+            get("finalScore").textContent = score;
+        }
+
+        if (get("bestScore")) {
+            get("bestScore").textContent = bestScore;
+        }
+
+        if (get("resultTitle")) {
+            get("resultTitle").textContent =
+                "Fin de la partie !";
+        }
+
+        if (get("result")) {
+            get("result").classList.add("active");
+        }
+
+        updateMenu();
+    }
+
 
     /* =========================
        STATS
     ========================= */
 
     function updateStats() {
-        const values = {
-            statsGoals: totalGoals,
-            statsSaves: totalSaves,
-            statsShots: totalShots,
-            statsBestCombo: globalBestCombo
-        };
 
-        Object.keys(values).forEach(
-            function (id) {
-                const element = get(id);
+        if (get("statBestScore")) {
+            get("statBestScore").textContent =
+                bestScore;
+        }
 
-                if (element) {
-                    element.textContent =
-                        values[id];
-                }
-            }
-        );
+        if (get("statGoals")) {
+            get("statGoals").textContent =
+                totalGoals;
+        }
 
-        const accuracy =
-            totalShots > 0
-                ? Math.round(
-                    totalGoals /
-                    totalShots *
-                    100
-                )
-                : 0;
+        if (get("statSaves")) {
+            get("statSaves").textContent =
+                totalSaves;
+        }
 
-        if (get("statsAccuracy")) {
-            get("statsAccuracy")
-                .textContent =
+        if (get("statCombo")) {
+            get("statCombo").textContent =
+                bestCombo;
+        }
+
+        if (get("statShots")) {
+            get("statShots").textContent =
+                totalShots;
+        }
+
+        var accuracy = 0;
+
+        if (totalShots > 0) {
+            accuracy =
+                Math.round(
+                    (totalGoals / totalShots) * 100
+                );
+        }
+
+        if (get("statAccuracy")) {
+            get("statAccuracy").textContent =
                 accuracy + "%";
+        }
+
+        if (get("trainingGoals")) {
+            get("trainingGoals").textContent =
+                trainingGoals;
+        }
+
+        if (get("trainingShots")) {
+            get("trainingShots").textContent =
+                trainingShots;
         }
     }
 
+
     /* =========================
-       DÉFIS
+       DEFIS
     ========================= */
 
-    function renderDaily() {
-        const container =
-            get("dailyChallenges");
+    function updateDailyChallenges() {
 
-        if (!container) {
+        var list = get("dailyChallengesList");
+
+        if (!list) {
             return;
         }
 
-        const challenges = [
-            {
-                title: "⚽ Buteur",
-                text: "Marque 5 buts",
-                progress: totalGoals,
-                target: 5
-            },
-            {
-                title: "🎯 Tireur",
-                text: "Tire 10 penalties",
-                progress: totalShots,
-                target: 10
-            },
-            {
-                title: "🔥 Combo",
-                text: "Atteins un combo de 4",
-                progress: globalBestCombo,
-                target: 4
-            }
-        ];
+        var goalsDone =
+            Math.min(totalGoals, 3);
 
-        container.innerHTML = "";
+        var shotsDone =
+            Math.min(totalShots, 5);
 
-        challenges.forEach(
-            function (challenge) {
-                const card =
-                    document.createElement(
-                        "div"
-                    );
+        var comboDone =
+            Math.min(bestCombo, 3);
 
-                card.className =
-                    "daily-card";
+        var completed = 0;
 
-                const progress =
-                    Math.min(
-                        challenge.progress,
-                        challenge.target
-                    );
+        if (goalsDone >= 3) {
+            completed++;
+        }
 
-                card.innerHTML = `
-                    <div>
-                        <h3>${challenge.title}</h3>
-                        <p>${challenge.text}</p>
-                    </div>
+        if (shotsDone >= 5) {
+            completed++;
+        }
 
-                    <div>
-                        <strong>
-                            ${progress}/${challenge.target}
-                        </strong>
-                        <span>
-                            +100 XP
-                        </span>
-                    </div>
-                `;
+        if (comboDone >= 3) {
+            completed++;
+        }
 
-                if (
-                    progress >=
-                    challenge.target
-                ) {
-                    card.classList.add(
-                        "completed"
-                    );
-                }
+        if (get("dailyCompletedCount")) {
+            get("dailyCompletedCount").textContent =
+                completed + "/3";
+        }
 
-                container.appendChild(card);
+        list.innerHTML =
+            '<div class="challenge">' +
+                '<strong>⚽ Marquer 3 buts</strong>' +
+                '<br>' +
+                '<span>' +
+                goalsDone +
+                '/3' +
+                '</span>' +
+            '</div>' +
+
+            '<div class="challenge">' +
+                '<strong>🎯 Faire 5 tirs</strong>' +
+                '<br>' +
+                '<span>' +
+                shotsDone +
+                '/5' +
+                '</span>' +
+            '</div>' +
+
+            '<div class="challenge">' +
+                '<strong>🔥 Faire un combo de 3</strong>' +
+                '<br>' +
+                '<span>' +
+                comboDone +
+                '/3' +
+                '</span>' +
+            '</div>';
+    }
+
+
+    /* =========================
+       BOUTONS MENU
+    ========================= */
+
+    get("playButton").addEventListener(
+        "click",
+        function () {
+            startGame(false);
+        }
+    );
+
+    get("trainingButton").addEventListener(
+        "click",
+        function () {
+            showScreen("trainingScreen");
+            updateStats();
+        }
+    );
+
+    get("dailyButton").addEventListener(
+        "click",
+        function () {
+            updateDailyChallenges();
+            showScreen("dailyScreen");
+        }
+    );
+
+    get("statsButton").addEventListener(
+        "click",
+        function () {
+            updateStats();
+            showScreen("statsScreen");
+        }
+    );
+
+    get("settingsButton").addEventListener(
+        "click",
+        function () {
+            showScreen("settingsScreen");
+        }
+    );
+
+
+    /* =========================
+       ENTRAINEMENT
+    ========================= */
+
+    get("startTrainingButton").addEventListener(
+        "click",
+        function () {
+            startGame(true);
+        }
+    );
+
+
+    /* =========================
+       RETOUR MENU
+    ========================= */
+
+    var backButtons =
+        document.querySelectorAll("[data-back-menu]");
+
+    for (var i = 0; i < backButtons.length; i++) {
+
+        backButtons[i].addEventListener(
+            "click",
+            function () {
+                updateMenu();
+                showScreen("mainMenu");
             }
         );
     }
 
-    /* =========================
-       RESET PROGRESSION
-    ========================= */
 
-    onClick(
-        "resetButton",
+    get("backToMenuButton").addEventListener(
+        "click",
         function () {
-            const confirmation =
-                window.confirm(
-                    "Veux-tu vraiment supprimer toute ta progression ?"
-                );
-
-            if (!confirmation) {
-                return;
-            }
-
-            localStorage.removeItem(
-                "pm_goals"
-            );
-
-            localStorage.removeItem(
-                "pm_shots"
-            );
-
-            localStorage.removeItem(
-                "pm_saves"
-            );
-
-            localStorage.removeItem(
-                "pm_best_combo"
-            );
-
-            localStorage.removeItem(
-                "pm_xp"
-            );
-
-            localStorage.removeItem(
-                "pm_level"
-            );
-
-            totalGoals = 0;
-            totalShots = 0;
-            totalSaves = 0;
-            globalBestCombo = 0;
-            xp = 0;
-            level = 1;
-
-            updateXP();
-            updateStats();
-            renderDaily();
-
-            show("menuScreen");
+            hideResult();
+            showScreen("mainMenu");
+            updateMenu();
         }
     );
 
+
+    get("resultMenuButton").addEventListener(
+        "click",
+        function () {
+            hideResult();
+            showScreen("mainMenu");
+            updateMenu();
+        }
+    );
+
+
     /* =========================
-       CLAVIER
+       REJOUER
     ========================= */
 
-    document.addEventListener(
-        "keydown",
+    get("restartButton").addEventListener(
+        "click",
+        function () {
+            hideResult();
+            startGame(trainingMode);
+        }
+    );
+
+
+    /* =========================
+       CLIC TERRAIN
+    ========================= */
+
+    get("goal").addEventListener(
+        "click",
         function (event) {
-            if (shooting) {
-                return;
-            }
-
-            if (event.key === "ArrowLeft") {
-                shoot("left");
-            }
-
-            if (event.key === "ArrowUp") {
-                shoot("center");
-            }
-
-            if (event.key === "ArrowRight") {
-                shoot("right");
-            }
+            shoot(event);
         }
     );
 
+
     /* =========================
-       DÉMARRAGE
+       SON
     ========================= */
 
-    updateXP();
-    updateStats();
-    renderDaily();
-    updateSoundButton();
-    updateGame();
+    function updateSoundButton() {
 
-    show("menuScreen");
+        var text =
+            soundEnabled
+                ? "🔊 Son : activé"
+                : "🔇 Son : désactivé";
 
-    console.log(
-        "PenaltyMind : jeu prêt"
+        if (get("settingsSoundButton")) {
+            get("settingsSoundButton").textContent =
+                text;
+        }
+
+        if (get("soundButton")) {
+            get("soundButton").textContent =
+                soundEnabled ? "🔊" : "🔇";
+        }
+    }
+
+
+    get("soundButton").addEventListener(
+        "click",
+        function () {
+
+            soundEnabled = !soundEnabled;
+
+            localStorage.setItem(
+                "pm_sound",
+                soundEnabled ? "on" : "off"
+            );
+
+            updateSoundButton();
+        }
     );
+
+
+    get("settingsSoundButton").addEventListener(
+        "click",
+        function () {
+
+            soundEnabled = !soundEnabled;
+
+            localStorage.setItem(
+                "pm_sound",
+                soundEnabled ? "on" : "off"
+            );
+
+            updateSoundButton();
+        }
+    );
+
+
+    /* =========================
+       RESET
+    ========================= */
+
+    get("resetStatsButton").addEventListener(
+        "click",
+        function () {
+
+            localStorage.removeItem("pm_xp");
+            localStorage.removeItem("pm_best_score");
+            localStorage.removeItem("pm_goals");
+            localStorage.removeItem("pm_saves");
+            localStorage.removeItem("pm_shots");
+            localStorage.removeItem("pm_best_combo");
+            localStorage.removeItem("pm_training_goals");
+            localStorage.removeItem("pm_training_shots");
+
+            xp = 0;
+            bestScore = 0;
+            totalGoals = 0;
+            totalSaves = 0;
+            totalShots = 0;
+            bestCombo = 0;
+            trainingGoals = 0;
+            trainingShots = 0;
+
+            updateMenu();
+            updateStats();
+            updateDailyChallenges();
+
+            alert("Données réinitialisées !");
+        }
+    );
+
+
+    /* =========================
+       INITIALISATION
+    ========================= */
+
+    updateMenu();
+    updateStats();
+    updateDailyChallenges();
+    updateSoundButton();
+
+    showScreen("mainMenu");
+
 });
