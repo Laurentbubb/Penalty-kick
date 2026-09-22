@@ -5,8 +5,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("⚽ PenaltyMind JS chargé");
-
     /* =====================================================
        OUTILS
        ===================================================== */
