@@ -3,48 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#07111f">
   <title>PenaltyMind</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<main class="game">
-
   <!-- ================= MENU ================= -->
 
   <section id="mainMenu" class="screen menu-screen">
 
-    <div class="menu-logo">
-      <div class="logo-ball">⚽</div>
-      <h1>Penalty<span>Mind</span></h1>
-      <p>Le penalty est dans ta tête.</p>
-    </div>
+    <div class="menu-background"></div>
 
-    <div class="menu-buttons">
+    <div class="menu-content">
 
-      <button id="playButton" class="main-button primary-button">
-        ⚽ Jouer
-      </button>
+      <div class="logo">
+        <span>⚽</span>
+        <h1>PenaltyMind</h1>
+        <p>Le mental fait la différence.</p>
+      </div>
 
-      <button id="trainingButton" class="main-button">
-        🎯 Entraînement
-      </button>
+      <div class="menu-progress">
 
-      <button id="statsButton" class="main-button">
-        📊 Statistiques
-      </button>
+        <div class="level-line">
+          <span>Niveau <strong id="menuLevel">1</strong></span>
+          <span>
+            <strong id="menuXP">0</strong> /
+            <strong id="menuXPNeeded">500</strong> XP
+          </span>
+        </div>
 
-      <button id="settingsButton" class="main-button">
-        ⚙️ Paramètres
-      </button>
+        <div class="xp-bar">
+          <div id="menuXPFill"></div>
+        </div>
 
-    </div>
+      </div>
 
-    <div class="menu-best">
-      🏆 Meilleur score :
-      <strong id="menuBestScore">0</strong>
+      <div class="menu-buttons">
+
+        <button id="playButton" class="main-button">
+          ⚽ Jouer
+        </button>
+
+        <button id="trainingButton" class="main-button secondary-button">
+          🎯 Entraînement
+        </button>
+
+        <button id="dailyButton" class="main-button daily-button">
+          📅 Défis du jour
+        </button>
+
+        <button id="statsButton" class="main-button secondary-button">
+          📊 Statistiques
+        </button>
+
+        <button id="settingsButton" class="main-button secondary-button">
+          ⚙️ Paramètres
+        </button>
+
+      </div>
+
+      <div class="menu-best">
+        Meilleur score :
+        <strong id="menuBestScore">0</strong>
+      </div>
+
     </div>
 
   </section>
@@ -54,27 +77,17 @@
 
   <section id="gameScreen" class="screen hidden-screen">
 
-    <header class="topbar">
+    <div class="game-top">
 
-      <div class="topbar-left">
+      <button id="backToMenuButton" class="small-button">
+        ← Menu
+      </button>
 
-        <button id="backToMenuButton" class="small-button">
-          ← Menu
-        </button>
-
-        <h1>⚽ PenaltyMind</h1>
-
-        <p id="gameSubtitle" class="subtitle">
-          Vise la cage et trompe le gardien
-        </p>
-
-      </div>
-
-      <div class="stats">
+      <div class="game-stats">
 
         <div>
           <span>Tir</span>
-          <strong id="shotNumber">1</strong>
+          <strong id="shotNumber">1 / 10</strong>
         </div>
 
         <div>
@@ -89,158 +102,118 @@
 
       </div>
 
-    </header>
+      <button id="soundButton" class="sound-button">
+        🔊
+      </button>
+
+    </div>
+
+    <div class="game-title">
+
+      <h2>PenaltyMind</h2>
+
+      <p id="gameSubtitle">
+        Vise la cage et trompe le gardien
+      </p>
+
+    </div>
 
 
-    <section class="match">
+    <div class="stadium">
 
-      <div class="stadium">
+      <div class="crowd"></div>
 
-        <div class="sky"></div>
-        <div class="crowd"></div>
+      <div class="field">
 
-        <div class="field">
-          <div class="penalty-area"></div>
-          <div class="penalty-spot"></div>
-        </div>
-
-
-        <!-- CAGE -->
-
-        <div id="goal" class="goal">
+        <div class="goal" id="goal">
 
           <div class="net"></div>
 
           <div class="post post-left"></div>
           <div class="post post-right"></div>
-          <div class="crossbar"></div>
-
-
-          <!-- GARDIEN -->
-
-          <div id="keeper" class="keeper">
-
-            <div class="keeper-head"></div>
-            <div class="keeper-body"></div>
-
-            <div class="keeper-arm left"></div>
-            <div class="keeper-arm right"></div>
-
-            <div class="keeper-leg left"></div>
-            <div class="keeper-leg right"></div>
-
-          </div>
-
-
-          <!-- CIBLE -->
+          <div class="post post-top"></div>
 
           <div id="targetDot" class="target-dot"></div>
 
-
-          <!-- BALLON -->
-
-          <div id="ball" class="ball">⚽</div>
-
-        </div>
-
-
-        <!-- JOUEUR -->
-
-        <div class="player">
-
-          <div class="player-head"></div>
-          <div class="player-body"></div>
-
-          <div class="player-arm left"></div>
-          <div class="player-arm right"></div>
-
-          <div class="player-leg left"></div>
-          <div class="player-leg right"></div>
+          <div id="keeper" class="keeper">
+            🧤
+          </div>
 
         </div>
 
 
-        <div id="message" class="message">
-          Vise la cage pour tirer ⚽
+        <div id="ball" class="ball">
+          ⚽
+        </div>
+
+        <div id="player" class="player">
+          🧍
         </div>
 
       </div>
 
+    </div>
 
-      <!-- CONTROLES -->
 
-      <div class="controls">
+    <div class="power-container">
 
-        <div class="instructions">
-          <span>🎯 Vise la cage</span>
-          <span>⚽ Le tir part automatiquement</span>
-          <span>🧤 Évite le gardien</span>
+      <div class="power-label">
+        Puissance
+      </div>
+
+      <div class="power-bar">
+        <div class="power-background"></div>
+        <div id="needle" class="power-needle"></div>
+      </div>
+
+    </div>
+
+
+    <div id="message" class="message">
+      Vise la cage pour tirer ⚽
+    </div>
+
+
+    <div id="result" class="result hidden-result">
+
+      <div class="result-card">
+
+        <div class="result-icon">
+          🏆
         </div>
 
+        <h2 id="resultTitle">
+          Bien joué !
+        </h2>
 
-        <div class="power-panel">
+        <p>
+          Score final
+        </p>
 
-          <div class="power-labels">
-            <span>FAIBLE</span>
-            <span>PARFAIT</span>
-            <span>FORT</span>
-          </div>
+        <strong id="finalScore">
+          0
+        </strong>
 
-          <div class="power-bar">
+        <p>
+          Meilleur score :
+          <strong id="bestScore">0</strong>
+        </p>
 
-            <div class="power-zone red left-red"></div>
-            <div class="power-zone orange left-orange"></div>
-            <div class="power-zone green"></div>
-            <div class="power-zone orange right-orange"></div>
-            <div class="power-zone red right-red"></div>
+        <div class="result-buttons">
 
-            <div id="needle" class="needle"></div>
-
-          </div>
-
-        </div>
-
-
-        <button
-          id="soundButton"
-          class="sound-button"
-          type="button"
-        >
-          🔊 Son
-        </button>
-
-
-        <!-- RESULTAT -->
-
-        <div id="result" class="result hidden">
-
-          <h2 id="resultTitle">
-            🏁 Match terminé
-          </h2>
-
-          <p>
-            Score :
-            <strong id="finalScore">0</strong>
-          </p>
-
-          <p>
-            Meilleur score :
-            <strong id="bestScore">0</strong>
-          </p>
-
-          <button id="restartButton" class="restart-button">
-            Rejouer
+          <button id="restartButton" class="main-button">
+            🔄 Rejouer
           </button>
 
-          <button id="resultMenuButton" class="secondary-button">
-            ← Retour au menu
+          <button id="resultMenuButton" class="main-button secondary-button">
+            🏠 Menu
           </button>
 
         </div>
 
       </div>
 
-    </section>
+    </div>
 
   </section>
 
@@ -256,36 +229,75 @@
       </button>
 
       <div class="subscreen-title">
+
         <div>🎯</div>
+
         <h2>Entraînement</h2>
-        <p>Travaille ta précision sans limite de tirs.</p>
+
+        <p>
+          Travaille ta précision sans limite de tirs.
+        </p>
+
       </div>
 
-      <div class="training-info">
+      <div class="training-card">
 
-        <div class="info-card">
-          <strong>∞</strong>
-          <span>Tirs libres</span>
-        </div>
-
-        <div class="info-card">
-          <strong id="trainingGoals">0</strong>
+        <div>
           <span>Buts</span>
+          <strong id="trainingGoals">0</strong>
         </div>
 
-        <div class="info-card">
-          <strong id="trainingShots">0</strong>
+        <div>
           <span>Tirs</span>
+          <strong id="trainingShots">0</strong>
         </div>
 
       </div>
 
-      <button
-        id="startTrainingButton"
-        class="main-button primary-button"
-      >
+      <button id="startTrainingButton" class="main-button">
         🎯 Commencer
       </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= DEFIS ================= -->
+
+  <section id="dailyScreen" class="screen hidden-screen">
+
+    <div class="subscreen">
+
+      <button class="back-button" data-back-menu>
+        ← Retour au menu
+      </button>
+
+      <div class="subscreen-title">
+
+        <div>📅</div>
+
+        <h2>Défis du jour</h2>
+
+        <p>
+          3 objectifs à terminer aujourd'hui.
+        </p>
+
+      </div>
+
+      <div class="daily-summary">
+
+        <span>
+          Défis terminés
+        </span>
+
+        <strong id="dailyCompletedCount">
+          0 / 3
+        </strong>
+
+      </div>
+
+      <div id="dailyChallengesList" class="daily-challenges-list"></div>
 
     </div>
 
@@ -303,47 +315,47 @@
       </button>
 
       <div class="subscreen-title">
+
         <div>📊</div>
+
         <h2>Statistiques</h2>
-        <p>Découvre tes performances.</p>
+
+        <p>
+          Ton parcours sur PenaltyMind.
+        </p>
+
       </div>
 
-      <div class="statistics-grid">
+      <div class="stats-grid">
 
         <div class="stat-card">
-          <span>🏆</span>
+          <span>Meilleur score</span>
           <strong id="statBestScore">0</strong>
-          <small>Meilleur score</small>
         </div>
 
         <div class="stat-card">
-          <span>⚽</span>
+          <span>Buts</span>
           <strong id="statGoals">0</strong>
-          <small>Buts</small>
         </div>
 
         <div class="stat-card">
-          <span>🧤</span>
+          <span>Arrêts</span>
           <strong id="statSaves">0</strong>
-          <small>Arrêts subis</small>
         </div>
 
         <div class="stat-card">
-          <span>🔥</span>
+          <span>Meilleur combo</span>
           <strong id="statCombo">0</strong>
-          <small>Meilleur combo</small>
         </div>
 
         <div class="stat-card">
-          <span>🎯</span>
+          <span>Tirs</span>
           <strong id="statShots">0</strong>
-          <small>Tirs</small>
         </div>
 
         <div class="stat-card">
-          <span>📈</span>
+          <span>Précision</span>
           <strong id="statAccuracy">0%</strong>
-          <small>Précision</small>
         </div>
 
       </div>
@@ -364,48 +376,34 @@
       </button>
 
       <div class="subscreen-title">
+
         <div>⚙️</div>
+
         <h2>Paramètres</h2>
-        <p>Personnalise ton expérience.</p>
+
       </div>
 
-      <div class="settings-list">
+      <div class="settings-card">
 
         <div class="setting-row">
 
-          <div>
-            <strong>🔊 Sons</strong>
-            <small>Activer les effets sonores</small>
-          </div>
+          <span>🔊 Sons</span>
 
-          <button
-            id="settingsSoundButton"
-            class="toggle-button"
-          >
-            ON
+          <button id="settingsSoundButton" class="setting-button">
+            Activés
           </button>
 
         </div>
 
-
         <div class="setting-row">
 
-          <div>
-            <strong>💾 Sauvegarde</strong>
-            <small>
-              Tes statistiques sont sauvegardées sur cet appareil.
-            </small>
-          </div>
+          <span>🗑️ Réinitialiser les statistiques</span>
+
+          <button id="resetStatsButton" class="setting-button danger-button">
+            Réinitialiser
+          </button>
 
         </div>
-
-
-        <button
-          id="resetStatsButton"
-          class="danger-button"
-        >
-          🗑️ Réinitialiser les statistiques
-        </button>
 
       </div>
 
@@ -413,9 +411,8 @@
 
   </section>
 
-</main>
 
-<script src="game.js"></script>
+  <script src="game.js"></script>
 
 </body>
 </html>
