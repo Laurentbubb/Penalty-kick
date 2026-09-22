@@ -1,6 +1,7 @@
-/* =====================================================
+/* =========================================================
    PENALTYMIND
-===================================================== */
+   Jeu + statistiques + entraînement + défis quotidiens + XP
+========================================================= */
 
 
 /* ================= ELEMENTS ================= */
@@ -8,16 +9,25 @@
 const mainMenu = document.getElementById("mainMenu");
 const gameScreen = document.getElementById("gameScreen");
 const trainingScreen = document.getElementById("trainingScreen");
+const dailyScreen = document.getElementById("dailyScreen");
 const statsScreen = document.getElementById("statsScreen");
 const settingsScreen = document.getElementById("settingsScreen");
+
+const playButton = document.getElementById("playButton");
+const trainingButton = document.getElementById("trainingButton");
+const dailyButton = document.getElementById("dailyButton");
+const statsButton = document.getElementById("statsButton");
+const settingsButton = document.getElementById("settingsButton");
+
+const backToMenuButton = document.getElementById("backToMenuButton");
 
 const goal = document.getElementById("goal");
 const keeper = document.getElementById("keeper");
 const ball = document.getElementById("ball");
+const player = document.getElementById("player");
 const targetDot = document.getElementById("targetDot");
-const message = document.getElementById("message");
-const player = document.querySelector(".player");
 
+const message = document.getElementById("message");
 const needle = document.getElementById("needle");
 
 const shotNumber = document.getElementById("shotNumber");
@@ -29,78 +39,97 @@ const resultTitle = document.getElementById("resultTitle");
 const finalScore = document.getElementById("finalScore");
 const bestScore = document.getElementById("bestScore");
 
+const restartButton = document.getElementById("restartButton");
+const resultMenuButton = document.getElementById("resultMenuButton");
+
 const soundButton = document.getElementById("soundButton");
-const settingsSoundButton =
-  document.getElementById("settingsSoundButton");
+const settingsSoundButton = document.getElementById("settingsSoundButton");
+const resetStatsButton = document.getElementById("resetStatsButton");
+
+const startTrainingButton = document.getElementById("startTrainingButton");
+
+const menuBestScore = document.getElementById("menuBestScore");
+
+const statBestScore = document.getElementById("statBestScore");
+const statGoals = document.getElementById("statGoals");
+const statSaves = document.getElementById("statSaves");
+const statCombo = document.getElementById("statCombo");
+const statShots = document.getElementById("statShots");
+const statAccuracy = document.getElementById("statAccuracy");
+
+const trainingGoalsElement = document.getElementById("trainingGoals");
+const trainingShotsElement = document.getElementById("trainingShots");
+
+const menuLevel = document.getElementById("menuLevel");
+const menuXP = document.getElementById("menuXP");
+const menuXPNeeded = document.getElementById("menuXPNeeded");
+const menuXPFill = document.getElementById("menuXPFill");
+
+const dailyChallengesList = document.getElementById("dailyChallengesList");
+const dailyCompletedCount = document.getElementById("dailyCompletedCount");
 
 
-/* ================= CONFIG ================= */
+/* ================= ECRANS ================= */
+
+const allScreens = [
+  mainMenu,
+  gameScreen,
+  trainingScreen,
+  dailyScreen,
+  statsScreen,
+  settingsScreen
+];
+
+function showScreen(screen) {
+
+  allScreens.forEach(currentScreen => {
+    currentScreen.classList.add("hidden-screen");
+  });
+
+  screen.classList.remove("hidden-screen");
+}
+
+
+/* ================= JEU ================= */
 
 const MAX_SHOTS = 10;
 
-
-/* ================= ETAT ================= */
-
 const state = {
-
   shot: 1,
   score: 0,
   combo: 0,
-
-  locked: false,
-
+  locked: true,
   aim: null,
-
   power: 0.5,
-
   training: false,
-
-  best:
-    Number(
-      localStorage.getItem("penaltyMindBest") || 0
-    )
-
+  best: Number(localStorage.getItem("penaltyMindBest") || 0)
 };
 
 
 /* ================= STATS ================= */
 
 const stats = {
+  goals: Number(localStorage.getItem("penaltyMindGoals") || 0),
+  saves: Number(localStorage.getItem("penaltyMindSaves") || 0),
+  shots: Number(localStorage.getItem("penaltyMindShots") || 0),
+  bestCombo: Number(localStorage.getItem("penaltyMindBestCombo") || 0),
 
-  goals:
-    Number(
-      localStorage.getItem("penaltyMindGoals") || 0
-    ),
+  trainingGoals: Number(
+    localStorage.getItem("penaltyMindTrainingGoals") || 0
+  ),
 
-  saves:
-    Number(
-      localStorage.getItem("penaltyMindSaves") || 0
-    ),
-
-  shots:
-    Number(
-      localStorage.getItem("penaltyMindShots") || 0
-    ),
-
-  bestCombo:
-    Number(
-      localStorage.getItem("penaltyMindBestCombo") || 0
-    ),
-
-  trainingGoals:
-    Number(
-      localStorage.getItem("penaltyMindTrainingGoals") || 0
-    ),
-
-  trainingShots:
-    Number(
-      localStorage.getItem("penaltyMindTrainingShots") || 0
-    )
-
+  trainingShots: Number(
+    localStorage.getItem("penaltyMindTrainingShots") || 0
+  )
 };
 
 
 function saveStats() {
+
+  localStorage.setItem(
+    "penaltyMindBest",
+    state.best
+  );
 
   localStorage.setItem(
     "penaltyMindGoals",
@@ -130,43 +159,681 @@ function saveStats() {
   localStorage.setItem(
     "penaltyMindTrainingShots",
     stats.trainingShots
-  );
-
 }
 
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+/* =========================================================
+   XP / NIVEAUX
+========================================================= */
 
-const allScreens = [
-  mainMenu,
-  gameScreen,
-  trainingScreen,
-  statsScreen,
-  settingsScreen
+let progression = {
+  xp: Number(localStorage.getItem("penaltyMindXP") || 0),
+  level: Number(localStorage.getItem("penaltyMindLevel") || 1)
+};
+
+
+function xpNeeded(level) {
+  return level * 500;
+}
+
+
+function saveProgression() {
+
+  localStorage.setItem(
+    "penaltyMindXP",
+    progression.xp
+  );
+
+  localStorage.setItem(
+    "penaltyMindLevel",
+    progression.level
+  );
+}
+
+
+function addXP(amount) {
+
+  let leveledUp = false;
+
+  progression.xp += amount;
+
+  while (progression.xp >= xpNeeded(progression.level)) {
+
+    progression.xp -= xpNeeded(progression.level);
+
+    progression.level++;
+
+    leveledUp = true;
+  }
+
+  saveProgression();
+  updateProgressionUI();
+
+  if (leveledUp) {
+    playLevelUpSound();
+
+    if (!state.locked && !state.training) {
+      message.textContent =
+        `🆙 Niveau ${progression.level} atteint !`;
+
+      message.className = "message goal-message";
+    }
+  }
+}
+
+
+function updateProgressionUI() {
+
+  const needed = xpNeeded(progression.level);
+
+  menuLevel.textContent = progression.level;
+  menuXP.textContent = progression.xp;
+  menuXPNeeded.textContent = needed;
+
+  const percentage =
+    Math.min(100, (progression.xp / needed) * 100);
+
+  menuXPFill.style.width = `${percentage}%`;
+}
+
+
+/* =========================================================
+   DATE / DEFIS QUOTIDIENS
+========================================================= */
+
+function getTodayKey() {
+
+  const now = new Date();
+
+  return `${now.getFullYear()}-${String(
+    now.getMonth() + 1
+  ).padStart(2, "0")}-${String(
+    now.getDate()
+  ).padStart(2, "0")}`;
+}
+
+
+function hashDate(dateString) {
+
+  let hash = 0;
+
+  for (let i = 0; i < dateString.length; i++) {
+
+    hash =
+      (hash * 31 + dateString.charCodeAt(i)) >>> 0;
+  }
+
+  return hash;
+}
+
+
+function seededRandom(seed) {
+
+  return () => {
+
+    seed =
+      (seed * 1664525 + 1013904223) >>> 0;
+
+    return seed / 4294967296;
+  };
+}
+
+
+function shuffleWithSeed(array, seed) {
+
+  const random = seededRandom(seed);
+  const result = [...array];
+
+  for (let i = result.length - 1; i > 0; i--) {
+
+    const j = Math.floor(random() * (i + 1));
+
+    [result[i], result[j]] =
+      [result[j], result[i]];
+  }
+
+  return result;
+}
+
+
+/* ================= POOL DE DEFIS ================= */
+
+const DAILY_CHALLENGE_POOL = [
+
+  {
+    id: "goals5",
+    icon: "⚽",
+    title: "Buteur",
+    text: "Marque 5 buts",
+    type: "goals",
+    target: 5,
+    xp: 100
+  },
+
+  {
+    id: "goals10",
+    icon: "🥅",
+    title: "Finisseur",
+    text: "Marque 10 buts",
+    type: "goals",
+    target: 10,
+    xp: 180
+  },
+
+  {
+    id: "shots15",
+    icon: "🎯",
+    title: "Tireur",
+    text: "Effectue 15 tirs",
+    type: "shots",
+    target: 15,
+    xp: 100
+  },
+
+  {
+    id: "score1000",
+    icon: "🏆",
+    title: "Gros score",
+    text: "Atteins 1 000 points",
+    type: "score",
+    target: 1000,
+    xp: 150
+  },
+
+  {
+    id: "combo4",
+    icon: "🔥",
+    title: "En feu",
+    text: "Atteins un combo de 4",
+    type: "bestCombo",
+    target: 4,
+    xp: 150
+  },
+
+  {
+    id: "combo6",
+    icon: "💥",
+    title: "Imparable",
+    text: "Atteins un combo de 6",
+    type: "bestCombo",
+    target: 6,
+    xp: 220
+  }
 ];
 
 
-function showScreen(screen) {
+let dailyState = {
+  date: getTodayKey(),
+  goals: 0,
+  shots: 0,
+  score: 0,
+  bestCombo: 0,
+  completed: []
+};
 
-  allScreens.forEach(
-    currentScreen => {
 
-      currentScreen.classList.add(
-        "hidden-screen"
-      );
+let dailyChallenges = [];
 
-    }
+
+function saveDailyState() {
+
+  localStorage.setItem(
+    "penaltyMindDailyState",
+    JSON.stringify(dailyState)
   );
 
-
-  screen.classList.remove(
-    "hidden-screen"
+  localStorage.setItem(
+    "penaltyMindDailyChallenges",
+    JSON.stringify(dailyChallenges)
   );
-
 }
 
+
+function loadDailyState() {
+
+  const today = getTodayKey();
+
+  let savedState = null;
+  let savedChallenges = null;
+
+  try {
+
+    savedState =
+      JSON.parse(
+        localStorage.getItem(
+          "penaltyMindDailyState"
+        ) || "null"
+      );
+
+    savedChallenges =
+      JSON.parse(
+        localStorage.getItem(
+          "penaltyMindDailyChallenges"
+        ) || "null"
+      );
+
+  } catch (error) {
+
+    savedState = null;
+    savedChallenges = null;
+  }
+
+
+  if (
+    !savedState ||
+    savedState.date !== today ||
+    !Array.isArray(savedState.completed)
+  ) {
+
+    dailyState = {
+      date: today,
+      goals: 0,
+      shots: 0,
+      score: 0,
+      bestCombo: 0,
+      completed: []
+    };
+
+    const seed = hashDate(today);
+
+    dailyChallenges =
+      shuffleWithSeed(
+        DAILY_CHALLENGE_POOL,
+        seed
+      ).slice(0, 3);
+
+    saveDailyState();
+
+  } else {
+
+    dailyState = savedState;
+
+    if (
+      Array.isArray(savedChallenges) &&
+      savedChallenges.length === 3
+    ) {
+
+      dailyChallenges = savedChallenges;
+
+    } else {
+
+      const seed = hashDate(today);
+
+      dailyChallenges =
+        shuffleWithSeed(
+          DAILY_CHALLENGE_POOL,
+          seed
+        ).slice(0, 3);
+
+      saveDailyState();
+    }
+  }
+}
+
+
+function getChallengeProgress(challenge) {
+
+  switch (challenge.type) {
+
+    case "goals":
+      return dailyState.goals;
+
+    case "shots":
+      return dailyState.shots;
+
+    case "score":
+      return dailyState.score;
+
+    case "bestCombo":
+      return dailyState.bestCombo;
+
+    default:
+      return 0;
+  }
+}
+
+
+function updateDailyProgress() {
+
+  let changed = false;
+
+  dailyChallenges.forEach(challenge => {
+
+    if (
+      dailyState.completed.includes(
+        challenge.id
+      )
+    ) {
+      return;
+    }
+
+    const progress =
+      getChallengeProgress(challenge);
+
+    if (progress >= challenge.target) {
+
+      dailyState.completed.push(
+        challenge.id
+      );
+
+      addXP(challenge.xp);
+
+      changed = true;
+    }
+  });
+
+
+  saveDailyState();
+
+  if (changed) {
+
+    renderDailyChallenges();
+
+    updateDailyMenuIndicator();
+  }
+}
+
+
+function renderDailyChallenges() {
+
+  dailyChallengesList.innerHTML = "";
+
+  let completedCount = 0;
+
+  dailyChallenges.forEach(challenge => {
+
+    const progress =
+      getChallengeProgress(challenge);
+
+    const completed =
+      dailyState.completed.includes(
+        challenge.id
+      );
+
+    if (completed) {
+      completedCount++;
+    }
+
+    const percentage =
+      Math.min(
+        100,
+        (progress / challenge.target) * 100
+      );
+
+    const displayedProgress =
+      Math.min(
+        progress,
+        challenge.target
+      );
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      `daily-card${completed ? " completed" : ""}`;
+
+    card.innerHTML = `
+
+      <div class="daily-card-top">
+
+        <div class="daily-icon">
+          ${challenge.icon}
+        </div>
+
+        <div class="daily-info">
+
+          <h3>
+            ${challenge.title}
+          </h3>
+
+          <p>
+            ${challenge.text}
+          </p>
+
+        </div>
+
+        <div class="daily-xp">
+          +${challenge.xp} XP
+        </div>
+
+      </div>
+
+      <div class="daily-progress-text">
+
+        <span>
+          Progression
+        </span>
+
+        <span>
+          ${displayedProgress} / ${challenge.target}
+        </span>
+
+      </div>
+
+      <div class="daily-progress">
+
+        <div
+          class="daily-progress-fill"
+          style="width:${percentage}%"
+        ></div>
+
+      </div>
+
+      ${
+        completed
+          ? `<div class="daily-complete">
+               ✓ Défi terminé
+             </div>`
+          : ""
+      }
+
+    `;
+
+    dailyChallengesList.appendChild(card);
+  });
+
+  dailyCompletedCount.textContent =
+    `${completedCount} / ${dailyChallenges.length}`;
+}
+
+
+function updateDailyMenuIndicator() {
+
+  const completed =
+    dailyState.completed.length;
+
+  if (completed === 3) {
+
+    dailyButton.textContent =
+      "📅 Défis du jour ✓";
+
+  } else {
+
+    dailyButton.textContent =
+      `📅 Défis du jour (${completed}/3)`;
+  }
+}
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let audioContext = null;
+
+let soundEnabled =
+  localStorage.getItem("penaltyMindSound") !== "false";
+
+
+function initAudio() {
+
+  if (!soundEnabled) {
+    return;
+  }
+
+  if (!audioContext) {
+
+    audioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+  }
+
+  if (
+    audioContext.state ===
+    "suspended"
+  ) {
+
+    audioContext.resume();
+  }
+}
+
+
+function tone(
+  frequency,
+  duration,
+  type = "sine",
+  volume = 0.05
+) {
+
+  if (!soundEnabled) {
+    return;
+  }
+
+  initAudio();
+
+  if (!audioContext) {
+    return;
+  }
+
+  const oscillator =
+    audioContext.createOscillator();
+
+  const gain =
+    audioContext.createGain();
+
+  oscillator.type = type;
+
+  oscillator.frequency.value =
+    frequency;
+
+  gain.gain.setValueAtTime(
+    volume,
+    audioContext.currentTime
+  );
+
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    audioContext.currentTime + duration
+  );
+
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+
+  oscillator.start();
+
+  oscillator.stop(
+    audioContext.currentTime + duration
+  );
+}
+
+
+function playKickSound() {
+
+  tone(120, .08, "square", .04);
+}
+
+
+function playGoalSound() {
+
+  tone(523, .12, "sine", .06);
+
+  setTimeout(() => {
+    tone(659, .12, "sine", .06);
+  }, 90);
+
+  setTimeout(() => {
+    tone(784, .18, "sine", .06);
+  }, 180);
+}
+
+
+function playSaveSound() {
+
+  tone(170, .18, "sawtooth", .05);
+
+  setTimeout(() => {
+    tone(100, .2, "sawtooth", .04);
+  }, 100);
+}
+
+
+function playWhistleSound() {
+
+  tone(900, .12, "sine", .05);
+
+  setTimeout(() => {
+    tone(1200, .18, "sine", .05);
+  }, 130);
+}
+
+
+function playLevelUpSound() {
+
+  tone(523, .1, "sine", .05);
+
+  setTimeout(() => {
+    tone(659, .1, "sine", .05);
+  }, 100);
+
+  setTimeout(() => {
+    tone(784, .1, "sine", .05);
+  }, 200);
+
+  setTimeout(() => {
+    tone(1046, .25, "sine", .06);
+  }, 300);
+}
+
+
+function updateSoundButtons() {
+
+  const text =
+    soundEnabled
+      ? "🔊"
+      : "🔇";
+
+  soundButton.textContent = text;
+
+  settingsSoundButton.textContent =
+    soundEnabled
+      ? "Activés"
+      : "Désactivés";
+}
+
+
+function toggleSound() {
+
+  soundEnabled = !soundEnabled;
+
+  localStorage.setItem(
+    "penaltyMindSound",
+    soundEnabled
+  );
+
+  updateSoundButtons();
+
+  if (soundEnabled) {
+    initAudio();
+    playKickSound();
+  }
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function showMenu() {
 
@@ -178,102 +845,103 @@ function showMenu() {
   showScreen(mainMenu);
 
   updateMenu();
-
 }
 
 
-/* =====================================================
-   MENU
-===================================================== */
+function updateMenu() {
 
-document
-  .getElementById("playButton")
-  .addEventListener(
-    "click",
-    startClassicGame
-  );
+  menuBestScore.textContent =
+    state.best;
+
+  updateProgressionUI();
+  updateDailyMenuIndicator();
+}
 
 
-document
-  .getElementById("trainingButton")
-  .addEventListener(
-    "click",
-    () => {
+playButton.addEventListener(
+  "click",
+  () => {
 
-      updateTrainingScreen();
-
-      showScreen(trainingScreen);
-
-    }
-  );
+    initAudio();
+    startClassicGame();
+  }
+);
 
 
-document
-  .getElementById("statsButton")
-  .addEventListener(
-    "click",
-    () => {
+trainingButton.addEventListener(
+  "click",
+  () => {
 
-      updateStatsScreen();
+    updateTrainingScreen();
 
-      showScreen(statsScreen);
-
-    }
-  );
+    showScreen(trainingScreen);
+  }
+);
 
 
-document
-  .getElementById("settingsButton")
-  .addEventListener(
-    "click",
-    () => {
+dailyButton.addEventListener(
+  "click",
+  () => {
 
-      updateSoundButtons();
+    renderDailyChallenges();
 
-      showScreen(settingsScreen);
+    showScreen(dailyScreen);
+  }
+);
 
-    }
-  );
+
+statsButton.addEventListener(
+  "click",
+  () => {
+
+    updateStatsScreen();
+
+    showScreen(statsScreen);
+  }
+);
+
+
+settingsButton.addEventListener(
+  "click",
+  () => {
+
+    updateSoundButtons();
+
+    showScreen(settingsScreen);
+  }
+);
 
 
 document
   .querySelectorAll("[data-back-menu]")
-  .forEach(
-    button => {
+  .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        showMenu
-      );
-
-    }
-  );
+    button.addEventListener(
+      "click",
+      showMenu
+    );
+  });
 
 
-document
-  .getElementById("backToMenuButton")
-  .addEventListener(
-    "click",
-    showMenu
-  );
+backToMenuButton.addEventListener(
+  "click",
+  showMenu
+);
 
 
-document
-  .getElementById("resultMenuButton")
-  .addEventListener(
-    "click",
-    showMenu
-  );
+resultMenuButton.addEventListener(
+  "click",
+  showMenu
+);
 
 
-/* =====================================================
+/* =========================================================
    JEU CLASSIQUE
-===================================================== */
+========================================================= */
 
 function startClassicGame() {
 
   state.training = false;
-
   state.shot = 1;
   state.score = 0;
   state.combo = 0;
@@ -281,7 +949,9 @@ function startClassicGame() {
   state.aim = null;
   state.power = 0.5;
 
-  result.classList.add("hidden");
+  result.classList.add(
+    "hidden-result"
+  );
 
   resetGameVisuals();
 
@@ -301,13 +971,12 @@ function startClassicGame() {
   showScreen(gameScreen);
 
   playWhistleSound();
-
 }
 
 
-/* =====================================================
-   JAUGE
-===================================================== */
+/* =========================================================
+   PUISSANCE
+========================================================= */
 
 let meterTime = 0;
 
@@ -319,28 +988,24 @@ function animateMeter() {
     meterTime += 0.04;
 
     state.power =
-      (
-        Math.sin(meterTime) + 1
-      ) / 2;
+      (Math.sin(meterTime) + 1) / 2;
 
     needle.style.left =
       `${state.power * 100}%`;
-
   }
 
   requestAnimationFrame(
     animateMeter
   );
-
 }
 
 
 animateMeter();
 
 
-/* =====================================================
-   DIRECTION GARDIEN
-===================================================== */
+/* =========================================================
+   GARDIEN
+========================================================= */
 
 function randomKeeperDirection() {
 
@@ -356,7 +1021,6 @@ function randomKeeperDirection() {
       directions.length
     )
   ];
-
 }
 
 
@@ -371,13 +1035,34 @@ function getAimDirection(x) {
   }
 
   return "center";
-
 }
 
 
-/* =====================================================
+function resetKeeper() {
+
+  keeper.classList.remove(
+    "dive-left",
+    "dive-center",
+    "dive-right"
+  );
+}
+
+
+function moveKeeper(direction) {
+
+  resetKeeper();
+
+  void keeper.offsetWidth;
+
+  keeper.classList.add(
+    `dive-${direction}`
+  );
+}
+
+
+/* =========================================================
    PRECISION
-===================================================== */
+========================================================= */
 
 function getAccuracy() {
 
@@ -390,7 +1075,6 @@ function getAccuracy() {
     0.15,
     1 - distance * 1.7
   );
-
 }
 
 
@@ -409,8 +1093,8 @@ function chooseActualAim(x, y) {
       Math.min(
         0.88,
         x +
-          (Math.random() - 0.5) *
-          error
+        (Math.random() - 0.5) *
+        error
       )
     ),
 
@@ -419,19 +1103,17 @@ function chooseActualAim(x, y) {
       Math.min(
         0.78,
         y +
-          (Math.random() - 0.5) *
-          error
+        (Math.random() - 0.5) *
+        error
       )
     )
-
   };
-
 }
 
 
-/* =====================================================
-   BALLON
-===================================================== */
+/* =========================================================
+   BALLE
+========================================================= */
 
 function moveBall(x, y) {
 
@@ -449,7 +1131,6 @@ function moveBall(x, y) {
 
   ball.style.transform =
     "translate(-50%,0) scale(.72)";
-
 }
 
 
@@ -459,46 +1140,20 @@ function resetBall() {
     "shooting"
   );
 
-  ball.style.left = "50%";
-  ball.style.bottom = "6%";
+  ball.style.left =
+    "50%";
+
+  ball.style.bottom =
+    "6%";
 
   ball.style.transform =
     "translate(-50%,0) scale(1)";
-
 }
 
 
-/* =====================================================
-   GARDIEN
-===================================================== */
-
-function resetKeeper() {
-
-  keeper.classList.remove(
-    "dive-left",
-    "dive-center",
-    "dive-right"
-  );
-
-}
-
-
-function moveKeeper(direction) {
-
-  resetKeeper();
-
-  void keeper.offsetWidth;
-
-  keeper.classList.add(
-    `dive-${direction}`
-  );
-
-}
-
-
-/* =====================================================
-   EFFETS
-===================================================== */
+/* =========================================================
+   RESET VISUEL
+========================================================= */
 
 function resetGameVisuals() {
 
@@ -517,15 +1172,13 @@ function resetGameVisuals() {
   );
 
   resetBall();
-
   resetKeeper();
-
 }
 
 
-/* =====================================================
+/* =========================================================
    TIR
-===================================================== */
+========================================================= */
 
 function shoot(x, y) {
 
@@ -535,37 +1188,51 @@ function shoot(x, y) {
 
   state.locked = true;
 
-
-  const accuracy =
-    getAccuracy();
-
-  const actual =
+  const actualAim =
     chooseActualAim(x, y);
-
-  const targetDirection =
-    getAimDirection(actual.x);
 
   const keeperDirection =
     randomKeeperDirection();
 
+  const playerDirection =
+    getAimDirection(
+      actualAim.x
+    );
+
   const saved =
-    targetDirection === keeperDirection;
+    keeperDirection ===
+    playerDirection;
+
+  const accuracy =
+    getAccuracy();
+
+
+  moveKeeper(
+    keeperDirection
+  );
+
+  ball.classList.add(
+    "shooting"
+  );
+
+  moveBall(
+    actualAim.x,
+    actualAim.y
+  );
 
 
   let points = 0;
 
 
-  /* ================= BUT ================= */
-
   if (!saved) {
 
     const accuracyBonus =
       Math.round(
-        accuracy * 100
+        accuracy * 80
       );
 
     const centerBonus =
-      targetDirection === "center"
+      playerDirection === "center"
         ? 25
         : 0;
 
@@ -578,12 +1245,9 @@ function shoot(x, y) {
       centerBonus +
       comboBonus;
 
-
-    state.score +=
-      points;
+    state.score += points;
 
     state.combo++;
-
 
     stats.goals++;
 
@@ -594,152 +1258,108 @@ function shoot(x, y) {
 
       stats.bestCombo =
         state.combo;
-
     }
-
 
     if (state.training) {
-
       stats.trainingGoals++;
-
     }
 
 
-    playGoalSound();
+    dailyState.goals++;
 
+    dailyState.score += points;
 
-  }
+    if (
+      state.combo >
+      dailyState.bestCombo
+    ) {
 
-  /* ================= ARRET ================= */
+      dailyState.bestCombo =
+        state.combo;
+    }
 
-  else {
-
-    state.combo = 0;
-
-    stats.saves++;
-
-    playSaveSound();
-
-  }
-
-
-  stats.shots++;
-
-  if (state.training) {
-    stats.trainingShots++;
-  }
-
-  saveStats();
-
-
-  /* ================= ANIMATION ================= */
-
-  moveKeeper(
-    keeperDirection
-  );
-
-  moveBall(
-    actual.x,
-    actual.y
-  );
-
-  ball.classList.add(
-    "shooting"
-  );
-
-
-  targetDot.style.left =
-    `${x * 100}%`;
-
-  targetDot.style.top =
-    `${(1 - y) * 100}%`;
-
-  targetDot.classList.add(
-    "visible"
-  );
-
-
-  if (saved) {
 
     message.textContent =
-      "🧤 ARRÊT !";
-
-    message.className =
-      "message save";
-
-    goal.classList.add(
-      "goal-saved"
-    );
-
-    player.classList.add(
-      "disappointed"
-    );
-
-  } else {
-
-    message.textContent =
-      `⚽ BUT ! +${points}`;
+      `⚽ BUT ! +${points} points`;
 
     message.className =
       "message goal-message";
-
-    goal.classList.add(
-      "goal-scored"
-    );
 
     player.classList.add(
       "celebrate"
     );
 
+    playGoalSound();
+
+  } else {
+
+    state.combo = 0;
+
+    stats.saves++;
+
+    message.textContent =
+      "🧤 ARRÊT DU GARDIEN !";
+
+    message.className =
+      "message save-message";
+
+    player.classList.add(
+      "disappointed"
+    );
+
+    playSaveSound();
   }
 
 
+  stats.shots++;
+
+  dailyState.shots++;
+
+
+  if (state.training) {
+    stats.trainingShots++;
+  }
+
+
+  saveStats();
+
+  saveDailyState();
+
+  updateDailyProgress();
+
   updateGameUI();
 
+  setTimeout(() => {
 
-  /* ================= SUITE ================= */
+    resetGameVisuals();
 
-  setTimeout(
-    () => {
+    if (state.training) {
 
-      resetGameVisuals();
+      state.locked = false;
 
-      state.aim = null;
+      message.textContent =
+        "Vise la cage pour continuer ⚽";
 
+      message.className =
+        "message";
 
-      /* MODE ENTRAINEMENT */
+      updateGameUI();
 
-      if (state.training) {
-
-        state.locked = false;
-
-        message.textContent =
-          "🎯 Vise encore !";
-
-        message.className =
-          "message";
-
-        return;
-
-      }
+      return;
+    }
 
 
-      /* MODE NORMAL */
-
-      state.shot++;
+    state.shot++;
 
 
-      if (
-        state.shot >
-        MAX_SHOTS
-      ) {
+    if (
+      state.shot >
+      MAX_SHOTS
+    ) {
 
-        finishGame();
+      finishGame();
 
-        return;
-
-      }
-
+    } else {
 
       state.locked = false;
 
@@ -750,85 +1370,67 @@ function shoot(x, y) {
         "message";
 
       updateGameUI();
+    }
 
-    },
-    1100
-  );
-
+  }, 1100);
 }
 
 
-/* =====================================================
-   VISER LA CAGE
-===================================================== */
+/* =========================================================
+   CLIC / TACTILE
+========================================================= */
 
 function handleAim(event) {
 
-  if (
-    state.locked ||
-    !gameScreen.classList.contains(
-      "hidden-screen"
-    ) === false
-  ) {
-    /* Le jeu doit être l'écran visible. */
+  if (state.locked) {
+    return;
   }
 
   if (
-    state.locked ||
-    !state.aim &&
-    false
+    gameScreen.classList.contains(
+      "hidden-screen"
+    )
   ) {
     return;
   }
 
-
   event.preventDefault();
-
 
   initAudio();
 
   playKickSound();
 
-
   const rect =
     goal.getBoundingClientRect();
 
-
   let x =
-    (
-      event.clientX -
-      rect.left
-    ) /
+    (event.clientX - rect.left) /
     rect.width;
-
 
   let y =
     1 -
     (
-      (
-        event.clientY -
-        rect.top
-      ) /
+      (event.clientY - rect.top) /
       rect.height
     );
 
+  x =
+    Math.max(
+      0.08,
+      Math.min(
+        0.92,
+        x
+      )
+    );
 
-  x = Math.max(
-    0.08,
-    Math.min(
-      0.92,
-      x
-    )
-  );
-
-
-  y = Math.max(
-    0.10,
-    Math.min(
-      0.85,
-      y
-    )
-  );
+  y =
+    Math.max(
+      0.10,
+      Math.min(
+        0.85,
+        y
+      )
+    );
 
 
   state.aim = {
@@ -849,7 +1451,6 @@ function handleAim(event) {
 
 
   shoot(x, y);
-
 }
 
 
@@ -859,14 +1460,11 @@ goal.addEventListener(
 );
 
 
-/* =====================================================
-   FIN DU MATCH
-===================================================== */
+/* =========================================================
+   FIN DE PARTIE
+========================================================= */
 
 function finishGame() {
-
-  state.locked = true;
-
 
   if (
     state.score >
@@ -876,11 +1474,7 @@ function finishGame() {
     state.best =
       state.score;
 
-    localStorage.setItem(
-      "penaltyMindBest",
-      state.best
-    );
-
+    saveStats();
   }
 
 
@@ -891,58 +1485,60 @@ function finishGame() {
     state.best;
 
 
-  if (state.score >= 1000) {
+  if (state.score >= 1300) {
 
     resultTitle.textContent =
-      "🏆 Énorme performance !";
+      "🔥 Performance incroyable !";
 
-  } else if (state.score > 0) {
+  } else if (state.score >= 900) {
 
     resultTitle.textContent =
-      "⚽ Match terminé !";
+      "🏆 Très belle partie !";
+
+  } else if (state.score >= 500) {
+
+    resultTitle.textContent =
+      "⚽ Bien joué !";
 
   } else {
 
     resultTitle.textContent =
-      "🏁 Match terminé";
-
+      "💪 Continue !";
   }
 
 
   result.classList.remove(
-    "hidden"
+    "hidden-result"
   );
 
   playWhistleSound();
 
   updateMenu();
-
 }
 
 
-/* =====================================================
-   REJOUER
-===================================================== */
+/* =========================================================
+   UI JEU
+========================================================= */
 
-document
-  .getElementById("restartButton")
-  .addEventListener(
-    "click",
-    startClassicGame
-  );
+function updateGameUI() {
+
+  shotNumber.textContent =
+    state.training
+      ? "∞"
+      : `${state.shot} / ${MAX_SHOTS}`;
+
+  scoreElement.textContent =
+    state.score;
+
+  comboElement.textContent =
+    state.combo;
+}
 
 
-/* =====================================================
+/* =========================================================
    ENTRAINEMENT
-===================================================== */
-
-document
-  .getElementById("startTrainingButton")
-  .addEventListener(
-    "click",
-    startTraining
-  );
-
+========================================================= */
 
 function startTraining() {
 
@@ -955,464 +1551,92 @@ function startTraining() {
   state.aim = null;
   state.power = 0.5;
 
-
   result.classList.add(
-    "hidden"
+    "hidden-result"
   );
 
-
   resetGameVisuals();
-
 
   document.getElementById(
     "gameSubtitle"
   ).textContent =
-    "Mode entraînement • tirs libres";
-
+    "Entraînement — tirs illimités";
 
   message.textContent =
-    "🎯 Vise la cage !";
+    "Vise la cage pour t'entraîner 🎯";
 
   message.className =
     "message";
-
 
   updateGameUI();
 
   showScreen(gameScreen);
 
   playWhistleSound();
-
 }
 
 
-/* =====================================================
-   UI
-===================================================== */
+startTrainingButton.addEventListener(
+  "click",
+  () => {
 
-function updateGameUI() {
+    initAudio();
 
-  shotNumber.textContent =
-    state.training
-      ? "∞"
-      : Math.min(
-          state.shot,
-          MAX_SHOTS
-        );
+    startTraining();
+  }
+);
 
-  scoreElement.textContent =
-    state.score;
 
-  comboElement.textContent =
-    state.combo;
+function updateTrainingScreen() {
 
+  trainingGoalsElement.textContent =
+    stats.trainingGoals;
+
+  trainingShotsElement.textContent =
+    stats.trainingShots;
 }
 
 
-function updateMenu() {
-
-  document.getElementById(
-    "menuBestScore"
-  ).textContent =
-    state.best;
-
-}
-
+/* =========================================================
+   STATS
+========================================================= */
 
 function updateStatsScreen() {
 
-  document.getElementById(
-    "statBestScore"
-  ).textContent =
+  statBestScore.textContent =
     state.best;
 
-  document.getElementById(
-    "statGoals"
-  ).textContent =
+  statGoals.textContent =
     stats.goals;
 
-  document.getElementById(
-    "statSaves"
-  ).textContent =
+  statSaves.textContent =
     stats.saves;
 
-  document.getElementById(
-    "statCombo"
-  ).textContent =
+  statCombo.textContent =
     stats.bestCombo;
 
-  document.getElementById(
-    "statShots"
-  ).textContent =
+  statShots.textContent =
     stats.shots;
 
 
   const accuracy =
     stats.shots > 0
       ? Math.round(
-          stats.goals /
-          stats.shots *
+          (stats.goals /
+            stats.shots) *
           100
         )
       : 0;
 
 
-  document.getElementById(
-    "statAccuracy"
-  ).textContent =
+  statAccuracy.textContent =
     `${accuracy}%`;
-
 }
 
 
-function updateTrainingScreen() {
-
-  document.getElementById(
-    "trainingGoals"
-  ).textContent =
-    stats.trainingGoals;
-
-  document.getElementById(
-    "trainingShots"
-  ).textContent =
-    stats.trainingShots;
-
-}
-
-
-/* =====================================================
-   RESET STATS
-===================================================== */
-
-document
-  .getElementById("resetStatsButton")
-  .addEventListener(
-    "click",
-    () => {
-
-      const confirmation =
-        confirm(
-          "Réinitialiser toutes les statistiques ?"
-        );
-
-      if (!confirmation) {
-        return;
-      }
-
-
-      stats.goals = 0;
-      stats.saves = 0;
-      stats.shots = 0;
-      stats.bestCombo = 0;
-      stats.trainingGoals = 0;
-      stats.trainingShots = 0;
-
-
-      state.best = 0;
-
-
-      localStorage.removeItem(
-        "penaltyMindBest"
-      );
-
-
-      saveStats();
-
-
-      updateMenu();
-      updateStatsScreen();
-      updateTrainingScreen();
-
-    }
-  );
-
-
-/* =====================================================
-   AUDIO
-===================================================== */
-
-let audioContext = null;
-
-let soundEnabled =
-  localStorage.getItem(
-    "penaltyMindSound"
-  ) !== "off";
-
-
-function initAudio() {
-
-  if (!soundEnabled) {
-    return;
-  }
-
-
-  try {
-
-    if (!audioContext) {
-
-      const AudioContext =
-        window.AudioContext ||
-        window.webkitAudioContext;
-
-      if (!AudioContext) {
-        return;
-      }
-
-      audioContext =
-        new AudioContext();
-
-    }
-
-
-    if (
-      audioContext.state ===
-      "suspended"
-    ) {
-
-      audioContext.resume();
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "Audio indisponible."
-    );
-
-  }
-
-}
-
-
-function tone(
-  frequency,
-  duration,
-  type,
-  volume,
-  delay = 0
-) {
-
-  if (
-    !soundEnabled ||
-    !audioContext
-  ) {
-    return;
-  }
-
-
-  try {
-
-    const now =
-      audioContext.currentTime +
-      delay;
-
-
-    const oscillator =
-      audioContext.createOscillator();
-
-    const gain =
-      audioContext.createGain();
-
-
-    oscillator.type =
-      type;
-
-    oscillator.frequency.setValueAtTime(
-      frequency,
-      now
-    );
-
-
-    gain.gain.setValueAtTime(
-      0.0001,
-      now
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-      volume,
-      now + 0.01
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-      0.0001,
-      now + duration
-    );
-
-
-    oscillator.connect(gain);
-    gain.connect(
-      audioContext.destination
-    );
-
-
-    oscillator.start(now);
-
-    oscillator.stop(
-      now +
-      duration +
-      0.03
-    );
-
-  } catch (error) {
-
-    console.warn(
-      "Erreur audio."
-    );
-
-  }
-
-}
-
-
-function playKickSound() {
-
-  initAudio();
-
-  tone(
-    180,
-    .08,
-    "triangle",
-    .08
-  );
-
-  tone(
-    90,
-    .12,
-    "sine",
-    .05,
-    .03
-  );
-
-}
-
-
-function playGoalSound() {
-
-  initAudio();
-
-  tone(
-    523,
-    .12,
-    "sine",
-    .06
-  );
-
-  tone(
-    659,
-    .12,
-    "sine",
-    .06,
-    .12
-  );
-
-  tone(
-    784,
-    .18,
-    "sine",
-    .07,
-    .24
-  );
-
-}
-
-
-function playSaveSound() {
-
-  initAudio();
-
-  tone(
-    160,
-    .12,
-    "sawtooth",
-    .05
-  );
-
-  tone(
-    110,
-    .18,
-    "triangle",
-    .06,
-    .08
-  );
-
-}
-
-
-function playWhistleSound() {
-
-  initAudio();
-
-  tone(
-    1000,
-    .08,
-    "sine",
-    .05
-  );
-
-  tone(
-    1400,
-    .12,
-    "sine",
-    .05,
-    .1
-  );
-
-}
-
-
-/* =====================================================
-   BOUTONS SON
-===================================================== */
-
-function updateSoundButtons() {
-
-  const text =
-    soundEnabled
-      ? "🔊 Son"
-      : "🔇 Son";
-
-
-  soundButton.textContent =
-    text;
-
-
-  settingsSoundButton.textContent =
-    soundEnabled
-      ? "ON"
-      : "OFF";
-
-
-  settingsSoundButton.style.background =
-    soundEnabled
-      ? "#2fbf71"
-      : "#555d68";
-
-}
-
-
-function toggleSound() {
-
-  soundEnabled =
-    !soundEnabled;
-
-
-  localStorage.setItem(
-    "penaltyMindSound",
-    soundEnabled
-      ? "on"
-      : "off"
-  );
-
-
-  if (soundEnabled) {
-    initAudio();
-  }
-
-
-  updateSoundButtons();
-
-}
-
+/* =========================================================
+   BOUTONS
+========================================================= */
 
 soundButton.addEventListener(
   "click",
@@ -1426,9 +1650,82 @@ settingsSoundButton.addEventListener(
 );
 
 
-/* =====================================================
+restartButton.addEventListener(
+  "click",
+  () => {
+
+    initAudio();
+
+    startClassicGame();
+  }
+);
+
+
+resetStatsButton.addEventListener(
+  "click",
+  () => {
+
+    const confirmed =
+      window.confirm(
+        "Réinitialiser toutes les statistiques ?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    localStorage.removeItem(
+      "penaltyMindBest"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindGoals"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindSaves"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindShots"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindBestCombo"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindTrainingGoals"
+    );
+
+    localStorage.removeItem(
+      "penaltyMindTrainingShots"
+    );
+
+
+    state.best = 0;
+
+    stats.goals = 0;
+    stats.saves = 0;
+    stats.shots = 0;
+    stats.bestCombo = 0;
+    stats.trainingGoals = 0;
+    stats.trainingShots = 0;
+
+
+    updateStatsScreen();
+    updateTrainingScreen();
+    updateMenu();
+  }
+);
+
+
+/* =========================================================
    INITIALISATION
-===================================================== */
+========================================================= */
+
+loadDailyState();
 
 updateSoundButtons();
 
@@ -1438,15 +1735,14 @@ updateStatsScreen();
 
 updateTrainingScreen();
 
+updateProgressionUI();
+
+renderDailyChallenges();
+
+updateDailyMenuIndicator();
+
 updateGameUI();
 
 resetGameVisuals();
-
-
-/*
-   IMPORTANT :
-   Le menu est affiché
-   directement au démarrage.
-*/
 
 showScreen(mainMenu);
