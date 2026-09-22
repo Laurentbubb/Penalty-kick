@@ -1,225 +1,425 @@
 const MAX_SHOTS = 10;
-const HISTORY_SIZE = 5;
 
 const state = {
-  shot: 1,
-  score: 0,
-  combo: 0,
-  history: [],
-  locked: false,
-  bestScore: Number(localStorage.getItem("penaltyMindBest") || 0)
+shot: 1,
+score: 0,
+combo: 0,
+locked: false,
+aim: null,
+power: 0,
+direction: 1,
+best: Number(localStorage.getItem("penaltyMindBest") || 0)
 };
 
-const keeper = document.getElementById("keeper");
+const goal = document.getElementById("goal");
 const ball = document.getElementById("ball");
+const keeper = document.getElementById("keeper");
+const targetDot = document.getElementById("targetDot");
 const message = document.getElementById("message");
+const needle = document.getElementById("needle");
+const shootButton = document.getElementById("shootButton");
+
+const result = document.getElementById("result");
+const resultTitle = document.getElementById("resultTitle");
+const finalScore = document.getElementById("finalScore");
+const bestScore = document.getElementById("bestScore");
+
 const shotNumber = document.getElementById("shotNumber");
 const scoreElement = document.getElementById("score");
 const comboElement = document.getElementById("combo");
-const controls = document.getElementById("controls");
-const result = document.getElementById("result");
-const finalScore = document.getElementById("finalScore");
-const bestScore = document.getElementById("bestScore");
-const resultTitle = document.getElementById("resultTitle");
 
-const positions = {
-  left: "27%",
-  center: "50%",
-  right: "73%"
-};
+const restartButton = document.getElementById("restartButton");
 
-function randomDirection() {
-  const directions = ["left", "center", "right"];
-  return directions[Math.floor(Math.random() * directions.length)];
-}
-
-function goalkeeperChooseDirection() {
-  if (state.history.length === 0) {
-    return randomDirection();
-  }
-
-  const counts = {
-    left: 0,
-    center: 0,
-    right: 0
-  };
-
-  for (const direction of state.history) {
-    counts[direction]++;
-  }
-
-  const max = Math.max(
-    counts.left,
-    counts.center,
-    counts.right
-  );
-
-  const mostUsed = Object.keys(counts).filter(
-    direction => counts[direction] === max
-  );
-
-  const predicted =
-    mostUsed[Math.floor(Math.random() * mostUsed.length)];
-
-  const learningStrength =
-    Math.min(0.35 + state.shot * 0.055, 0.9);
-
-  if (Math.random() < learningStrength) {
-    return predicted;
-  }
-
-  return randomDirection();
-}
-
-function getPoints(direction) {
-  const basePoints = direction === "center" ? 80 : 120;
-  return basePoints + state.combo * 25;
-}
+let lastTime = performance.now();
 
 function updateUI() {
-  shotNumber.textContent = state.shot;
-  scoreElement.textContent = state.score;
-  comboElement.textContent = state.combo;
+shotNumber.textContent = state.shot;
+scoreElement.textContent = state.score;
+comboElement.textContent = state.combo;
 }
 
-function disableButtons(value) {
-  document.querySelectorAll(".shot-btn").forEach(button => {
-    button.disabled = value;
-  });
+function animateMeter(now) {
+const delta = Math.min(
+(now - lastTime) / 1000,
+0.05
+);
+
+lastTime = now;
+
+if (!state.locked) {
+state.power += state.direction * delta * 0.95;
+
+```
+if (state.power >= 1) {
+  state.power = 1;
+  state.direction = -1;
+}
+
+if (state.power <= 0) {
+  state.power = 0;
+  state.direction = 1;
+}
+
+needle.style.left =
+  `${state.power * 100}%`;
+```
+
+}
+
+requestAnimationFrame(animateMeter);
+}
+
+function setMessage(text) {
+message.textContent = text;
 }
 
 function resetBall() {
-  ball.style.left = "50%";
-  ball.style.bottom = "65px";
-  ball.style.transform = "translateX(-50%)";
-
-  keeper.style.left = "50%";
+ball.style.left = "50%";
+ball.style.bottom = "17%";
+ball.style.transform = "translateX(-50%)";
 }
 
-function shoot(direction) {
-  if (state.locked || state.shot > MAX_SHOTS) {
-    return;
-  }
+function resetKeeper() {
+keeper.classList.remove(
+"dive-left",
+"dive-center",
+"dive-right"
+);
 
-  state.locked = true;
-  disableButtons(true);
+keeper.style.left = "50%";
+}
 
-  const goalkeeperDirection =
-    goalkeeperChooseDirection();
+function resetTarget() {
+state.aim = null;
+targetDot.classList.remove("visible");
+}
 
-  const scored =
-    direction !== goalkeeperDirection;
+function getGoalkeeperChoice() {
+const random = Math.random();
 
-  let points = 0;
+if (random < 0.34) {
+return "left";
+}
 
-  if (scored) {
-    points = getPoints(direction);
-    state.score += points;
-    state.combo++;
-  } else {
-    state.combo = 0;
-  }
+if (random < 0.66) {
+return "center";
+}
 
-  state.history.push(direction);
+return "right";
+}
 
-  if (state.history.length > HISTORY_SIZE) {
-    state.history.shift();
-  }
+function keeperPosition(direction) {
+if (direction === "left") {
+return 27;
+}
 
-  // Animation du ballon
-  ball.style.left = positions[direction];
-  ball.style.bottom = "285px";
-  ball.style.transform =
-    "translateX(-50%) scale(0.7) rotate(360deg)";
+if (direction === "right") {
+return 73;
+}
 
-  // Animation du gardien
-  keeper.style.left = positions[goalkeeperDirection];
+return 50;
+}
 
-  if (scored) {
-    message.textContent =
-      `⚽ BUT ! +${points} points`;
-  } else {
-    message.textContent =
-      "🧤 ARRÊT ! Le gardien t'a lu";
-  }
+function getAimDirection(x) {
+if (x < 0.34) {
+return "left";
+}
 
-  updateUI();
+if (x > 0.66) {
+return "right";
+}
 
-  setTimeout(() => {
-    if (state.shot >= MAX_SHOTS) {
-      finishGame();
-      return;
-    }
+return "center";
+}
 
-    state.shot++;
+function getAccuracy() {
+const distance =
+Math.abs(state.power - 0.5);
 
-    state.locked = false;
-    disableButtons(false);
+const greenHalfWidth = 0.15;
 
-    resetBall();
+if (distance <= greenHalfWidth) {
+return 1 -
+distance / greenHalfWidth;
+}
 
-    message.textContent =
-      `Tir ${state.shot} : choisis ta direction`;
+const orangeHalfWidth = 0.33;
 
-    updateUI();
+const progress = Math.max(
+0,
+1 -
+(distance - greenHalfWidth) /
+(orangeHalfWidth - greenHalfWidth)
+);
 
-  }, 1100);
+return progress * 0.55;
+}
+
+function chooseActualAim() {
+const accuracy = getAccuracy();
+const desiredX = state.aim.x;
+
+const maxError =
+(1 - accuracy) * 0.30;
+
+const error =
+(Math.random() * 2 - 1) *
+maxError;
+
+return Math.max(
+0.03,
+Math.min(
+0.97,
+desiredX + error
+)
+);
+}
+
+function shoot() {
+if (
+state.locked ||
+!state.aim ||
+state.shot > MAX_SHOTS
+) {
+return;
+}
+
+state.locked = true;
+shootButton.disabled = true;
+
+const accuracy = getAccuracy();
+const actualX = chooseActualAim();
+
+const targetDirection =
+getAimDirection(actualX);
+
+const keeperDirection =
+getGoalkeeperChoice();
+
+const saved =
+targetDirection === keeperDirection &&
+Math.random() < 0.82;
+
+let points = 0;
+
+if (saved) {
+state.combo = 0;
+
+```
+setMessage(
+  "🧤 ARRÊT ! Le gardien plonge au bon endroit."
+);
+```
+
+} else {
+const precisionBonus =
+Math.round(accuracy * 80);
+
+```
+const comboBonus =
+  state.combo * 25;
+
+points =
+  100 +
+  precisionBonus +
+  comboBonus;
+
+state.score += points;
+state.combo++;
+
+setMessage(
+  `⚽ BUT ! +${points} points`
+);
+```
+
+}
+
+keeper.style.left =
+`${keeperPosition(keeperDirection)}%`;
+
+if (keeperDirection === "left") {
+keeper.classList.add("dive-left");
+
+} else if (keeperDirection === "right") {
+keeper.classList.add("dive-right");
+
+} else {
+keeper.classList.add("dive-center");
+}
+
+const targetY = state.aim.y;
+
+ball.style.left =
+`${actualX * 100}%`;
+
+ball.style.bottom =
+`${Math.max(
+      47,
+      67 - targetY * 28
+    )}%`;
+
+ball.style.transform =
+"translateX(-50%) scale(.62)";
+
+targetDot.style.left =
+`${state.aim.x * 100}%`;
+
+targetDot.style.top =
+`${state.aim.y * 100}%`;
+
+targetDot.classList.add("visible");
+
+updateUI();
+
+setTimeout(() => {
+
+```
+if (state.shot >= MAX_SHOTS) {
+  finishGame();
+  return;
+}
+
+state.shot++;
+state.locked = false;
+shootButton.disabled = false;
+
+resetBall();
+resetKeeper();
+resetTarget();
+
+setMessage(
+  "Clique dans la cage pour viser"
+);
+
+updateUI();
+```
+
+}, 1150);
+}
+
+function aim(event) {
+if (state.locked) {
+return;
+}
+
+const rect =
+goal.getBoundingClientRect();
+
+const x =
+Math.max(
+0,
+Math.min(
+1,
+(event.clientX - rect.left) /
+rect.width
+)
+);
+
+const y =
+Math.max(
+0,
+Math.min(
+1,
+(event.clientY - rect.top) /
+rect.height
+)
+);
+
+state.aim = {
+x,
+y
+};
+
+targetDot.style.left =
+`${x * 100}%`;
+
+targetDot.style.top =
+`${y * 100}%`;
+
+targetDot.classList.add("visible");
+
+setMessage(
+"🎯 Cible choisie ! Maintenant, tire au bon moment."
+);
 }
 
 function finishGame() {
-  state.locked = true;
+state.locked = true;
 
-  if (state.score > state.bestScore) {
-    state.bestScore = state.score;
+if (state.score > state.best) {
+state.best = state.score;
 
-    localStorage.setItem(
-      "penaltyMindBest",
-      state.bestScore
-    );
+```
+localStorage.setItem(
+  "penaltyMindBest",
+  String(state.best)
+);
 
-    resultTitle.textContent =
-      "🏆 Nouveau record !";
-  } else {
-    resultTitle.textContent =
-      "🏁 Fin de partie";
-  }
+resultTitle.textContent =
+  "🏆 Nouveau record !";
+```
 
-  finalScore.textContent = state.score;
-  bestScore.textContent = state.bestScore;
+} else {
+resultTitle.textContent =
+"🏁 Fin du match";
+}
 
-  controls.classList.add("hidden");
-  result.classList.remove("hidden");
+finalScore.textContent =
+state.score;
 
-  message.textContent = "Partie terminée";
+bestScore.textContent =
+state.best;
+
+result.classList.remove("hidden");
+
+shootButton.disabled = true;
+
+setMessage(
+"Match terminé !"
+);
 }
 
 function restart() {
-  state.shot = 1;
-  state.score = 0;
-  state.combo = 0;
-  state.history = [];
-  state.locked = false;
+state.shot = 1;
+state.score = 0;
+state.combo = 0;
+state.locked = false;
+state.aim = null;
+state.power = 0;
+state.direction = 1;
 
-  result.classList.add("hidden");
-  controls.classList.remove("hidden");
+result.classList.add("hidden");
 
-  disableButtons(false);
-  resetBall();
+shootButton.disabled = false;
 
-  message.textContent =
-    "Choisis une direction";
+resetBall();
+resetKeeper();
+resetTarget();
 
-  updateUI();
-}
-
-document.querySelectorAll(".shot-btn").forEach(button => {
-  button.addEventListener("click", () => {
-    shoot(button.dataset.direction);
-  });
-});
-
-document
-  .getElementById("restartBtn")
-  .addEventListener("click", restart);
+setMessage(
+"Clique dans la cage pour viser"
+);
 
 updateUI();
+}
+
+goal.addEventListener(
+"click",
+aim
+);
+
+shootButton.addEventListener(
+"click",
+shoot
+);
+
+restartButton.addEventListener(
+"click",
+restart
+);
+
+updateUI();
+
+requestAnimationFrame(
+animateMeter
+);
