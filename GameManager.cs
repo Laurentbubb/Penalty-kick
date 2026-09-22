@@ -1,10 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Base du GameManager pour une future version Unity de PenaltyMind.
-/// Le prototype navigateur utilise game.js.
-/// </summary>
 public class GameManager : MonoBehaviour
 {
     public enum Direction
@@ -29,8 +25,7 @@ public class GameManager : MonoBehaviour
     private int score;
     private int combo;
 
-    private readonly List<Direction> shotHistory =
-        new List<Direction>();
+    private readonly List<Direction> shotHistory = new List<Direction>();
 
     public int CurrentShot => currentShot;
     public int Score => score;
@@ -39,6 +34,41 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         StartGame();
+    }
+
+    private void Update()
+    {
+        // Détecte le clic gauche de la souris
+        if (Input.GetMouseButtonDown(0))
+        {
+            HandleClick(Input.mousePosition);
+        }
+    }
+
+    private void HandleClick(Vector3 mousePosition)
+    {
+        // Largeur de l'écran
+        float screenWidth = Screen.width;
+
+        // Position horizontale du clic
+        float x = mousePosition.x;
+
+        Direction direction;
+
+        if (x < screenWidth / 3f)
+        {
+            direction = Direction.Left;
+        }
+        else if (x < screenWidth * 2f / 3f)
+        {
+            direction = Direction.Center;
+        }
+        else
+        {
+            direction = Direction.Right;
+        }
+
+        TakePenalty(direction);
     }
 
     public void StartGame()
@@ -54,18 +84,15 @@ public class GameManager : MonoBehaviour
         if (currentShot > maxShots)
             return;
 
-        Direction goalkeeperDirection =
-            ChooseGoalkeeperDirection();
+        Direction goalkeeperDirection = ChooseGoalkeeperDirection();
 
-        bool scored =
-            playerDirection != goalkeeperDirection;
+        bool scored = playerDirection != goalkeeperDirection;
 
         if (scored)
         {
-            int points =
-                playerDirection == Direction.Center
-                    ? centerShotPoints
-                    : sideShotPoints;
+            int points = playerDirection == Direction.Center
+                ? centerShotPoints
+                : sideShotPoints;
 
             points += combo * comboBonus;
 
@@ -118,11 +145,9 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        int max =
-            Mathf.Max(left, Mathf.Max(center, right));
+        int max = Mathf.Max(left, Mathf.Max(center, right));
 
-        List<Direction> candidates =
-            new List<Direction>();
+        List<Direction> candidates = new List<Direction>();
 
         if (left == max)
             candidates.Add(Direction.Left);
@@ -134,15 +159,10 @@ public class GameManager : MonoBehaviour
             candidates.Add(Direction.Right);
 
         Direction mostUsed =
-            candidates[
-                Random.Range(0, candidates.Count)
-            ];
+            candidates[Random.Range(0, candidates.Count)];
 
         float learningStrength =
-            Mathf.Min(
-                0.35f + currentShot * 0.055f,
-                0.90f
-            );
+            Mathf.Min(0.35f + currentShot * 0.055f, 0.90f);
 
         if (Random.value < learningStrength)
             return mostUsed;
@@ -165,15 +185,6 @@ public class GameManager : MonoBehaviour
 
     private void EndGame()
     {
-        Debug.Log(
-            $"Partie terminée ! Score final : {score}"
-        );
-
-        // À connecter plus tard :
-        // - écran de fin
-        // - meilleur score
-        // - pubs
-        // - classement
-        // - mode 1v1
+        Debug.Log($"Partie terminée ! Score final : {score}");
     }
 }
