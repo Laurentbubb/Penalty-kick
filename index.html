@@ -12,178 +12,425 @@
 
   <main class="game">
 
-    <header class="topbar">
+    <!-- =========================
+         MENU PRINCIPAL
+    ========================== -->
 
-      <div>
-        <h1>⚽ PenaltyMind</h1>
-        <p class="subtitle">Vise la cage et trompe le gardien</p>
+    <section id="mainMenu" class="screen active-screen">
+
+      <div class="menu-logo">
+        <div class="logo-ball">⚽</div>
+        <h1>Penalty<span>Mind</span></h1>
+        <p>Le penalty est dans ta tête.</p>
       </div>
 
-      <div class="stats">
-        <div>
-          <span>Tir</span>
-          <strong id="shotNumber">1</strong>
-        </div>
+      <div class="menu-buttons">
 
-        <div>
-          <span>Score</span>
-          <strong id="score">0</strong>
-        </div>
-
-        <div>
-          <span>Combo</span>
-          <strong id="combo">0</strong>
-        </div>
-      </div>
-
-    </header>
-
-
-    <section class="match">
-
-      <div class="stadium">
-
-        <div class="sky"></div>
-        <div class="crowd"></div>
-
-        <div class="field">
-          <div class="penalty-area"></div>
-          <div class="penalty-spot"></div>
-        </div>
-
-
-        <!-- CAGE -->
-
-        <div id="goal" class="goal">
-
-          <div class="net"></div>
-
-          <div class="post post-left"></div>
-          <div class="post post-right"></div>
-          <div class="crossbar"></div>
-
-
-          <!-- GARDIEN -->
-
-          <div id="keeper" class="keeper">
-
-            <div class="keeper-head"></div>
-            <div class="keeper-body"></div>
-
-            <div class="keeper-arm left"></div>
-            <div class="keeper-arm right"></div>
-
-            <div class="keeper-leg left"></div>
-            <div class="keeper-leg right"></div>
-
-          </div>
-
-
-          <!-- CIBLE -->
-
-          <div id="targetDot" class="target-dot"></div>
-
-
-          <!-- BALLON -->
-
-          <div id="ball" class="ball">⚽</div>
-
-        </div>
-
-
-        <!-- JOUEUR -->
-
-        <div class="player">
-
-          <div class="player-head"></div>
-          <div class="player-body"></div>
-
-          <div class="player-arm left"></div>
-          <div class="player-arm right"></div>
-
-          <div class="player-leg left"></div>
-          <div class="player-leg right"></div>
-
-        </div>
-
-
-        <!-- MESSAGE -->
-
-        <div id="message" class="message">
-          Tape dans la cage pour tirer ⚽
-        </div>
-
-      </div>
-
-
-      <!-- CONTROLES -->
-
-      <div class="controls">
-
-        <div class="instructions">
-
-          <span>🎯 Vise la cage</span>
-          <span>⚽ Le tir part automatiquement</span>
-          <span>🧤 Évite le gardien</span>
-
-        </div>
-
-
-        <!-- PUISSANCE -->
-
-        <div class="power-panel">
-
-          <div class="power-labels">
-            <span>FAIBLE</span>
-            <span>PARFAIT</span>
-            <span>FORT</span>
-          </div>
-
-          <div class="power-bar">
-
-            <div class="power-zone red left-red"></div>
-            <div class="power-zone orange left-orange"></div>
-            <div class="power-zone green"></div>
-            <div class="power-zone orange right-orange"></div>
-            <div class="power-zone red right-red"></div>
-
-            <div id="needle" class="needle"></div>
-
-          </div>
-
-        </div>
-
-
-        <!-- SON -->
-
-        <button
-          id="soundButton"
-          class="sound-button"
-          type="button"
-          aria-pressed="true"
-        >
-          🔊 Son
+        <button id="playButton" class="main-button primary-button">
+          ⚽ Jouer
         </button>
 
+        <button id="trainingButton" class="main-button">
+          🎯 Entraînement
+        </button>
 
-        <!-- FIN DE MATCH -->
+        <button id="statsButton" class="main-button">
+          📊 Statistiques
+        </button>
 
-        <div id="result" class="result hidden">
+        <button id="settingsButton" class="main-button">
+          ⚙️ Paramètres
+        </button>
 
-          <h2 id="resultTitle">🏁 Match terminé</h2>
+      </div>
 
-          <p>
-            Score :
-            <strong id="finalScore">0</strong>
+      <div class="menu-best">
+        🏆 Meilleur score :
+        <strong id="menuBestScore">0</strong>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         ECRAN DE JEU
+    ========================== -->
+
+    <section id="gameScreen" class="screen">
+
+      <header class="topbar">
+
+        <div>
+
+          <button id="backToMenuButton" class="small-button">
+            ← Menu
+          </button>
+
+          <h1>⚽ PenaltyMind</h1>
+
+          <p id="gameSubtitle" class="subtitle">
+            Vise la cage et trompe le gardien
           </p>
 
-          <p>
-            Meilleur score :
-            <strong id="bestScore">0</strong>
-          </p>
+        </div>
 
-          <button id="restartButton" class="restart-button" type="button">
-            Rejouer
+        <div class="stats">
+
+          <div>
+            <span>Tir</span>
+            <strong id="shotNumber">1</strong>
+          </div>
+
+          <div>
+            <span>Score</span>
+            <strong id="score">0</strong>
+          </div>
+
+          <div>
+            <span>Combo</span>
+            <strong id="combo">0</strong>
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <section class="match">
+
+        <div class="stadium">
+
+          <div class="sky"></div>
+          <div class="crowd"></div>
+
+          <div class="field">
+            <div class="penalty-area"></div>
+            <div class="penalty-spot"></div>
+          </div>
+
+
+          <!-- CAGE -->
+
+          <div id="goal" class="goal">
+
+            <div class="net"></div>
+
+            <div class="post post-left"></div>
+            <div class="post post-right"></div>
+            <div class="crossbar"></div>
+
+
+            <!-- GARDIEN -->
+
+            <div id="keeper" class="keeper">
+
+              <div class="keeper-head"></div>
+              <div class="keeper-body"></div>
+
+              <div class="keeper-arm left"></div>
+              <div class="keeper-arm right"></div>
+
+              <div class="keeper-leg left"></div>
+              <div class="keeper-leg right"></div>
+
+            </div>
+
+
+            <!-- CIBLE -->
+
+            <div id="targetDot" class="target-dot"></div>
+
+
+            <!-- BALLON -->
+
+            <div id="ball" class="ball">⚽</div>
+
+          </div>
+
+
+          <!-- JOUEUR -->
+
+          <div class="player">
+
+            <div class="player-head"></div>
+            <div class="player-body"></div>
+
+            <div class="player-arm left"></div>
+            <div class="player-arm right"></div>
+
+            <div class="player-leg left"></div>
+            <div class="player-leg right"></div>
+
+          </div>
+
+
+          <div id="message" class="message">
+            Vise la cage pour tirer ⚽
+          </div>
+
+        </div>
+
+
+        <!-- CONTROLES -->
+
+        <div class="controls">
+
+          <div class="instructions">
+
+            <span>🎯 Vise la cage</span>
+            <span>⚽ Le tir part automatiquement</span>
+            <span>🧤 Évite le gardien</span>
+
+          </div>
+
+
+          <!-- PUISSANCE -->
+
+          <div class="power-panel">
+
+            <div class="power-labels">
+              <span>FAIBLE</span>
+              <span>PARFAIT</span>
+              <span>FORT</span>
+            </div>
+
+            <div class="power-bar">
+
+              <div class="power-zone red left-red"></div>
+              <div class="power-zone orange left-orange"></div>
+              <div class="power-zone green"></div>
+              <div class="power-zone orange right-orange"></div>
+              <div class="power-zone red right-red"></div>
+
+              <div id="needle" class="needle"></div>
+
+            </div>
+
+          </div>
+
+
+          <button
+            id="soundButton"
+            class="sound-button"
+            type="button"
+            aria-pressed="true"
+          >
+            🔊 Son
+          </button>
+
+
+          <!-- RESULTAT -->
+
+          <div id="result" class="result hidden">
+
+            <h2 id="resultTitle">
+              🏁 Match terminé
+            </h2>
+
+            <p>
+              Score :
+              <strong id="finalScore">0</strong>
+            </p>
+
+            <p>
+              Meilleur score :
+              <strong id="bestScore">0</strong>
+            </p>
+
+            <button
+              id="restartButton"
+              class="restart-button"
+              type="button"
+            >
+              Rejouer
+            </button>
+
+            <button
+              id="resultMenuButton"
+              class="secondary-button"
+              type="button"
+            >
+              ← Retour au menu
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- =========================
+         ENTRAINEMENT
+    ========================== -->
+
+    <section id="trainingScreen" class="screen">
+
+      <div class="subscreen">
+
+        <button class="back-button" data-back-menu>
+          ← Retour au menu
+        </button>
+
+        <div class="subscreen-title">
+          <span>🎯</span>
+          <h2>Entraînement</h2>
+          <p>
+            Travaille ta précision sans limite de tirs.
+          </p>
+        </div>
+
+
+        <div class="training-info">
+
+          <div class="info-card">
+            <strong>∞</strong>
+            <span>Tirs libres</span>
+          </div>
+
+          <div class="info-card">
+            <strong id="trainingGoals">0</strong>
+            <span>Buts</span>
+          </div>
+
+          <div class="info-card">
+            <strong id="trainingShots">0</strong>
+            <span>Tirs</span>
+          </div>
+
+        </div>
+
+
+        <button id="startTrainingButton" class="main-button primary-button">
+          🎯 Commencer
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         STATISTIQUES
+    ========================== -->
+
+    <section id="statsScreen" class="screen">
+
+      <div class="subscreen">
+
+        <button class="back-button" data-back-menu>
+          ← Retour au menu
+        </button>
+
+        <div class="subscreen-title">
+          <span>📊</span>
+          <h2>Statistiques</h2>
+          <p>Découvre tes performances.</p>
+        </div>
+
+
+        <div class="statistics-grid">
+
+          <div class="stat-card">
+            <span>🏆</span>
+            <strong id="statBestScore">0</strong>
+            <small>Meilleur score</small>
+          </div>
+
+          <div class="stat-card">
+            <span>⚽</span>
+            <strong id="statGoals">0</strong>
+            <small>Buts</small>
+          </div>
+
+          <div class="stat-card">
+            <span>🧤</span>
+            <strong id="statSaves">0</strong>
+            <small>Arrêts subis</small>
+          </div>
+
+          <div class="stat-card">
+            <span>🔥</span>
+            <strong id="statCombo">0</strong>
+            <small>Meilleur combo</small>
+          </div>
+
+          <div class="stat-card">
+            <span>🎯</span>
+            <strong id="statShots">0</strong>
+            <small>Tirs</small>
+          </div>
+
+          <div class="stat-card">
+            <span>📈</span>
+            <strong id="statAccuracy">0%</strong>
+            <small>Précision</small>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         PARAMETRES
+    ========================== -->
+
+    <section id="settingsScreen" class="screen">
+
+      <div class="subscreen">
+
+        <button class="back-button" data-back-menu>
+          ← Retour au menu
+        </button>
+
+        <div class="subscreen-title">
+          <span>⚙️</span>
+          <h2>Paramètres</h2>
+          <p>Personnalise ton expérience.</p>
+        </div>
+
+
+        <div class="settings-list">
+
+          <div class="setting-row">
+
+            <div>
+              <strong>🔊 Sons</strong>
+              <small>Activer les effets sonores</small>
+            </div>
+
+            <button
+              id="settingsSoundButton"
+              class="toggle-button"
+              type="button"
+            >
+              ON
+            </button>
+
+          </div>
+
+
+          <div class="setting-row">
+
+            <div>
+              <strong>💾 Données</strong>
+              <small>Les statistiques sont sauvegardées sur cet appareil.</small>
+            </div>
+
+          </div>
+
+
+          <button
+            id="resetStatsButton"
+            class="danger-button"
+            type="button"
+          >
+            🗑️ Réinitialiser les statistiques
           </button>
 
         </div>
@@ -193,6 +440,7 @@
     </section>
 
   </main>
+
 
   <script src="game.js"></script>
 
