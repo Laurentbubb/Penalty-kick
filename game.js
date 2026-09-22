@@ -1,4 +1,4 @@
-```javascript
+javascript
 const MAX_SHOTS = 10;
 
 const state = {
