@@ -13,33 +13,138 @@
   <main class="game">
 
 ```
-<h1>⚽ PenaltyMind</h1>
+<header class="topbar">
+  <div>
+    <h1>PenaltyMind</h1>
+    <p class="subtitle">Vise juste. Trouve le bon timing. Bat le gardien.</p>
+  </div>
 
-<p id="message">Choisis une direction</p>
+  <div class="stats">
+    <div>
+      <span>Penalty</span>
+      <strong><span id="shotNumber">1</span>/10</strong>
+    </div>
 
-<div class="scoreboard">
-  <span>Tir : <b id="shotNumber">1</b>/10</span>
-  <span>Score : <b id="score">0</b></span>
-  <span>Combo : <b id="combo">0</b></span>
-</div>
+    <div>
+      <span>Score</span>
+      <strong id="score">0</strong>
+    </div>
 
-<div class="goal">
-  <div id="keeper">🧤</div>
-  <div id="ball">⚽</div>
-</div>
+    <div>
+      <span>Combo</span>
+      <strong id="combo">0</strong>
+    </div>
+  </div>
+</header>
 
-<div id="controls">
-  <button class="shot-btn" data-direction="left">⬅️ Gauche</button>
-  <button class="shot-btn" data-direction="center">⬆️ Centre</button>
-  <button class="shot-btn" data-direction="right">➡️ Droite</button>
-</div>
+<section class="match">
 
-<div id="result" class="hidden">
-  <h2 id="resultTitle">🏁 Fin de partie</h2>
-  <p>Score : <b id="finalScore">0</b></p>
-  <p>Record : <b id="bestScore">0</b></p>
-  <button id="restartBtn">🔄 Rejouer</button>
-</div>
+  <div class="stadium">
+
+    <div class="crowd"></div>
+    <div class="sky"></div>
+
+    <div class="goal" id="goal">
+
+      <div class="net"></div>
+
+      <div class="post post-left"></div>
+      <div class="post post-right"></div>
+      <div class="crossbar"></div>
+
+      <div class="keeper" id="keeper">
+        <div class="keeper-head"></div>
+        <div class="keeper-body"></div>
+        <div class="keeper-arm left"></div>
+        <div class="keeper-arm right"></div>
+        <div class="keeper-leg left"></div>
+        <div class="keeper-leg right"></div>
+      </div>
+
+      <div class="target-dot" id="targetDot"></div>
+
+    </div>
+
+    <div class="field">
+
+      <div class="penalty-area"></div>
+      <div class="penalty-spot"></div>
+
+      <div class="player">
+        <div class="player-head"></div>
+        <div class="player-body"></div>
+        <div class="player-arm left"></div>
+        <div class="player-arm right"></div>
+        <div class="player-leg left"></div>
+        <div class="player-leg right"></div>
+      </div>
+
+      <div class="ball" id="ball">⚽</div>
+
+    </div>
+
+    <div class="message" id="message">
+      Clique dans la cage pour viser
+    </div>
+
+  </div>
+
+  <div class="controls">
+
+    <div class="instructions">
+      <span>🖱️ Clique dans la cage pour viser</span>
+      <span>🎯 Tire quand la jauge est verte</span>
+    </div>
+
+    <div class="power-panel">
+
+      <div class="power-labels">
+        <span>IMPRÉCIS</span>
+        <strong>PRÉCISION</strong>
+        <span>IMPRÉCIS</span>
+      </div>
+
+      <div class="power-bar">
+
+        <div class="power-zone red left-red"></div>
+        <div class="power-zone orange left-orange"></div>
+        <div class="power-zone green"></div>
+        <div class="power-zone orange right-orange"></div>
+        <div class="power-zone red right-red"></div>
+
+        <div class="needle" id="needle"></div>
+
+      </div>
+
+      <button id="shootButton" class="shoot-button">
+        TIRER !
+      </button>
+
+    </div>
+
+    <div class="result hidden" id="result">
+
+      <h2 id="resultTitle">Fin du match</h2>
+
+      <p>
+        Score final :
+        <strong id="finalScore">0</strong>
+      </p>
+
+      <p>
+        Meilleur score :
+        <strong id="bestScore">0</strong>
+      </p>
+
+      <button id="restartButton" class="restart-button">
+        Rejouer
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
 ```
 
   </main>
