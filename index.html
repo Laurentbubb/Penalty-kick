@@ -1,11 +1,9 @@
-html
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>PenaltyMind</title>
 
   <link rel="stylesheet" href="style.css">
@@ -14,10 +12,6 @@ html
 <body>
 
   <main class="game">
-
-    <!-- =========================
-         BARRE DU HAUT
-    ========================== -->
 
     <header class="topbar">
 
@@ -51,10 +45,6 @@ html
     </header>
 
 
-    <!-- =========================
-         TERRAIN
-    ========================== -->
-
     <section class="match">
 
       <div class="stadium">
@@ -72,9 +62,7 @@ html
         </div>
 
 
-        <!-- =========================
-             CAGE
-        ========================== -->
+        <!-- CAGE -->
 
         <div id="goal" class="goal">
 
@@ -87,133 +75,100 @@ html
           <div class="crossbar"></div>
 
 
-          <!-- Gardien -->
+          <!-- GARDIEN -->
 
           <div id="keeper" class="keeper">
 
             <div class="keeper-head"></div>
-
             <div class="keeper-body"></div>
 
             <div class="keeper-arm left"></div>
-
             <div class="keeper-arm right"></div>
 
             <div class="keeper-leg left"></div>
-
             <div class="keeper-leg right"></div>
 
           </div>
 
 
-          <!-- Cible -->
+          <!-- CIBLE -->
 
-          <div
-            id="targetDot"
-            class="target-dot">
-          </div>
+          <div id="targetDot" class="target-dot"></div>
 
 
           <!-- BALLE -->
 
-          <div
-            id="ball"
-            class="ball">
-            ⚽
-          </div>
+          <div id="ball" class="ball">⚽</div>
 
         </div>
 
 
-        <!-- Joueur -->
+        <!-- JOUEUR -->
 
         <div class="player">
 
           <div class="player-head"></div>
-
           <div class="player-body"></div>
 
           <div class="player-arm left"></div>
-
           <div class="player-arm right"></div>
 
           <div class="player-leg left"></div>
-
           <div class="player-leg right"></div>
 
         </div>
 
 
-        <!-- Message -->
+        <!-- MESSAGE -->
 
-        <div
-          id="message"
-          class="message">
+        <div id="message" class="message">
           Clique dans la cage pour tirer ⚽
         </div>
 
       </div>
 
 
-      <!-- =========================
-           CONTROLES
-      ========================== -->
+      <!-- CONTROLES -->
 
       <div class="controls">
 
         <div class="instructions">
 
           <span>🎯 Clique dans la cage</span>
-
           <span>⚽ Le tir part automatiquement</span>
-
           <span>🧤 Évite le gardien</span>
 
         </div>
 
 
-        <!-- Jauge -->
+        <!-- JAUGE -->
 
         <div class="power-panel">
 
           <div class="power-labels">
-
             <span>FAIBLE</span>
-
             <span>PARFAIT</span>
-
             <span>FORT</span>
-
           </div>
-
 
           <div class="power-bar">
 
             <div class="power-zone red left-red"></div>
-
             <div class="power-zone orange left-orange"></div>
-
             <div class="power-zone green"></div>
-
             <div class="power-zone orange right-orange"></div>
-
             <div class="power-zone red right-red"></div>
 
-            <div
-              id="needle"
-              class="needle">
-            </div>
+            <div id="needle" class="needle"></div>
 
           </div>
 
         </div>
 
 
-        <!-- Résultat -->
+        <!-- RESULTAT -->
 
-        <div
-          id="result"
-          class="result hidden">
+        <div id="result" class="result hidden">
 
           <h2 id="resultTitle">
             🏁 Fin du match
@@ -229,9 +184,7 @@ html
             <strong id="bestScore">0</strong>
           </p>
 
-          <button
-            id="restartButton"
-            class="restart-button">
+          <button id="restartButton" class="restart-button">
             Rejouer
           </button>
 
