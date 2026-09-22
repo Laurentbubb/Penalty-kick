@@ -1,759 +1,925 @@
-document.addEventListener("DOMContentLoaded", function () {
+// ============================================================
+// PENALTYMIND
+// Prototype complet
+// ============================================================
 
-    console.log("PenaltyMind game.js OK");
+const $ = (id) => document.getElementById(id);
 
-    var currentScreen = null;
-
-    var score = 0;
-    var shots = 0;
-    var combo = 0;
-    var trainingMode = false;
-    var gameFinished = false;
-
-    var xp = Number(localStorage.getItem("pm_xp")) || 0;
-    var bestScore = Number(localStorage.getItem("pm_best_score")) || 0;
-    var totalGoals = Number(localStorage.getItem("pm_goals")) || 0;
-    var totalSaves = Number(localStorage.getItem("pm_saves")) || 0;
-    var totalShots = Number(localStorage.getItem("pm_shots")) || 0;
-    var bestCombo = Number(localStorage.getItem("pm_best_combo")) || 0;
-    var trainingGoals = Number(localStorage.getItem("pm_training_goals")) || 0;
-    var trainingShots = Number(localStorage.getItem("pm_training_shots")) || 0;
-
-    var soundEnabled =
-        localStorage.getItem("pm_sound") !== "off";
+const screens = {
+    menu: $("mainMenu"),
+    game: $("gameScreen"),
+    training: $("trainingScreen"),
+    daily: $("dailyScreen"),
+    stats: $("statsScreen"),
+    settings: $("settingsScreen")
+};
 
 
-    /* =========================
-       OUTILS
-    ========================= */
+// ============================================================
+// DONNEES
+// ============================================================
 
-    function get(id) {
-        return document.getElementById(id);
+let save = JSON.parse(localStorage.getItem("penaltymind_save")) || {
+    level: 1,
+    xp: 0,
+    bestScore: 0,
+
+    goals: 0,
+    saves: 0,
+    shots: 0,
+    bestCombo: 0,
+
+    sound: true,
+
+    daily: {
+        goals: 0,
+        shots: 0,
+        perfect: 0
     }
+};
 
-    function showScreen(id) {
 
-        var screens = document.querySelectorAll(".screen");
+let game = {
+    shots: 0,
+    maxShots: 5,
+    score: 0,
+    combo: 0,
 
-        for (var i = 0; i < screens.length; i++) {
-            screens[i].classList.remove("active");
-        }
+    targetX: 50,
+    targetY: 23,
 
-        var screen = get(id);
+    power: 50,
 
-        if (screen) {
-            screen.classList.add("active");
-            currentScreen = id;
-        }
-    }
+    playing: false,
+    training: false,
 
+    powerDirection: 1,
+    powerTimer: null
+};
 
-    /* =========================
-       SAUVEGARDE
-    ========================= */
 
-    function saveData() {
+// ============================================================
+// SAUVEGARDE
+// ============================================================
 
-        localStorage.setItem("pm_xp", xp);
-        localStorage.setItem("pm_best_score", bestScore);
-        localStorage.setItem("pm_goals", totalGoals);
-        localStorage.setItem("pm_saves", totalSaves);
-        localStorage.setItem("pm_shots", totalShots);
-        localStorage.setItem("pm_best_combo", bestCombo);
-        localStorage.setItem("pm_training_goals", trainingGoals);
-        localStorage.setItem("pm_training_shots", trainingShots);
-    }
-
-
-    /* =========================
-       XP / NIVEAU
-    ========================= */
-
-    function getLevel() {
-        return Math.floor(xp / 500) + 1;
-    }
-
-    function updateXP() {
-
-        var level = getLevel();
-        var currentXP = xp % 500;
-        var percent = (currentXP / 500) * 100;
-
-        if (get("menuLevel")) {
-            get("menuLevel").textContent = level;
-        }
-
-        if (get("menuXP")) {
-            get("menuXP").textContent = currentXP;
-        }
-
-        if (get("menuXPNeeded")) {
-            get("menuXPNeeded").textContent = "500";
-        }
-
-        if (get("menuXPFill")) {
-            get("menuXPFill").style.width = percent + "%";
-        }
-    }
-
-    function addXP(amount) {
-        xp += amount;
-        saveData();
-        updateXP();
-    }
-
-
-    /* =========================
-       MENU
-    ========================= */
-
-    function updateMenu() {
-
-        updateXP();
-
-        if (get("menuBestScore")) {
-            get("menuBestScore").textContent = bestScore;
-        }
-    }
-
-
-    /* =========================
-       JEU
-    ========================= */
-
-    function startGame(training) {
-
-        trainingMode = training;
-        gameFinished = false;
-
-        score = 0;
-        shots = 0;
-        combo = 0;
-
-        if (get("gameSubtitle")) {
-
-            if (trainingMode) {
-                get("gameSubtitle").textContent =
-                    "Entraînement : tirs illimités";
-            } else {
-                get("gameSubtitle").textContent =
-                    "10 tirs pour faire le meilleur score";
-            }
-        }
-
-        if (get("result")) {
-            get("result").classList.remove("active");
-        }
-
-        updateGameDisplay();
-        resetField();
-
-        showScreen("gameScreen");
-    }
-
-
-    function updateGameDisplay() {
-
-        if (get("shotNumber")) {
-            get("shotNumber").textContent =
-                trainingMode ? shots + 1 : Math.min(shots + 1, 10);
-        }
-
-        if (get("score")) {
-            get("score").textContent = score;
-        }
-
-        if (get("combo")) {
-            get("combo").textContent = combo;
-        }
-    }
-
-
-    function resetField() {
-
-        if (get("ball")) {
-            get("ball").style.left = "50%";
-            get("ball").style.bottom = "25px";
-        }
-
-        if (get("keeper")) {
-            get("keeper").style.left = "50%";
-        }
-
-        if (get("message")) {
-            get("message").textContent =
-                "Vise la cage pour tirer ⚽";
-        }
-    }
-
-
-    /* =========================
-       TIR
-    ========================= */
-
-    function shoot(event) {
-
-        if (gameFinished) {
-            return;
-        }
-
-        if (event && event.target) {
-
-            if (
-                event.target.closest("button") ||
-                event.target.closest(".result-card")
-            ) {
-                return;
-            }
-        }
-
-        var goal = get("goal");
-
-        if (!goal) {
-            return;
-        }
-
-        var rect = goal.getBoundingClientRect();
-
-        var clickX = event
-            ? event.clientX - rect.left
-            : rect.width / 2;
-
-        var clickY = event
-            ? event.clientY - rect.top
-            : rect.height / 2;
-
-        var percentX =
-            (clickX / rect.width) * 100;
-
-        var percentY =
-            (clickY / rect.height) * 100;
-
-        if (percentX < 0) {
-            percentX = 0;
-        }
-
-        if (percentX > 100) {
-            percentX = 100;
-        }
-
-        if (percentY < 0) {
-            percentY = 0;
-        }
-
-        if (percentY > 100) {
-            percentY = 100;
-        }
-
-        shots++;
-        totalShots++;
-
-        var keeperPositions = [
-            20,
-            50,
-            80
-        ];
-
-        var keeperPosition =
-            keeperPositions[
-                Math.floor(
-                    Math.random() * keeperPositions.length
-                )
-            ];
-
-        var distance =
-            Math.abs(percentX - keeperPosition);
-
-        var isGoal = distance > 16;
-
-        if (get("ball")) {
-
-            get("ball").style.left =
-                percentX + "%";
-
-            get("ball").style.bottom =
-                "55%";
-        }
-
-        if (get("keeper")) {
-
-            get("keeper").style.left =
-                keeperPosition + "%";
-        }
-
-        if (get("message")) {
-            get("message").textContent =
-                "Tir en cours...";
-        }
-
-        setTimeout(function () {
-
-            if (isGoal) {
-
-                var points = 100 + combo * 25;
-
-                score += points;
-                combo++;
-
-                totalGoals++;
-
-                if (combo > bestCombo) {
-                    bestCombo = combo;
-                }
-
-                addXP(25);
-
-                if (get("message")) {
-                    get("message").textContent =
-                        "BUT ! +" + points + " points ⚽";
-                }
-
-                showResult(
-                    "BUT ! ⚽",
-                    "+" + points + " points"
-                );
-
-            } else {
-
-                combo = 0;
-                totalSaves++;
-
-                if (get("message")) {
-                    get("message").textContent =
-                        "ARRÊT ! 🧤";
-                }
-
-                showResult(
-                    "ARRÊT ! 🧤",
-                    "Le gardien a arrêté ton tir."
-                );
-            }
-
-            saveData();
-            updateGameDisplay();
-
-            if (!trainingMode && shots >= 10) {
-
-                setTimeout(function () {
-                    finishGame();
-                }, 900);
-            }
-
-        }, 500);
-    }
-
-
-    /* =========================
-       RESULTAT
-    ========================= */
-
-    function showResult(title, text) {
-
-        if (get("resultTitle")) {
-            get("resultTitle").textContent = title;
-        }
-
-        if (get("finalScore")) {
-            get("finalScore").textContent = score;
-        }
-
-        if (get("bestScore")) {
-            get("bestScore").textContent =
-                Math.max(bestScore, score);
-        }
-
-        if (get("result")) {
-            get("result").classList.add("active");
-        }
-    }
-
-
-    function hideResult() {
-
-        if (get("result")) {
-            get("result").classList.remove("active");
-        }
-
-        resetField();
-    }
-
-
-    function finishGame() {
-
-        gameFinished = true;
-
-        if (score > bestScore) {
-            bestScore = score;
-        }
-
-        saveData();
-
-        if (get("finalScore")) {
-            get("finalScore").textContent = score;
-        }
-
-        if (get("bestScore")) {
-            get("bestScore").textContent = bestScore;
-        }
-
-        if (get("resultTitle")) {
-            get("resultTitle").textContent =
-                "Fin de la partie !";
-        }
-
-        if (get("result")) {
-            get("result").classList.add("active");
-        }
-
-        updateMenu();
-    }
-
-
-    /* =========================
-       STATS
-    ========================= */
-
-    function updateStats() {
-
-        if (get("statBestScore")) {
-            get("statBestScore").textContent =
-                bestScore;
-        }
-
-        if (get("statGoals")) {
-            get("statGoals").textContent =
-                totalGoals;
-        }
-
-        if (get("statSaves")) {
-            get("statSaves").textContent =
-                totalSaves;
-        }
-
-        if (get("statCombo")) {
-            get("statCombo").textContent =
-                bestCombo;
-        }
-
-        if (get("statShots")) {
-            get("statShots").textContent =
-                totalShots;
-        }
-
-        var accuracy = 0;
-
-        if (totalShots > 0) {
-            accuracy =
-                Math.round(
-                    (totalGoals / totalShots) * 100
-                );
-        }
-
-        if (get("statAccuracy")) {
-            get("statAccuracy").textContent =
-                accuracy + "%";
-        }
-
-        if (get("trainingGoals")) {
-            get("trainingGoals").textContent =
-                trainingGoals;
-        }
-
-        if (get("trainingShots")) {
-            get("trainingShots").textContent =
-                trainingShots;
-        }
-    }
-
-
-    /* =========================
-       DEFIS
-    ========================= */
-
-    function updateDailyChallenges() {
-
-        var list = get("dailyChallengesList");
-
-        if (!list) {
-            return;
-        }
-
-        var goalsDone =
-            Math.min(totalGoals, 3);
-
-        var shotsDone =
-            Math.min(totalShots, 5);
-
-        var comboDone =
-            Math.min(bestCombo, 3);
-
-        var completed = 0;
-
-        if (goalsDone >= 3) {
-            completed++;
-        }
-
-        if (shotsDone >= 5) {
-            completed++;
-        }
-
-        if (comboDone >= 3) {
-            completed++;
-        }
-
-        if (get("dailyCompletedCount")) {
-            get("dailyCompletedCount").textContent =
-                completed + "/3";
-        }
-
-        list.innerHTML =
-            '<div class="challenge">' +
-                '<strong>⚽ Marquer 3 buts</strong>' +
-                '<br>' +
-                '<span>' +
-                goalsDone +
-                '/3' +
-                '</span>' +
-            '</div>' +
-
-            '<div class="challenge">' +
-                '<strong>🎯 Faire 5 tirs</strong>' +
-                '<br>' +
-                '<span>' +
-                shotsDone +
-                '/5' +
-                '</span>' +
-            '</div>' +
-
-            '<div class="challenge">' +
-                '<strong>🔥 Faire un combo de 3</strong>' +
-                '<br>' +
-                '<span>' +
-                comboDone +
-                '/3' +
-                '</span>' +
-            '</div>';
-    }
-
-
-    /* =========================
-       BOUTONS MENU
-    ========================= */
-
-    get("playButton").addEventListener(
-        "click",
-        function () {
-            startGame(false);
-        }
+function saveGame() {
+    localStorage.setItem(
+        "penaltymind_save",
+        JSON.stringify(save)
     );
-
-    get("trainingButton").addEventListener(
-        "click",
-        function () {
-            showScreen("trainingScreen");
-            updateStats();
-        }
-    );
-
-    get("dailyButton").addEventListener(
-        "click",
-        function () {
-            updateDailyChallenges();
-            showScreen("dailyScreen");
-        }
-    );
-
-    get("statsButton").addEventListener(
-        "click",
-        function () {
-            updateStats();
-            showScreen("statsScreen");
-        }
-    );
-
-    get("settingsButton").addEventListener(
-        "click",
-        function () {
-            showScreen("settingsScreen");
-        }
-    );
+}
 
 
-    /* =========================
-       ENTRAINEMENT
-    ========================= */
+// ============================================================
+// ECRANS
+// ============================================================
 
-    get("startTrainingButton").addEventListener(
-        "click",
-        function () {
-            startGame(true);
-        }
-    );
+function showScreen(screen) {
+
+    Object.values(screens).forEach(s => {
+        if (s) s.classList.add("hidden");
+    });
+
+    screen.classList.remove("hidden");
+}
 
 
-    /* =========================
-       RETOUR MENU
-    ========================= */
+function goMenu() {
+    stopPower();
+    game.playing = false;
 
-    var backButtons =
-        document.querySelectorAll("[data-back-menu]");
+    $("result").classList.add("hidden-result");
 
-    for (var i = 0; i < backButtons.length; i++) {
+    showScreen(screens.menu);
 
-        backButtons[i].addEventListener(
-            "click",
-            function () {
-                updateMenu();
-                showScreen("mainMenu");
-            }
+    updateMenu();
+}
+
+
+// ============================================================
+// XP
+// ============================================================
+
+function xpNeeded() {
+    return save.level * 100;
+}
+
+
+function addXP(amount) {
+
+    save.xp += amount;
+
+    while (save.xp >= xpNeeded()) {
+        save.xp -= xpNeeded();
+        save.level++;
+
+        showFloatingMessage(
+            "LEVEL UP ! 🎉"
         );
     }
 
+    saveGame();
+    updateMenu();
+}
 
-    get("backToMenuButton").addEventListener(
-        "click",
-        function () {
-            hideResult();
-            showScreen("mainMenu");
-            updateMenu();
+
+function updateMenu() {
+
+    $("menuLevel").textContent = save.level;
+
+    $("menuXP").textContent = save.xp;
+
+    $("menuXPNeeded").textContent = xpNeeded();
+
+    const percentage =
+        Math.min(100, (save.xp / xpNeeded()) * 100);
+
+    $("menuXPFill").style.width =
+        percentage + "%";
+
+    $("menuBestScore").textContent =
+        save.bestScore;
+
+    updateStats();
+    updateDaily();
+}
+
+
+// ============================================================
+// STATS
+// ============================================================
+
+function updateStats() {
+
+    $("statBestScore").textContent =
+        save.bestScore;
+
+    $("statGoals").textContent =
+        save.goals;
+
+    $("statSaves").textContent =
+        save.saves;
+
+    $("statCombo").textContent =
+        save.bestCombo;
+
+    $("statShots").textContent =
+        save.shots;
+
+    const accuracy =
+        save.shots === 0
+            ? 0
+            : Math.round(
+                (save.goals / save.shots) * 100
+            );
+
+    $("statAccuracy").textContent =
+        accuracy + "%";
+}
+
+
+// ============================================================
+// QUETES
+// ============================================================
+
+function updateDaily() {
+
+    const challenges = [
+
+        {
+            icon: "⚽",
+            name: "Marquer 3 buts",
+            progress: Math.min(save.daily.goals, 3),
+            max: 3,
+            xp: 50
+        },
+
+        {
+            icon: "🎯",
+            name: "Tirer 10 fois",
+            progress: Math.min(save.daily.shots, 10),
+            max: 10,
+            xp: 40
+        },
+
+        {
+            icon: "🔥",
+            name: "Faire un tir parfait",
+            progress: Math.min(save.daily.perfect, 1),
+            max: 1,
+            xp: 75
         }
-    );
 
+    ];
 
-    get("resultMenuButton").addEventListener(
-        "click",
-        function () {
-            hideResult();
-            showScreen("mainMenu");
-            updateMenu();
-        }
-    );
+    const container =
+        $("dailyChallengesList");
 
+    container.innerHTML = "";
 
-    /* =========================
-       REJOUER
-    ========================= */
+    let completed = 0;
 
-    get("restartButton").addEventListener(
-        "click",
-        function () {
-            hideResult();
-            startGame(trainingMode);
-        }
-    );
+    challenges.forEach(challenge => {
 
+        const done =
+            challenge.progress >= challenge.max;
 
-    /* =========================
-       CLIC TERRAIN
-    ========================= */
-
-    get("goal").addEventListener(
-        "click",
-        function (event) {
-            shoot(event);
-        }
-    );
-
-
-    /* =========================
-       SON
-    ========================= */
-
-    function updateSoundButton() {
-
-        var text =
-            soundEnabled
-                ? "🔊 Son : activé"
-                : "🔇 Son : désactivé";
-
-        if (get("settingsSoundButton")) {
-            get("settingsSoundButton").textContent =
-                text;
+        if (done) {
+            completed++;
         }
 
-        if (get("soundButton")) {
-            get("soundButton").textContent =
-                soundEnabled ? "🔊" : "🔇";
-        }
+        const element =
+            document.createElement("div");
+
+        element.className =
+            "challenge" +
+            (done ? " done" : "");
+
+        element.innerHTML = `
+
+            <div class="challenge-info">
+
+                <strong>
+                    ${challenge.icon}
+                    ${challenge.name}
+                </strong>
+
+                <small>
+                    ${challenge.progress}/${challenge.max}
+                    ${done ? " • TERMINÉ ✓" : ""}
+                </small>
+
+            </div>
+
+            <div class="challenge-xp">
+                +${challenge.xp} XP
+            </div>
+        `;
+
+        container.appendChild(element);
+    });
+
+    $("dailyCompletedCount").textContent =
+        completed;
+}
+
+
+// ============================================================
+// JEU
+// ============================================================
+
+function startGame(training = false) {
+
+    game.shots = 0;
+    game.score = 0;
+    game.combo = 0;
+    game.playing = true;
+    game.training = training;
+
+    $("score").textContent = "0";
+    $("combo").textContent = "0🔥";
+
+    $("gameSubtitle").textContent =
+        training
+            ? "MODE ENTRAÎNEMENT"
+            : "MODE CLASSIQUE";
+
+    $("result").classList.add("hidden-result");
+
+    showScreen(screens.game);
+
+    nextShot();
+}
+
+
+function nextShot() {
+
+    if (!game.playing) return;
+
+    if (
+        !game.training &&
+        game.shots >= game.maxShots
+    ) {
+        finishGame();
+        return;
     }
 
+    game.shots++;
 
-    get("soundButton").addEventListener(
-        "click",
-        function () {
+    $("shotNumber").textContent =
+        game.shots;
 
-            soundEnabled = !soundEnabled;
+    $("message").textContent =
+        "PLACE LA CIBLE DANS LA CAGE";
 
-            localStorage.setItem(
-                "pm_sound",
-                soundEnabled ? "on" : "off"
-            );
+    resetBall();
 
-            updateSoundButton();
+    moveTarget();
+
+    resetKeeper();
+
+    startPower();
+
+    updateDailyShots();
+}
+
+
+function resetBall() {
+
+    const ball = $("ball");
+
+    ball.style.left = "50%";
+    ball.style.bottom = "7%";
+    ball.style.transform =
+        "translateX(-50%) scale(1)";
+
+    ball.style.transition =
+        "none";
+}
+
+
+function moveTarget() {
+
+    // zone réellement atteignable dans la cage
+    game.targetX =
+        27 + Math.random() * 46;
+
+    game.targetY =
+        13 + Math.random() * 27;
+
+    const target =
+        $("targetDot");
+
+    target.style.left =
+        game.targetX + "%";
+
+    target.style.top =
+        game.targetY + "%";
+}
+
+
+function resetKeeper() {
+
+    const keeper =
+        $("keeper");
+
+    keeper.style.transform =
+        "translateX(-50%)";
+}
+
+
+// ============================================================
+// JAUGE DE PUISSANCE
+// ============================================================
+
+function startPower() {
+
+    stopPower();
+
+    game.power = 20;
+    game.powerDirection = 1;
+
+    game.powerTimer =
+        setInterval(() => {
+
+            game.power +=
+                game.powerDirection * 1.8;
+
+            if (game.power >= 100) {
+                game.power = 100;
+                game.powerDirection = -1;
+            }
+
+            if (game.power <= 5) {
+                game.power = 5;
+                game.powerDirection = 1;
+            }
+
+            updatePower();
+
+        }, 25);
+}
+
+
+function stopPower() {
+
+    if (game.powerTimer) {
+        clearInterval(game.powerTimer);
+        game.powerTimer = null;
+    }
+}
+
+
+function updatePower() {
+
+    $("needle").style.left =
+        game.power + "%";
+
+    $("powerValue").textContent =
+        Math.round(game.power) + "%";
+}
+
+
+// ============================================================
+// TIR
+// ============================================================
+
+function shoot() {
+
+    if (!game.playing) return;
+
+    stopPower();
+
+    const power =
+        game.power;
+
+    const perfect =
+        power >= 78 &&
+        power <= 92;
+
+    const good =
+        power >= 58 &&
+        power <= 97;
+
+    const target =
+        $("targetDot");
+
+    const ball =
+        $("ball");
+
+    // Le gardien choisit une zone
+    // proche mais pas toujours parfaite
+    const keeperDirection =
+        Math.random();
+
+    let keeperX;
+
+    if (keeperDirection < .33) {
+        keeperX = 28;
+    } else if (keeperDirection < .66) {
+        keeperX = 50;
+    } else {
+        keeperX = 72;
+    }
+
+    const distance =
+        Math.abs(
+            game.targetX - keeperX
+        );
+
+    let saved = false;
+
+    // Le gardien a davantage de chances
+    // si le tir arrive dans sa zone
+    if (distance < 12) {
+
+        const saveChance =
+            perfect ? .18 : .48;
+
+        saved =
+            Math.random() < saveChance;
+    }
+
+    // animation cible
+    target.style.opacity = "0";
+
+    // animation du ballon
+    ball.style.transition =
+        "all .55s cubic-bezier(.15,.8,.25,1)";
+
+    ball.style.left =
+        game.targetX + "%";
+
+    ball.style.bottom =
+        "62%";
+
+    ball.style.transform =
+        "translateX(-50%) scale(.45)";
+
+    // mouvement gardien
+    const keeper =
+        $("keeper");
+
+    if (saved) {
+
+        const direction =
+            game.targetX < 50
+                ? -1
+                : 1;
+
+        keeper.style.transform =
+            `translateX(calc(-50% + ${direction * 75}px)) rotate(${direction * 15}deg)`;
+
+    } else {
+
+        keeper.style.transform =
+            `translateX(-50%)`;
+    }
+
+    setTimeout(() => {
+
+        target.style.opacity = "1";
+
+        if (saved) {
+
+            onSave();
+
+        } else {
+
+            onGoal(perfect, good);
         }
+
+    }, 600);
+}
+
+
+// ============================================================
+// BUT
+// ============================================================
+
+function onGoal(perfect, good) {
+
+    game.combo++;
+
+    save.goals++;
+    save.shots++;
+
+    if (game.combo > save.bestCombo) {
+        save.bestCombo =
+            game.combo;
+    }
+
+    let points = 100;
+
+    if (good) {
+        points += 50;
+    }
+
+    if (perfect) {
+        points += 150;
+        save.daily.perfect++;
+    }
+
+    points +=
+        game.combo * 25;
+
+    game.score += points;
+
+    $("score").textContent =
+        game.score;
+
+    $("combo").textContent =
+        game.combo + "🔥";
+
+    $("message").textContent =
+        perfect
+            ? "🎯 TIR PARFAIT ! +"+points
+            : "⚽ BUT ! +"+points;
+
+    addXP(
+        perfect ? 20 : 10
     );
 
+    save.daily.goals++;
 
-    get("settingsSoundButton").addEventListener(
-        "click",
-        function () {
+    saveGame();
+    updateDaily();
 
-            soundEnabled = !soundEnabled;
+    setTimeout(() => {
 
-            localStorage.setItem(
-                "pm_sound",
-                soundEnabled ? "on" : "off"
-            );
+        if (game.training) {
 
-            updateSoundButton();
+            nextShot();
+
+        } else {
+
+            nextShot();
         }
-    );
+
+    }, 850);
+}
 
 
-    /* =========================
-       RESET
-    ========================= */
+// ============================================================
+// ARRET
+// ============================================================
 
-    get("resetStatsButton").addEventListener(
-        "click",
-        function () {
+function onSave() {
 
-            localStorage.removeItem("pm_xp");
-            localStorage.removeItem("pm_best_score");
-            localStorage.removeItem("pm_goals");
-            localStorage.removeItem("pm_saves");
-            localStorage.removeItem("pm_shots");
-            localStorage.removeItem("pm_best_combo");
-            localStorage.removeItem("pm_training_goals");
-            localStorage.removeItem("pm_training_shots");
+    game.combo = 0;
 
-            xp = 0;
-            bestScore = 0;
-            totalGoals = 0;
-            totalSaves = 0;
-            totalShots = 0;
-            bestCombo = 0;
-            trainingGoals = 0;
-            trainingShots = 0;
+    save.saves++;
+    save.shots++;
 
-            updateMenu();
-            updateStats();
-            updateDailyChallenges();
+    $("combo").textContent =
+        "0🔥";
 
-            alert("Données réinitialisées !");
-        }
-    );
+    $("message").textContent =
+        "🧤 ARRÊT DU GARDIEN !";
+
+    saveGame();
+
+    setTimeout(() => {
+        nextShot();
+    }, 850);
+}
 
 
-    /* =========================
-       INITIALISATION
-    ========================= */
+// ============================================================
+// FIN DE PARTIE
+// ============================================================
+
+function finishGame() {
+
+    game.playing = false;
+
+    stopPower();
+
+    if (
+        game.score >
+        save.bestScore
+    ) {
+        save.bestScore =
+            game.score;
+
+        $("resultTitle").textContent =
+            "🏆 NOUVEAU RECORD !";
+
+    } else {
+
+        $("resultTitle").textContent =
+            "BIEN JOUÉ !";
+    }
+
+    $("finalScore").textContent =
+        game.score;
+
+    $("bestScore").textContent =
+        save.bestScore;
+
+    saveGame();
 
     updateMenu();
-    updateStats();
-    updateDailyChallenges();
-    updateSoundButton();
 
-    showScreen("mainMenu");
+    $("result").classList.remove(
+        "hidden-result"
+    );
+}
 
-});
+
+// ============================================================
+// MESSAGE
+// ============================================================
+
+function showFloatingMessage(text) {
+
+    $("message").textContent =
+        text;
+}
+
+
+// ============================================================
+// QUETES
+// ============================================================
+
+function updateDailyShots() {
+
+    save.daily.shots++;
+
+    saveGame();
+    updateDaily();
+}
+
+
+// ============================================================
+// SON
+// ============================================================
+
+let audioContext = null;
+
+function playSound(type) {
+
+    if (!save.sound) return;
+
+    try {
+
+        if (!audioContext) {
+            audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+        }
+
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+
+        if (type === "goal") {
+
+            oscillator.frequency.value = 620;
+
+        } else {
+
+            oscillator.frequency.value = 180;
+        }
+
+        gain.gain.value = .04;
+
+        oscillator.start();
+
+        oscillator.stop(
+            audioContext.currentTime + .12
+        );
+
+    } catch (e) {}
+}
+
+
+// ============================================================
+// EVENEMENTS MENU
+// ============================================================
+
+$("playButton").addEventListener(
+    "click",
+    () => startGame(false)
+);
+
+$("trainingButton").addEventListener(
+    "click",
+    () => showScreen(screens.training)
+);
+
+$("dailyButton").addEventListener(
+    "click",
+    () => {
+        updateDaily();
+        showScreen(screens.daily);
+    }
+);
+
+$("statsButton").addEventListener(
+    "click",
+    () => {
+        updateStats();
+        showScreen(screens.stats);
+    }
+);
+
+$("settingsButton").addEventListener(
+    "click",
+    () => showScreen(screens.settings)
+);
+
+
+// ============================================================
+// RETOURS MENU
+// ============================================================
+
+$("backToMenuButton").addEventListener(
+    "click",
+    goMenu
+);
+
+document
+    .querySelectorAll("[data-back-menu]")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            goMenu
+        );
+    });
+
+$("resultMenuButton").addEventListener(
+    "click",
+    goMenu
+);
+
+
+// ============================================================
+// REJOUER
+// ============================================================
+
+$("restartButton").addEventListener(
+    "click",
+    () => startGame(game.training)
+);
+
+
+// ============================================================
+// TIR
+// ============================================================
+
+$("shootButton").addEventListener(
+    "click",
+    shoot
+);
+
+$("powerMeter").addEventListener(
+    "click",
+    shoot
+);
+
+
+// ============================================================
+// ENTRAINEMENT
+// ============================================================
+
+$("startTrainingButton").addEventListener(
+    "click",
+    () => startGame(true)
+);
+
+
+// ============================================================
+// SON
+// ============================================================
+
+$("soundButton").addEventListener(
+    "click",
+    () => {
+
+        save.sound =
+            !save.sound;
+
+        saveGame();
+
+        $("soundButton").textContent =
+            save.sound ? "🔊" : "🔇";
+    }
+);
+
+$("settingsSoundButton").addEventListener(
+    "click",
+    () => {
+
+        save.sound =
+            !save.sound;
+
+        saveGame();
+
+        $("settingsSoundButton").textContent =
+            save.sound
+                ? "🔊 SON : ACTIVÉ"
+                : "🔇 SON : DÉSACTIVÉ";
+    }
+);
+
+
+// ============================================================
+// RESET
+// ============================================================
+
+$("resetStatsButton").addEventListener(
+    "click",
+    () => {
+
+        const confirmed =
+            confirm(
+                "Réinitialiser toute ta progression ?"
+            );
+
+        if (!confirmed) return;
+
+        save = {
+            level: 1,
+            xp: 0,
+            bestScore: 0,
+
+            goals: 0,
+            saves: 0,
+            shots: 0,
+            bestCombo: 0,
+
+            sound: true,
+
+            daily: {
+                goals: 0,
+                shots: 0,
+                perfect: 0
+            }
+        };
+
+        saveGame();
+        updateMenu();
+
+        alert(
+            "Progression réinitialisée."
+        );
+    }
+);
+
+
+// ============================================================
+// INITIALISATION
+// ============================================================
+
+updateMenu();
+
+showScreen(screens.menu);
