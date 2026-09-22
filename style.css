@@ -2,26 +2,27 @@
   box-sizing: border-box;
   }
 
-:root {
+html,
+body {
+margin: 0;
+min-height: 100%;
 font-family: Arial, sans-serif;
-color: white;
 background: #07111d;
+color: white;
 }
 
 body {
-margin: 0;
 min-height: 100vh;
-background: linear-gradient(#173453, #07111d);
 }
 
 button {
-font: inherit;
+font-family: Arial, sans-serif;
 }
 
 .game {
-width: min(1180px, 100%);
+width: min(1200px, 100%);
 margin: auto;
-padding: 18px;
+padding: 20px;
 }
 
 .topbar {
@@ -39,7 +40,7 @@ font-size: 42px;
 
 .subtitle {
 margin: 5px 0 0;
-color: #b7c6d4;
+color: #b9c7d5;
 }
 
 .stats {
@@ -52,7 +53,7 @@ min-width: 85px;
 padding: 10px;
 text-align: center;
 border-radius: 12px;
-background: rgba(255,255,255,.08);
+background: #142333;
 }
 
 .stats span {
@@ -76,52 +77,655 @@ background: #09131f;
 
 .stadium {
 position: relative;
-height: 650px;
+height: 680px;
 overflow: hidden;
+background: #228746;
 cursor: crosshair;
-background: #218346;
 }
 
 .sky {
 position: absolute;
-inset: 0 0 52%;
-background: linear-gradient(#83c9eb, #d9f3ff);
+z-index: 0;
+left: 0;
+right: 0;
+top: 0;
+height: 48%;
+background: linear-gradient(
+#62b7df,
+#d7f3ff
+);
 }
 
 .crowd {
 position: absolute;
-top: 28%;
+z-index: 1;
 left: 0;
 right: 0;
-height: 25%;
+top: 28%;
+height: 20%;
 background:
-radial-gradient(circle, #24384b 0 5px, transparent 6px) 0 0 / 55px 45px,
-#303d48;
+radial-gradient(
+circle,
+#263a4d 0 5px,
+transparent 6px
+) 0 0 / 45px 38px,
+#344553;
 }
 
 .field {
 position: absolute;
-inset: 47% 0 0;
+z-index: 2;
+left: 0;
+right: 0;
+top: 45%;
+bottom: 0;
+
 background:
 repeating-linear-gradient(
 90deg,
-rgba(255,255,255,.025) 0 70px,
+rgba(255,255,255,.035) 0 70px,
 transparent 70px 140px
 ),
-linear-gradient(#278d4d, #126136);
+linear-gradient(
+#2b914e,
+#126536
+);
 }
 
 .penalty-area {
 position: absolute;
-width: 70%;
-height: 55%;
 left: 50%;
-top: -5%;
+top: -10px;
+
+width: 70%;
+height: 60%;
+
 transform: translateX(-50%);
-border: 3px solid rgba(255,255,255,.6);
+
+border: 4px solid rgba(255,255,255,.75);
 border-top: 0;
 border-radius: 0 0 50% 50%;
 }
 
 .penalty-spot {
-position:
+position: absolute;
+left: 50%;
+top: 25%;
+
+width: 12px;
+height: 12px;
+
+transform: translateX(-50%);
+
+border-radius: 50%;
+background: white;
+}
+
+/* CAGE */
+
+.goal {
+position: absolute;
+z-index: 10;
+
+left: 50%;
+top: 9%;
+
+width: min(780px, 82vw);
+height: 350px;
+
+transform: translateX(-50%);
+}
+
+.net {
+position: absolute;
+z-index: 1;
+
+left: 0;
+right: 0;
+top: 10px;
+bottom: 0;
+
+border: 7px solid white;
+
+background-color: rgba(255,255,255,.08);
+
+background-image:
+linear-gradient(
+rgba(255,255,255,.25) 2px,
+transparent 2px
+),
+linear-gradient(
+90deg,
+rgba(255,255,255,.25) 2px,
+transparent 2px
+);
+
+background-size: 25px 25px;
+}
+
+.post {
+position: absolute;
+z-index: 20;
+
+top: 0;
+bottom: 0;
+
+width: 12px;
+
+background: white;
+
+box-shadow: 0 0 5px rgba(0,0,0,.5);
+}
+
+.post-left {
+left: 0;
+}
+
+.post-right {
+right: 0;
+}
+
+.crossbar {
+position: absolute;
+z-index: 20;
+
+left: 0;
+right: 0;
+top: 0;
+
+height: 12px;
+
+background: white;
+
+box-shadow: 0 0 5px rgba(0,0,0,.5);
+}
+
+/* GARDIEN */
+
+.keeper {
+position: absolute;
+z-index: 30;
+
+left: 50%;
+bottom: 9%;
+
+width: 90px;
+height: 145px;
+
+transform: translateX(-50%);
+
+transition:
+left .45s ease,
+transform .45s ease;
+}
+
+.keeper-head {
+position: absolute;
+
+left: 27px;
+top: 0;
+
+width: 36px;
+height: 36px;
+
+border-radius: 50%;
+
+background: #c98257;
+border: 3px solid #202020;
+}
+
+.keeper-body {
+position: absolute;
+
+left: 17px;
+top: 31px;
+
+width: 56px;
+height: 65px;
+
+border-radius: 12px;
+
+background: #f0a51d;
+border: 4px solid #202020;
+}
+
+.keeper-arm {
+position: absolute;
+
+top: 38px;
+
+width: 16px;
+height: 70px;
+
+border-radius: 12px;
+
+background: #c98257;
+border: 3px solid #202020;
+}
+
+.keeper-arm.left {
+left: 2px;
+transform: rotate(25deg);
+}
+
+.keeper-arm.right {
+right: 2px;
+transform: rotate(-25deg);
+}
+
+.keeper-leg {
+position: absolute;
+
+top: 92px;
+
+width: 18px;
+height: 52px;
+
+border-radius: 10px;
+
+background: #20252b;
+border: 3px solid #151515;
+}
+
+.keeper-leg.left {
+left: 24px;
+}
+
+.keeper-leg.right {
+right: 24px;
+}
+
+.keeper.dive-left {
+transform:
+translateX(-50%)
+rotate(-65deg);
+}
+
+.keeper.dive-right {
+transform:
+translateX(-50%)
+rotate(65deg);
+}
+
+.keeper.dive-center {
+transform:
+translateX(-50%)
+translateY(-10px);
+}
+
+/* CIBLE */
+
+.target-dot {
+position: absolute;
+z-index: 40;
+
+width: 28px;
+height: 28px;
+
+transform: translate(-50%, -50%);
+
+border: 4px solid white;
+border-radius: 50%;
+
+background: rgba(255,255,255,.15);
+
+box-shadow: 0 0 10px white;
+
+opacity: 0;
+
+pointer-events: none;
+}
+
+.target-dot.visible {
+opacity: 1;
+}
+
+/* JOUEUR */
+
+.player {
+position: absolute;
+z-index: 15;
+
+left: 50%;
+bottom: 2%;
+
+width: 100px;
+height: 205px;
+
+transform: translateX(-50%);
+}
+
+.player-head {
+position: absolute;
+
+left: 31px;
+top: 0;
+
+width: 40px;
+height: 40px;
+
+border-radius: 50%;
+
+background: #9b5c3d;
+border: 4px solid #211914;
+}
+
+.player-body {
+position: absolute;
+
+left: 19px;
+top: 37px;
+
+width: 62px;
+height: 88px;
+
+border-radius: 15px;
+
+background: #18274a;
+border: 4px solid #0c1429;
+}
+
+.player-arm {
+position: absolute;
+
+top: 48px;
+
+width: 18px;
+height: 80px;
+
+border-radius: 12px;
+
+background: #9b5c3d;
+border: 4px solid #211914;
+}
+
+.player-arm.left {
+left: 1px;
+transform: rotate(8deg);
+}
+
+.player-arm.right {
+right: 1px;
+transform: rotate(-8deg);
+}
+
+.player-leg {
+position: absolute;
+
+top: 116px;
+
+width: 22px;
+height: 86px;
+
+border-radius: 12px;
+
+background: #111a31;
+border: 4px solid #090e1c;
+}
+
+.player-leg.left {
+left: 25px;
+}
+
+.player-leg.right {
+right: 25px;
+}
+
+/* BALLON */
+
+.ball {
+position: absolute;
+z-index: 50;
+
+left: 50%;
+bottom: 17%;
+
+font-size: 42px;
+
+transform: translateX(-50%);
+
+transition:
+left .65s ease,
+bottom .65s ease,
+transform .65s ease;
+
+filter: drop-shadow(
+0 5px 4px rgba(0,0,0,.35)
+);
+}
+
+/* MESSAGE */
+
+.message {
+position: absolute;
+z-index: 100;
+
+left: 50%;
+top: 3%;
+
+transform: translateX(-50%);
+
+padding: 11px 20px;
+
+border-radius: 999px;
+
+background: rgba(5,13,21,.85);
+
+font-weight: bold;
+
+white-space: nowrap;
+}
+
+/* CONTROLES */
+
+.controls {
+padding: 20px;
+}
+
+.instructions {
+display: flex;
+justify-content: center;
+gap: 25px;
+flex-wrap: wrap;
+
+margin-bottom: 15px;
+
+color: #b5c3d0;
+font-size: 13px;
+}
+
+.power-panel {
+width: min(760px, 100%);
+margin: auto;
+}
+
+.power-labels {
+display: flex;
+justify-content: space-between;
+
+margin-bottom: 6px;
+
+font-size: 10px;
+}
+
+.power-bar {
+position: relative;
+
+display: flex;
+
+height: 30px;
+
+overflow: hidden;
+
+border: 2px solid rgba(255,255,255,.2);
+border-radius: 20px;
+}
+
+.power-zone {
+height: 100%;
+}
+
+.red {
+background: #df3d3d;
+}
+
+.orange {
+background: #ed922e;
+}
+
+.green {
+background: #35c96f;
+}
+
+.left-red,
+.right-red {
+width: 17%;
+}
+
+.left-orange,
+.right-orange {
+width: 18%;
+}
+
+.green {
+width: 30%;
+}
+
+.needle {
+position: absolute;
+
+top: -5px;
+bottom: -5px;
+
+left: 0;
+
+width: 5px;
+
+border-radius: 5px;
+
+background: white;
+
+box-shadow: 0 0 12px white;
+
+transform: translateX(-50%);
+}
+
+.shoot-button,
+.restart-button {
+display: block;
+
+margin: 15px auto 0;
+
+padding: 13px 32px;
+
+border: 0;
+border-radius: 12px;
+
+background: white;
+color: #07111d;
+
+font-weight: bold;
+font-size: 16px;
+
+cursor: pointer;
+}
+
+.shoot-button:hover,
+.restart-button:hover {
+transform: scale(1.04);
+}
+
+.shoot-button:disabled {
+opacity: .45;
+cursor: not-allowed;
+}
+
+.result {
+text-align: center;
+padding-top: 10px;
+}
+
+.result h2 {
+margin-bottom: 5px;
+}
+
+.result p {
+color: #b9c7d2;
+}
+
+.hidden {
+display: none !important;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+.game {
+padding: 8px;
+}
+
+.topbar {
+flex-direction: column;
+align-items: flex-start;
+}
+
+.stats {
+width: 100%;
+}
+
+.stats div {
+flex: 1;
+}
+
+.stadium {
+height: 570px;
+}
+
+.goal {
+width: 92vw;
+height: 275px;
+}
+
+.keeper {
+transform:
+translateX(-50%)
+scale(.8);
+
+```
+transform-origin: bottom center;
+```
+
+}
+
+.keeper.dive-left {
+transform:
+translateX(-50%)
+rotate(-65deg)
+scale(.8);
+}
+
+.keeper.dive-right {
+transform:
+translateX(-50%)
+rotate(65deg)
+scale(.8);
+}
+
+.player {
+transform:
+translateX(-50%)
+scale(.8);
+
+```
+transform-origin: bottom center;
+```
+
+}
+
+.message {
+max-width: 90%;
+white-space: normal;
+text-align: center;
+}
+}
