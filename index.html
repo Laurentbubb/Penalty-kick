@@ -1,5 +1,5 @@
+```html
 <!DOCTYPE html>
-
 <html lang="fr">
 
 <head>
@@ -15,262 +15,234 @@
 
   <main class="game">
 
-```
-<header class="topbar">
+    <!-- =========================
+         BARRE DU HAUT
+    ========================== -->
 
-  <div>
-    <h1>PenaltyMind</h1>
+    <header class="topbar">
 
-    <p class="subtitle">
-      Vise juste. Trouve le bon timing. Bat le gardien.
-    </p>
-  </div>
+      <div>
+        <h1>⚽ PenaltyMind</h1>
 
-  <div class="stats">
+        <p class="subtitle">
+          Clique dans la cage pour tirer
+        </p>
+      </div>
 
-    <div>
-      <span>Penalty</span>
-      <strong>
-        <span id="shotNumber">1</span>/10
-      </strong>
-    </div>
+      <div class="stats">
 
-    <div>
-      <span>Score</span>
-      <strong id="score">0</strong>
-    </div>
+        <div>
+          <span>Tir</span>
+          <strong id="shotNumber">1</strong>
+        </div>
 
-    <div>
-      <span>Combo</span>
-      <strong id="combo">0</strong>
-    </div>
+        <div>
+          <span>Score</span>
+          <strong id="score">0</strong>
+        </div>
 
-  </div>
-
-</header>
-
-
-<section class="match">
-
-  <div class="stadium">
-
-    <!-- CIEL -->
-
-    <div class="sky"></div>
-
-    <!-- PUBLIC -->
-
-    <div class="crowd"></div>
-
-
-    <!-- TERRAIN -->
-
-    <div class="field">
-
-      <div class="penalty-area"></div>
-
-      <div class="penalty-spot"></div>
-
-
-      <!-- JOUEUR -->
-
-      <div class="player">
-
-        <div class="player-head"></div>
-
-        <div class="player-body"></div>
-
-        <div class="player-arm left"></div>
-
-        <div class="player-arm right"></div>
-
-        <div class="player-leg left"></div>
-
-        <div class="player-leg right"></div>
+        <div>
+          <span>Combo</span>
+          <strong id="combo">0</strong>
+        </div>
 
       </div>
 
-
-      <!-- BALLON -->
-
-      <div
-        class="ball"
-        id="ball"
-      >
-        ⚽
-      </div>
-
-    </div>
+    </header>
 
 
-    <!-- CAGE -->
+    <!-- =========================
+         TERRAIN
+    ========================== -->
 
-    <div
-      class="goal"
-      id="goal"
-    >
+    <section class="match">
 
-      <!-- FILET -->
+      <div class="stadium">
 
-      <div class="net"></div>
+        <div class="sky"></div>
 
+        <div class="crowd"></div>
 
-      <!-- POTEAUX -->
+        <div class="field">
 
-      <div class="post post-left"></div>
+          <div class="penalty-area"></div>
 
-      <div class="post post-right"></div>
+          <div class="penalty-spot"></div>
 
-
-      <!-- BARRE -->
-
-      <div class="crossbar"></div>
+        </div>
 
 
-      <!-- GARDIEN -->
+        <!-- =========================
+             CAGE
+        ========================== -->
 
-      <div
-        class="keeper"
-        id="keeper"
-      >
+        <div id="goal" class="goal">
 
-        <div class="keeper-head"></div>
+          <div class="net"></div>
 
-        <div class="keeper-body"></div>
+          <div class="post post-left"></div>
 
-        <div class="keeper-arm left"></div>
+          <div class="post post-right"></div>
 
-        <div class="keeper-arm right"></div>
-
-        <div class="keeper-leg left"></div>
-
-        <div class="keeper-leg right"></div>
-
-      </div>
+          <div class="crossbar"></div>
 
 
-      <!-- CIBLE -->
+          <!-- Gardien -->
 
-      <div
-        class="target-dot"
-        id="targetDot"
-      ></div>
+          <div id="keeper" class="keeper">
 
-    </div>
+            <div class="keeper-head"></div>
 
+            <div class="keeper-body"></div>
 
-    <!-- MESSAGE -->
+            <div class="keeper-arm left"></div>
 
-    <div
-      class="message"
-      id="message"
-    >
-      Clique dans la cage pour viser
-    </div>
+            <div class="keeper-arm right"></div>
 
-  </div>
+            <div class="keeper-leg left"></div>
+
+            <div class="keeper-leg right"></div>
+
+          </div>
 
 
-  <!-- CONTROLES -->
+          <!-- Cible -->
 
-  <div class="controls">
-
-    <div class="instructions">
-
-      <span>
-        🖱️ Clique dans la cage pour viser
-      </span>
-
-      <span>
-        🎯 Tire quand la jauge est verte
-      </span>
-
-    </div>
+          <div
+            id="targetDot"
+            class="target-dot">
+          </div>
 
 
-    <!-- JAUGE -->
+          <!-- BALLE -->
 
-    <div class="power-panel">
+          <div
+            id="ball"
+            class="ball">
+            ⚽
+          </div>
 
-      <div class="power-labels">
-
-        <span>IMPRÉCIS</span>
-
-        <strong>PRÉCISION</strong>
-
-        <span>IMPRÉCIS</span>
-
-      </div>
+        </div>
 
 
-      <div class="power-bar">
+        <!-- Joueur -->
 
-        <div class="power-zone red left-red"></div>
+        <div class="player">
 
-        <div class="power-zone orange left-orange"></div>
+          <div class="player-head"></div>
 
-        <div class="power-zone green"></div>
+          <div class="player-body"></div>
 
-        <div class="power-zone orange right-orange"></div>
+          <div class="player-arm left"></div>
 
-        <div class="power-zone red right-red"></div>
+          <div class="player-arm right"></div>
+
+          <div class="player-leg left"></div>
+
+          <div class="player-leg right"></div>
+
+        </div>
+
+
+        <!-- Message -->
 
         <div
-          class="needle"
-          id="needle"
-        ></div>
+          id="message"
+          class="message">
+          Clique dans la cage pour tirer ⚽
+        </div>
 
       </div>
 
 
-      <button
-        id="shootButton"
-        class="shoot-button"
-      >
-        TIRER !
-      </button>
+      <!-- =========================
+           CONTROLES
+      ========================== -->
 
-    </div>
+      <div class="controls">
+
+        <div class="instructions">
+
+          <span>🎯 Clique dans la cage</span>
+
+          <span>⚽ Le tir part automatiquement</span>
+
+          <span>🧤 Évite le gardien</span>
+
+        </div>
 
 
-    <!-- RESULTAT -->
+        <!-- Jauge -->
 
-    <div
-      class="result hidden"
-      id="result"
-    >
+        <div class="power-panel">
 
-      <h2 id="resultTitle">
-        Fin du match
-      </h2>
+          <div class="power-labels">
 
-      <p>
-        Score final :
-        <strong id="finalScore">0</strong>
-      </p>
+            <span>FAIBLE</span>
 
-      <p>
-        Meilleur score :
-        <strong id="bestScore">0</strong>
-      </p>
+            <span>PARFAIT</span>
 
-      <button
-        id="restartButton"
-        class="restart-button"
-      >
-        Rejouer
-      </button>
+            <span>FORT</span>
 
-    </div>
+          </div>
 
-  </div>
 
-</section>
-```
+          <div class="power-bar">
+
+            <div class="power-zone red left-red"></div>
+
+            <div class="power-zone orange left-orange"></div>
+
+            <div class="power-zone green"></div>
+
+            <div class="power-zone orange right-orange"></div>
+
+            <div class="power-zone red right-red"></div>
+
+            <div
+              id="needle"
+              class="needle">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Résultat -->
+
+        <div
+          id="result"
+          class="result hidden">
+
+          <h2 id="resultTitle">
+            🏁 Fin du match
+          </h2>
+
+          <p>
+            Score :
+            <strong id="finalScore">0</strong>
+          </p>
+
+          <p>
+            Meilleur score :
+            <strong id="bestScore">0</strong>
+          </p>
+
+          <button
+            id="restartButton"
+            class="restart-button">
+            Rejouer
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
 
   </main>
 
-  <!-- JAVASCRIPT -->
 
   <script src="game.js"></script>
 
