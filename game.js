@@ -1,6 +1,6 @@
 /* ==================================================
    PENALTYMIND
-   Jeu de penalty - PC / tablette / téléphone
+   Menu + Jeu + Entraînement + Statistiques
 ================================================== */
 
 
@@ -12,30 +12,86 @@ const MAX_SHOTS = 10;
 
 
 /* ==================================================
-   ELEMENTS HTML
+   ECRANS
 ================================================== */
 
-const goal = document.getElementById("goal");
-const keeper = document.getElementById("keeper");
-const ball = document.getElementById("ball");
-const targetDot = document.getElementById("targetDot");
-const message = document.getElementById("message");
-const player = document.querySelector(".player");
+const screens = {
 
-const needle = document.getElementById("needle");
+  menu:
+    document.getElementById("mainMenu"),
 
-const shotNumber = document.getElementById("shotNumber");
-const scoreElement = document.getElementById("score");
-const comboElement = document.getElementById("combo");
+  game:
+    document.getElementById("gameScreen"),
 
-const result = document.getElementById("result");
-const resultTitle = document.getElementById("resultTitle");
+  training:
+    document.getElementById("trainingScreen"),
 
-const finalScore = document.getElementById("finalScore");
-const bestScore = document.getElementById("bestScore");
+  stats:
+    document.getElementById("statsScreen"),
 
-const restartButton = document.getElementById("restartButton");
-const soundButton = document.getElementById("soundButton");
+  settings:
+    document.getElementById("settingsScreen")
+
+};
+
+
+/* ==================================================
+   ELEMENTS DU JEU
+================================================== */
+
+const goal =
+  document.getElementById("goal");
+
+const keeper =
+  document.getElementById("keeper");
+
+const ball =
+  document.getElementById("ball");
+
+const targetDot =
+  document.getElementById("targetDot");
+
+const message =
+  document.getElementById("message");
+
+const player =
+  document.querySelector(".player");
+
+const needle =
+  document.getElementById("needle");
+
+const shotNumber =
+  document.getElementById("shotNumber");
+
+const scoreElement =
+  document.getElementById("score");
+
+const comboElement =
+  document.getElementById("combo");
+
+const result =
+  document.getElementById("result");
+
+const resultTitle =
+  document.getElementById("resultTitle");
+
+const finalScore =
+  document.getElementById("finalScore");
+
+const bestScore =
+  document.getElementById("bestScore");
+
+const restartButton =
+  document.getElementById("restartButton");
+
+const resultMenuButton =
+  document.getElementById("resultMenuButton");
+
+const soundButton =
+  document.getElementById("soundButton");
+
+const settingsSoundButton =
+  document.getElementById("settingsSoundButton");
 
 
 /* ==================================================
@@ -56,11 +112,104 @@ const state = {
 
   power: 0.5,
 
-  best: Number(
-    localStorage.getItem("penaltyMindBest") || 0
-  )
+  best:
+    Number(
+      localStorage.getItem(
+        "penaltyMindBest"
+      ) || 0
+    )
 
 };
+
+
+/* ==================================================
+   STATISTIQUES SAUVEGARDEES
+================================================== */
+
+const statistics = {
+
+  goals:
+    Number(
+      localStorage.getItem(
+        "penaltyMindGoals"
+      ) || 0
+    ),
+
+  saves:
+    Number(
+      localStorage.getItem(
+        "penaltyMindSaves"
+      ) || 0
+    ),
+
+  shots:
+    Number(
+      localStorage.getItem(
+        "penaltyMindShots"
+      ) || 0
+    ),
+
+  bestCombo:
+    Number(
+      localStorage.getItem(
+        "penaltyMindBestCombo"
+      ) || 0
+    ),
+
+  trainingGoals:
+    Number(
+      localStorage.getItem(
+        "penaltyMindTrainingGoals"
+      ) || 0
+    ),
+
+  trainingShots:
+    Number(
+      localStorage.getItem(
+        "penaltyMindTrainingShots"
+      ) || 0
+    )
+
+};
+
+
+/* ==================================================
+   SAUVEGARDE STATS
+================================================== */
+
+function saveStatistics() {
+
+  localStorage.setItem(
+    "penaltyMindGoals",
+    statistics.goals
+  );
+
+  localStorage.setItem(
+    "penaltyMindSaves",
+    statistics.saves
+  );
+
+  localStorage.setItem(
+    "penaltyMindShots",
+    statistics.shots
+  );
+
+  localStorage.setItem(
+    "penaltyMindBestCombo",
+    statistics.bestCombo
+  );
+
+  localStorage.setItem(
+    "penaltyMindTrainingGoals",
+    statistics.trainingGoals
+  );
+
+  localStorage.setItem(
+    "penaltyMindTrainingShots",
+    statistics.trainingShots
+  );
+
+}
 
 
 /* ==================================================
@@ -70,7 +219,9 @@ const state = {
 let audioContext = null;
 
 let soundEnabled =
-  localStorage.getItem("penaltyMindSound") !== "off";
+  localStorage.getItem(
+    "penaltyMindSound"
+  ) !== "off";
 
 
 function initAudio() {
@@ -91,16 +242,25 @@ function initAudio() {
         return;
       }
 
-      audioContext = new AudioContext();
+      audioContext =
+        new AudioContext();
+
     }
 
-    if (audioContext.state === "suspended") {
+    if (
+      audioContext.state ===
+      "suspended"
+    ) {
+
       audioContext.resume();
+
     }
 
   } catch (error) {
 
-    console.warn("Audio non disponible.");
+    console.warn(
+      "Audio non disponible."
+    );
 
   }
 
@@ -115,13 +275,22 @@ function tone(
   delay = 0
 ) {
 
-  if (!soundEnabled || !audioContext) {
+  if (
+    !soundEnabled ||
+    !audioContext
+  ) {
+
     return;
+
   }
+
 
   try {
 
-    const now = audioContext.currentTime + delay;
+    const now =
+      audioContext.currentTime +
+      delay;
+
 
     const oscillator =
       audioContext.createOscillator();
@@ -130,7 +299,8 @@ function tone(
       audioContext.createGain();
 
 
-    oscillator.type = type;
+    oscillator.type =
+      type;
 
     oscillator.frequency.setValueAtTime(
       frequency,
@@ -155,27 +325,30 @@ function tone(
 
 
     oscillator.connect(gain);
-    gain.connect(audioContext.destination);
+
+    gain.connect(
+      audioContext.destination
+    );
 
 
     oscillator.start(now);
 
     oscillator.stop(
-      now + duration + 0.03
+      now +
+      duration +
+      0.03
     );
 
   } catch (error) {
 
-    console.warn("Impossible de jouer le son.");
+    console.warn(
+      "Son impossible à jouer."
+    );
 
   }
 
 }
 
-
-/* -------------------------------
-   Sons
--------------------------------- */
 
 function playKickSound() {
 
@@ -183,17 +356,17 @@ function playKickSound() {
 
   tone(
     180,
-    0.08,
+    .08,
     "triangle",
-    0.08
+    .08
   );
 
   tone(
     90,
-    0.12,
+    .12,
     "sine",
-    0.05,
-    0.03
+    .05,
+    .03
   );
 
 }
@@ -205,25 +378,25 @@ function playGoalSound() {
 
   tone(
     523,
-    0.12,
+    .12,
     "sine",
-    0.06
+    .06
   );
 
   tone(
     659,
-    0.12,
+    .12,
     "sine",
-    0.06,
-    0.12
+    .06,
+    .12
   );
 
   tone(
     784,
-    0.18,
+    .18,
     "sine",
-    0.07,
-    0.24
+    .07,
+    .24
   );
 
 }
@@ -235,17 +408,17 @@ function playSaveSound() {
 
   tone(
     160,
-    0.12,
+    .12,
     "sawtooth",
-    0.045
+    .045
   );
 
   tone(
     110,
-    0.18,
+    .18,
     "triangle",
-    0.06,
-    0.08
+    .06,
+    .08
   );
 
 }
@@ -257,17 +430,17 @@ function playWhistleSound() {
 
   tone(
     1000,
-    0.08,
+    .08,
     "sine",
-    0.045
+    .045
   );
 
   tone(
     1400,
-    0.12,
+    .12,
     "sine",
-    0.05,
-    0.1
+    .05,
+    .1
   );
 
 }
@@ -277,50 +450,273 @@ function playWhistleSound() {
    BOUTON SON
 ================================================== */
 
-function updateSoundButton() {
+function updateSoundButtons() {
 
-  if (soundEnabled) {
+  const text =
+    soundEnabled
+      ? "🔊 Son"
+      : "🔇 Son";
 
-    soundButton.textContent = "🔊 Son";
-
-  } else {
-
-    soundButton.textContent = "🔇 Son";
-
-  }
+  soundButton.textContent =
+    text;
 
   soundButton.setAttribute(
     "aria-pressed",
     String(soundEnabled)
   );
 
+
+  settingsSoundButton.textContent =
+    soundEnabled
+      ? "ON"
+      : "OFF";
+
+
+  settingsSoundButton.style.background =
+    soundEnabled
+      ? "#2fbf71"
+      : "#555d68";
+
+}
+
+
+function toggleSound() {
+
+  soundEnabled =
+    !soundEnabled;
+
+
+  localStorage.setItem(
+    "penaltyMindSound",
+    soundEnabled
+      ? "on"
+      : "off"
+  );
+
+
+  if (soundEnabled) {
+
+    initAudio();
+
+    playKickSound();
+
+  }
+
+
+  updateSoundButtons();
+
 }
 
 
 soundButton.addEventListener(
   "click",
-  () => {
+  toggleSound
+);
 
-    soundEnabled = !soundEnabled;
-
-    localStorage.setItem(
-      "penaltyMindSound",
-      soundEnabled ? "on" : "off"
-    );
-
-    if (soundEnabled) {
-      initAudio();
-      playKickSound();
-    }
-
-    updateSoundButton();
-
-  }
+settingsSoundButton.addEventListener(
+  "click",
+  toggleSound
 );
 
 
 /* ==================================================
-   JAUGE DE PUISSANCE
+   NAVIGATION
+================================================== */
+
+function showScreen(screen) {
+
+  Object.values(screens)
+    .forEach(
+      currentScreen => {
+
+        currentScreen.classList.remove(
+          "active-screen"
+        );
+
+      }
+    );
+
+
+  screen.classList.add(
+    "active-screen"
+  );
+
+}
+
+
+function showMenu() {
+
+  /*
+    On remet le jeu proprement
+    lorsque l'on revient au menu.
+  */
+
+  state.locked = true;
+
+  resetEffects();
+
+  resetBall();
+
+  result.classList.add(
+    "hidden"
+  );
+
+  targetDot.classList.remove(
+    "visible"
+  );
+
+  showScreen(
+    screens.menu
+  );
+
+  updateMenu();
+
+}
+
+
+/* ==================================================
+   BOUTONS DU MENU
+================================================== */
+
+document
+  .getElementById("playButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      startClassicGame();
+
+    }
+  );
+
+
+document
+  .getElementById("trainingButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      updateTrainingScreen();
+
+      showScreen(
+        screens.training
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("statsButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      updateStatsScreen();
+
+      showScreen(
+        screens.stats
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("settingsButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      updateSoundButtons();
+
+      showScreen(
+        screens.settings
+      );
+
+    }
+  );
+
+
+document
+  .querySelectorAll("[data-back-menu]")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        showMenu
+      );
+
+    }
+  );
+
+
+document
+  .getElementById("backToMenuButton")
+  .addEventListener(
+    "click",
+    showMenu
+  );
+
+
+resultMenuButton.addEventListener(
+  "click",
+  showMenu
+);
+
+
+/* ==================================================
+   JEU CLASSIQUE
+================================================== */
+
+function startClassicGame() {
+
+  state.shot = 1;
+
+  state.score = 0;
+
+  state.combo = 0;
+
+  state.locked = false;
+
+  state.aim = null;
+
+  state.power = .5;
+
+
+  result.classList.add(
+    "hidden"
+  );
+
+
+  resetEffects();
+
+  resetBall();
+
+
+  message.textContent =
+    "Vise la cage pour tirer ⚽";
+
+  message.className =
+    "message";
+
+
+  updateUI();
+
+
+  showScreen(
+    screens.game
+  );
+
+
+  playWhistleSound();
+
+}
+
+
+/* ==================================================
+   JAUGE
 ================================================== */
 
 let meterTime = 0;
@@ -330,17 +726,24 @@ function animateMeter() {
 
   if (!state.locked) {
 
-    meterTime += 0.04;
+    meterTime += .04;
 
     state.power =
-      (Math.sin(meterTime) + 1) / 2;
+      (
+        Math.sin(meterTime) +
+        1
+      ) / 2;
+
 
     needle.style.left =
       `${state.power * 100}%`;
 
   }
 
-  requestAnimationFrame(animateMeter);
+
+  requestAnimationFrame(
+    animateMeter
+  );
 
 }
 
@@ -362,7 +765,8 @@ function randomKeeperDirection() {
 
   return directions[
     Math.floor(
-      Math.random() * directions.length
+      Math.random() *
+      directions.length
     )
   ];
 
@@ -371,12 +775,16 @@ function randomKeeperDirection() {
 
 function getAimDirection(x) {
 
-  if (x < 0.34) {
+  if (x < .34) {
+
     return "left";
+
   }
 
-  if (x > 0.66) {
+  if (x > .66) {
+
     return "right";
+
   }
 
   return "center";
@@ -385,86 +793,96 @@ function getAimDirection(x) {
 
 
 /* ==================================================
-   PRECISION DU TIR
+   PRECISION
 ================================================== */
 
 function getAccuracy() {
 
   const distance =
-    Math.abs(state.power - 0.5);
+    Math.abs(
+      state.power -
+      .5
+    );
+
 
   return Math.max(
-    0.15,
-    1 - distance * 1.7
+    .15,
+    1 -
+      distance *
+      1.7
   );
 
 }
 
 
-/* ==================================================
-   PETITE ERREUR NATURELLE DU TIR
-================================================== */
-
-function chooseActualAim(x, y) {
+function chooseActualAim(
+  x,
+  y
+) {
 
   const accuracy =
     getAccuracy();
 
+
   const error =
-    (1 - accuracy) * 0.20;
-
-
-  const actualX =
-    Math.max(
-      0.12,
-      Math.min(
-        0.88,
-        x +
-          (Math.random() - 0.5) *
-          error
-      )
-    );
-
-
-  const actualY =
-    Math.max(
-      0.15,
-      Math.min(
-        0.78,
-        y +
-          (Math.random() - 0.5) *
-          error
-      )
-    );
+    (1 - accuracy) *
+    .20;
 
 
   return {
-    x: actualX,
-    y: actualY
+
+    x:
+      Math.max(
+        .12,
+        Math.min(
+          .88,
+          x +
+            (
+              Math.random() -
+              .5
+            ) *
+            error
+        )
+      ),
+
+    y:
+      Math.max(
+        .15,
+        Math.min(
+          .78,
+          y +
+            (
+              Math.random() -
+              .5
+            ) *
+            error
+        )
+      )
+
   };
 
 }
 
 
 /* ==================================================
-   POSITION DU BALLON
+   BALLON
 ================================================== */
 
-function moveBall(x, y) {
-
-  /*
-    On convertit les coordonnées
-    en position interne à la cage.
-
-    Les limites empêchent le ballon
-    de sortir visuellement.
-  */
+function moveBall(
+  x,
+  y
+) {
 
   const safeX =
-    12 + x * 76;
+    12 +
+    x *
+    76;
+
 
   const safeY =
-    10 + y * 58;
+    10 +
+    y *
+    58;
 
 
   ball.style.left =
@@ -474,7 +892,28 @@ function moveBall(x, y) {
     `${safeY}%`;
 
   ball.style.transform =
-    "translate(-50%, 0) scale(.72)";
+    "translate(-50%,0) scale(.72)";
+
+}
+
+
+function resetBall() {
+
+  ball.classList.remove(
+    "shooting"
+  );
+
+  ball.style.left =
+    "50%";
+
+  ball.style.bottom =
+    "6%";
+
+  ball.style.transform =
+    "translate(-50%,0) scale(1)";
+
+
+  clearKeeperAnimation();
 
 }
 
@@ -494,18 +933,13 @@ function clearKeeperAnimation() {
 }
 
 
-function moveKeeper(direction) {
+function moveKeeper(
+  direction
+) {
 
   clearKeeperAnimation();
 
-  /*
-    Force le navigateur à recalculer
-    l'élément pour permettre de rejouer
-    la même animation deux fois.
-  */
-
   void keeper.offsetWidth;
-
 
   keeper.classList.add(
     `dive-${direction}`
@@ -515,28 +949,7 @@ function moveKeeper(direction) {
 
 
 /* ==================================================
-   RESET BALLON
-================================================== */
-
-function resetBall() {
-
-  ball.classList.remove("shooting");
-
-  ball.style.left = "50%";
-
-  ball.style.bottom = "6%";
-
-  ball.style.transform =
-    "translate(-50%, 0) scale(1)";
-
-
-  clearKeeperAnimation();
-
-}
-
-
-/* ==================================================
-   RESET DES EFFETS
+   EFFETS
 ================================================== */
 
 function resetEffects() {
@@ -565,7 +978,9 @@ function shoot() {
     !state.aim ||
     state.shot > MAX_SHOTS
   ) {
+
     return;
+
   }
 
 
@@ -584,7 +999,9 @@ function shoot() {
 
 
   const targetDirection =
-    getAimDirection(actual.x);
+    getAimDirection(
+      actual.x
+    );
 
 
   const keeperDirection =
@@ -592,12 +1009,9 @@ function shoot() {
 
 
   const saved =
-    targetDirection === keeperDirection;
+    targetDirection ===
+    keeperDirection;
 
-
-  /*
-    Calcul des points
-  */
 
   let points = 0;
 
@@ -609,13 +1023,16 @@ function shoot() {
         accuracy * 100
       );
 
+
     const centerBonus =
       targetDirection === "center"
         ? 25
         : 0;
 
+
     const comboBonus =
-      state.combo * 20;
+      state.combo *
+      20;
 
 
     points =
@@ -625,20 +1042,45 @@ function shoot() {
       comboBonus;
 
 
-    state.score += points;
+    state.score +=
+      points;
+
 
     state.combo++;
+
+
+    statistics.goals++;
+
+
+    if (
+      state.combo >
+      statistics.bestCombo
+    ) {
+
+      statistics.bestCombo =
+        state.combo;
+
+    }
+
+
+    playGoalSound();
+
 
   } else {
 
     state.combo = 0;
 
+    statistics.saves++;
+
+    playSaveSound();
+
   }
 
 
-  /* -------------------------------
-     Animations
-  -------------------------------- */
+  statistics.shots++;
+
+  saveStatistics();
+
 
   resetEffects();
 
@@ -670,15 +1112,10 @@ function shoot() {
   );
 
 
-  /* -------------------------------
-     Résultat
-  -------------------------------- */
-
   if (saved) {
 
     message.textContent =
       "🧤 ARRÊT !";
-
 
     message.className =
       "message save";
@@ -693,15 +1130,10 @@ function shoot() {
       "disappointed"
     );
 
-
-    playSaveSound();
-
-
   } else {
 
     message.textContent =
       `⚽ BUT ! +${points}`;
-
 
     message.className =
       "message goal-message";
@@ -716,18 +1148,11 @@ function shoot() {
       "celebrate"
     );
 
-
-    playGoalSound();
-
   }
 
 
   updateUI();
 
-
-  /* -------------------------------
-     Tir suivant
-  -------------------------------- */
 
   setTimeout(
     () => {
@@ -735,7 +1160,10 @@ function shoot() {
       state.shot++;
 
 
-      if (state.shot > MAX_SHOTS) {
+      if (
+        state.shot >
+        MAX_SHOTS
+      ) {
 
         finishGame();
 
@@ -756,7 +1184,6 @@ function shoot() {
 
       message.textContent =
         "Vise la cage pour tirer ⚽";
-
 
       message.className =
         "message";
@@ -786,14 +1213,11 @@ function aim(event) {
     state.locked ||
     state.shot > MAX_SHOTS
   ) {
+
     return;
+
   }
 
-
-  /*
-    Empêche le scroll accidentel
-    sur tablette/téléphone.
-  */
 
   event.preventDefault();
 
@@ -808,27 +1232,29 @@ function aim(event) {
 
 
   let x =
-    (event.clientX - rect.left) /
+    (
+      event.clientX -
+      rect.left
+    ) /
     rect.width;
 
 
   let y =
     1 -
     (
-      (event.clientY - rect.top) /
+      (
+        event.clientY -
+        rect.top
+      ) /
       rect.height
     );
 
 
-  /*
-    Limites de sécurité.
-  */
-
   x =
     Math.max(
-      0.08,
+      .08,
       Math.min(
-        0.92,
+        .92,
         x
       )
     );
@@ -836,9 +1262,9 @@ function aim(event) {
 
   y =
     Math.max(
-      0.10,
+      .10,
       Math.min(
-        0.85,
+        .85,
         y
       )
     );
@@ -856,19 +1282,20 @@ function aim(event) {
   targetDot.style.top =
     `${(1 - y) * 100}%`;
 
-
   targetDot.classList.add(
     "visible"
   );
 
 
-  /*
-    Le tir part immédiatement.
-  */
-
   shoot();
 
 }
+
+
+goal.addEventListener(
+  "pointerdown",
+  aim
+);
 
 
 /* ==================================================
@@ -905,12 +1332,17 @@ function finishGame() {
     state.best;
 
 
-  if (state.score >= 1000) {
+  if (
+    state.score >=
+    1000
+  ) {
 
     resultTitle.textContent =
       "🏆 Énorme performance !";
 
-  } else if (state.score > 0) {
+  } else if (
+    state.score > 0
+  ) {
 
     resultTitle.textContent =
       "⚽ Match terminé !";
@@ -937,7 +1369,7 @@ function finishGame() {
 
 
 /* ==================================================
-   MISE A JOUR INTERFACE
+   UI DU JEU
 ================================================== */
 
 function updateUI() {
@@ -958,10 +1390,140 @@ function updateUI() {
 
 
 /* ==================================================
-   RECOMMENCER
+   REJOUER
 ================================================== */
 
-function restartGame() {
+restartButton.addEventListener(
+  "click",
+  () => {
+
+    startClassicGame();
+
+  }
+);
+
+
+/* ==================================================
+   STATISTIQUES
+================================================== */
+
+function updateStatsScreen() {
+
+  document.getElementById(
+    "statBestScore"
+  ).textContent =
+    state.best;
+
+
+  document.getElementById(
+    "statGoals"
+  ).textContent =
+    statistics.goals;
+
+
+  document.getElementById(
+    "statSaves"
+  ).textContent =
+    statistics.saves;
+
+
+  document.getElementById(
+    "statCombo"
+  ).textContent =
+    statistics.bestCombo;
+
+
+  document.getElementById(
+    "statShots"
+  ).textContent =
+    statistics.shots;
+
+
+  const accuracy =
+    statistics.shots > 0
+      ? Math.round(
+          (
+            statistics.goals /
+            statistics.shots
+          ) *
+          100
+        )
+      : 0;
+
+
+  document.getElementById(
+    "statAccuracy"
+  ).textContent =
+    `${accuracy}%`;
+
+}
+
+
+/* ==================================================
+   MENU
+================================================== */
+
+function updateMenu() {
+
+  document.getElementById(
+    "menuBestScore"
+  ).textContent =
+    state.best;
+
+}
+
+
+/* ==================================================
+   ENTRAINEMENT
+================================================== */
+
+let trainingMode = false;
+
+let trainingShots = 0;
+
+let trainingGoals = 0;
+
+
+function updateTrainingScreen() {
+
+  document.getElementById(
+    "trainingGoals"
+  ).textContent =
+    statistics.trainingGoals;
+
+
+  document.getElementById(
+    "trainingShots"
+  ).textContent =
+    statistics.trainingShots;
+
+}
+
+
+document
+  .getElementById(
+    "startTrainingButton"
+  )
+  .addEventListener(
+    "click",
+    startTraining
+  );
+
+
+function startTraining() {
+
+  trainingMode = true;
+
+  trainingShots = 0;
+
+  trainingGoals = 0;
+
+
+  /*
+    On réutilise exactement
+    la même cage et les mêmes
+    animations que le mode normal.
+  */
 
   state.shot = 1;
 
@@ -973,22 +1535,14 @@ function restartGame() {
 
   state.aim = null;
 
-  state.power = 0.5;
-
 
   result.classList.add(
     "hidden"
   );
 
 
-  targetDot.classList.remove(
-    "visible"
-  );
-
-
   message.textContent =
-    "Vise la cage pour tirer ⚽";
-
+    "🎯 Entraînement : vise la cage !";
 
   message.className =
     "message";
@@ -1001,43 +1555,414 @@ function restartGame() {
   updateUI();
 
 
+  document.getElementById(
+    "gameSubtitle"
+  ).textContent =
+    "Mode entraînement • tirs libres";
+
+
+  showScreen(
+    screens.game
+  );
+
+
   playWhistleSound();
 
 }
 
 
 /* ==================================================
-   EVENEMENTS
+   MODIFICATION DU TIR POUR L'ENTRAINEMENT
 ================================================== */
+
+/*
+  On remplace temporairement le
+  comportement de fin de tir.
+
+  Après chaque tir, le joueur peut
+  immédiatement recommencer.
+*/
+
+const originalShoot =
+  shoot;
 
 
 /*
-  Pointerdown fonctionne avec :
-
-  - souris
-  - stylet
-  - tablette
-  - téléphone
-  - écran tactile
+  On utilise un wrapper afin de
+  conserver le gameplay classique.
 */
 
-goal.addEventListener(
+function handleTrainingAfterShot(
+  saved
+) {
+
+  trainingShots++;
+
+  statistics.trainingShots++;
+
+
+  if (!saved) {
+
+    trainingGoals++;
+
+    statistics.trainingGoals++;
+
+  }
+
+
+  saveStatistics();
+
+
+  setTimeout(
+    () => {
+
+      resetEffects();
+
+      resetBall();
+
+      targetDot.classList.remove(
+        "visible"
+      );
+
+
+      message.textContent =
+        "🎯 Vise encore !";
+
+
+      message.className =
+        "message";
+
+
+      state.aim = null;
+
+      state.locked = false;
+
+    },
+    1100
+  );
+
+}
+
+
+/* ==================================================
+   MODE ENTRAINEMENT : TIR
+================================================== */
+
+function trainingAim(event) {
+
+  if (!trainingMode) {
+
+    return;
+
+  }
+
+
+  if (state.locked) {
+
+    return;
+
+  }
+
+
+  event.preventDefault();
+
+
+  initAudio();
+
+  playKickSound();
+
+
+  const rect =
+    goal.getBoundingClientRect();
+
+
+  let x =
+    (
+      event.clientX -
+      rect.left
+    ) /
+    rect.width;
+
+
+  let y =
+    1 -
+    (
+      (
+        event.clientY -
+        rect.top
+      ) /
+      rect.height
+    );
+
+
+  x =
+    Math.max(
+      .08,
+      Math.min(
+        .92,
+        x
+      )
+    );
+
+
+  y =
+    Math.max(
+      .10,
+      Math.min(
+        .85,
+        y
+      )
+    );
+
+
+  state.locked = true;
+
+
+  const accuracy =
+    getAccuracy();
+
+
+  const actual =
+    chooseActualAim(
+      x,
+      y
+    );
+
+
+  const targetDirection =
+    getAimDirection(
+      actual.x
+    );
+
+
+  const keeperDirection =
+    randomKeeperDirection();
+
+
+  const saved =
+    targetDirection ===
+    keeperDirection;
+
+
+  state.aim = {
+    x,
+    y
+  };
+
+
+  moveKeeper(
+    keeperDirection
+  );
+
+
+  moveBall(
+    actual.x,
+    actual.y
+  );
+
+
+  ball.classList.add(
+    "shooting"
+  );
+
+
+  targetDot.style.left =
+    `${x * 100}%`;
+
+  targetDot.style.top =
+    `${(1 - y) * 100}%`;
+
+  targetDot.classList.add(
+    "visible"
+  );
+
+
+  resetEffects();
+
+
+  if (saved) {
+
+    message.textContent =
+      "🧤 ARRÊT !";
+
+    message.className =
+      "message save";
+
+    goal.classList.add(
+      "goal-saved"
+    );
+
+    player.classList.add(
+      "disappointed"
+    );
+
+    playSaveSound();
+
+  } else {
+
+    const points =
+      Math.round(
+        accuracy * 100
+      );
+
+
+    message.textContent =
+      `⚽ BUT ! +${points}`;
+
+    message.className =
+      "message goal-message";
+
+    goal.classList.add(
+      "goal-scored"
+    );
+
+    player.classList.add(
+      "celebrate"
+    );
+
+    playGoalSound();
+
+  }
+
+
+  handleTrainingAfterShot(
+    saved
+  );
+
+}
+
+
+/*
+  Le listener normal est remplacé
+  selon le mode.
+*/
+
+goal.removeEventListener(
   "pointerdown",
   aim
 );
 
 
-restartButton.addEventListener(
-  "click",
-  restartGame
+goal.addEventListener(
+  "pointerdown",
+  event => {
+
+    if (trainingMode) {
+
+      trainingAim(event);
+
+    } else {
+
+      aim(event);
+
+    }
+
+  }
 );
+
+
+/* ==================================================
+   RETOUR MENU
+================================================== */
+
+document
+  .getElementById(
+    "backToMenuButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      trainingMode = false;
+
+      showMenu();
+
+    }
+  );
+
+
+resultMenuButton.addEventListener(
+  "click",
+  () => {
+
+    trainingMode = false;
+
+    showMenu();
+
+  }
+);
+
+
+/* ==================================================
+   RESET STATS
+================================================== */
+
+document
+  .getElementById(
+    "resetStatsButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const confirmed =
+        window.confirm(
+          "Réinitialiser toutes tes statistiques ?"
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      statistics.goals = 0;
+
+      statistics.saves = 0;
+
+      statistics.shots = 0;
+
+      statistics.bestCombo = 0;
+
+      statistics.trainingGoals = 0;
+
+      statistics.trainingShots = 0;
+
+
+      state.best = 0;
+
+
+      localStorage.removeItem(
+        "penaltyMindBest"
+      );
+
+
+      saveStatistics();
+
+
+      updateStatsScreen();
+
+      updateTrainingScreen();
+
+      updateMenu();
+
+    }
+  );
 
 
 /* ==================================================
    INITIALISATION
 ================================================== */
 
-updateSoundButton();
+updateSoundButtons();
+
+updateMenu();
+
+updateStatsScreen();
+
+updateTrainingScreen();
 
 bestScore.textContent =
   state.best;
@@ -1045,3 +1970,7 @@ bestScore.textContent =
 resetBall();
 
 updateUI();
+
+showScreen(
+  screens.menu
+);
