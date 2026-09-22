@@ -1,925 +1,259 @@
-// ============================================================
-// PENALTYMIND
-// Prototype complet
-// ============================================================
-
-const $ = (id) => document.getElementById(id);
-
-const screens = {
-    menu: $("mainMenu"),
-    game: $("gameScreen"),
-    training: $("trainingScreen"),
-    daily: $("dailyScreen"),
-    stats: $("statsScreen"),
-    settings: $("settingsScreen")
-};
-
-
-// ============================================================
-// DONNEES
-// ============================================================
-
-let save = JSON.parse(localStorage.getItem("penaltymind_save")) || {
-    level: 1,
-    xp: 0,
-    bestScore: 0,
-
-    goals: 0,
-    saves: 0,
-    shots: 0,
-    bestCombo: 0,
-
-    sound: true,
-
-    daily: {
-        goals: 0,
-        shots: 0,
-        perfect: 0
-    }
-};
-
+const $ = id => document.getElementById(id);
 
 let game = {
-    shots: 0,
+    shot: 1,
     maxShots: 5,
     score: 0,
-    combo: 0,
-
-    targetX: 50,
-    targetY: 23,
-
     power: 50,
-
-    playing: false,
-    training: false,
-
-    powerDirection: 1,
-    powerTimer: null
+    direction: 1,
+    timer: null,
+    playing: true
 };
 
 
-// ============================================================
-// SAUVEGARDE
-// ============================================================
+// ================= PUISSANCE =================
 
-function saveGame() {
-    localStorage.setItem(
-        "penaltymind_save",
-        JSON.stringify(save)
-    );
-}
+function startPower() {
 
+    clearInterval(game.timer);
 
-// ============================================================
-// ECRANS
-// ============================================================
+    game.power = 20;
+    game.direction = 1;
 
-function showScreen(screen) {
+    game.timer = setInterval(() => {
 
-    Object.values(screens).forEach(s => {
-        if (s) s.classList.add("hidden");
-    });
+        game.power += game.direction * 2;
 
-    screen.classList.remove("hidden");
-}
-
-
-function goMenu() {
-    stopPower();
-    game.playing = false;
-
-    $("result").classList.add("hidden-result");
-
-    showScreen(screens.menu);
-
-    updateMenu();
-}
-
-
-// ============================================================
-// XP
-// ============================================================
-
-function xpNeeded() {
-    return save.level * 100;
-}
-
-
-function addXP(amount) {
-
-    save.xp += amount;
-
-    while (save.xp >= xpNeeded()) {
-        save.xp -= xpNeeded();
-        save.level++;
-
-        showFloatingMessage(
-            "LEVEL UP ! 🎉"
-        );
-    }
-
-    saveGame();
-    updateMenu();
-}
-
-
-function updateMenu() {
-
-    $("menuLevel").textContent = save.level;
-
-    $("menuXP").textContent = save.xp;
-
-    $("menuXPNeeded").textContent = xpNeeded();
-
-    const percentage =
-        Math.min(100, (save.xp / xpNeeded()) * 100);
-
-    $("menuXPFill").style.width =
-        percentage + "%";
-
-    $("menuBestScore").textContent =
-        save.bestScore;
-
-    updateStats();
-    updateDaily();
-}
-
-
-// ============================================================
-// STATS
-// ============================================================
-
-function updateStats() {
-
-    $("statBestScore").textContent =
-        save.bestScore;
-
-    $("statGoals").textContent =
-        save.goals;
-
-    $("statSaves").textContent =
-        save.saves;
-
-    $("statCombo").textContent =
-        save.bestCombo;
-
-    $("statShots").textContent =
-        save.shots;
-
-    const accuracy =
-        save.shots === 0
-            ? 0
-            : Math.round(
-                (save.goals / save.shots) * 100
-            );
-
-    $("statAccuracy").textContent =
-        accuracy + "%";
-}
-
-
-// ============================================================
-// QUETES
-// ============================================================
-
-function updateDaily() {
-
-    const challenges = [
-
-        {
-            icon: "⚽",
-            name: "Marquer 3 buts",
-            progress: Math.min(save.daily.goals, 3),
-            max: 3,
-            xp: 50
-        },
-
-        {
-            icon: "🎯",
-            name: "Tirer 10 fois",
-            progress: Math.min(save.daily.shots, 10),
-            max: 10,
-            xp: 40
-        },
-
-        {
-            icon: "🔥",
-            name: "Faire un tir parfait",
-            progress: Math.min(save.daily.perfect, 1),
-            max: 1,
-            xp: 75
+        if (game.power >= 100) {
+            game.power = 100;
+            game.direction = -1;
         }
 
-    ];
-
-    const container =
-        $("dailyChallengesList");
-
-    container.innerHTML = "";
-
-    let completed = 0;
-
-    challenges.forEach(challenge => {
-
-        const done =
-            challenge.progress >= challenge.max;
-
-        if (done) {
-            completed++;
+        if (game.power <= 5) {
+            game.power = 5;
+            game.direction = 1;
         }
 
-        const element =
-            document.createElement("div");
+        $("needle").style.left =
+            game.power + "%";
 
-        element.className =
-            "challenge" +
-            (done ? " done" : "");
+        $("power").textContent =
+            Math.round(game.power) + "%";
 
-        element.innerHTML = `
-
-            <div class="challenge-info">
-
-                <strong>
-                    ${challenge.icon}
-                    ${challenge.name}
-                </strong>
-
-                <small>
-                    ${challenge.progress}/${challenge.max}
-                    ${done ? " • TERMINÉ ✓" : ""}
-                </small>
-
-            </div>
-
-            <div class="challenge-xp">
-                +${challenge.xp} XP
-            </div>
-        `;
-
-        container.appendChild(element);
-    });
-
-    $("dailyCompletedCount").textContent =
-        completed;
+    }, 25);
 }
 
 
-// ============================================================
-// JEU
-// ============================================================
-
-function startGame(training = false) {
-
-    game.shots = 0;
-    game.score = 0;
-    game.combo = 0;
-    game.playing = true;
-    game.training = training;
-
-    $("score").textContent = "0";
-    $("combo").textContent = "0🔥";
-
-    $("gameSubtitle").textContent =
-        training
-            ? "MODE ENTRAÎNEMENT"
-            : "MODE CLASSIQUE";
-
-    $("result").classList.add("hidden-result");
-
-    showScreen(screens.game);
-
-    nextShot();
-}
-
-
-function nextShot() {
-
-    if (!game.playing) return;
-
-    if (
-        !game.training &&
-        game.shots >= game.maxShots
-    ) {
-        finishGame();
-        return;
-    }
-
-    game.shots++;
-
-    $("shotNumber").textContent =
-        game.shots;
-
-    $("message").textContent =
-        "PLACE LA CIBLE DANS LA CAGE";
-
-    resetBall();
-
-    moveTarget();
-
-    resetKeeper();
-
-    startPower();
-
-    updateDailyShots();
-}
-
-
-function resetBall() {
-
-    const ball = $("ball");
-
-    ball.style.left = "50%";
-    ball.style.bottom = "7%";
-    ball.style.transform =
-        "translateX(-50%) scale(1)";
-
-    ball.style.transition =
-        "none";
-}
-
+// ================= CIBLE =================
 
 function moveTarget() {
 
-    // zone réellement atteignable dans la cage
-    game.targetX =
-        27 + Math.random() * 46;
+    const x =
+        28 + Math.random() * 44;
 
-    game.targetY =
-        13 + Math.random() * 27;
+    const y =
+        15 + Math.random() * 28;
 
-    const target =
-        $("targetDot");
+    $("target").style.left =
+        x + "%";
 
-    target.style.left =
-        game.targetX + "%";
+    $("target").style.top =
+        y + "%";
 
-    target.style.top =
-        game.targetY + "%";
+    return { x, y };
 }
 
 
+// ================= GARDIEN =================
+
 function resetKeeper() {
 
-    const keeper =
-        $("keeper");
-
-    keeper.style.transform =
+    $("keeper").style.transform =
         "translateX(-50%)";
 }
 
 
-// ============================================================
-// JAUGE DE PUISSANCE
-// ============================================================
-
-function startPower() {
-
-    stopPower();
-
-    game.power = 20;
-    game.powerDirection = 1;
-
-    game.powerTimer =
-        setInterval(() => {
-
-            game.power +=
-                game.powerDirection * 1.8;
-
-            if (game.power >= 100) {
-                game.power = 100;
-                game.powerDirection = -1;
-            }
-
-            if (game.power <= 5) {
-                game.power = 5;
-                game.powerDirection = 1;
-            }
-
-            updatePower();
-
-        }, 25);
-}
-
-
-function stopPower() {
-
-    if (game.powerTimer) {
-        clearInterval(game.powerTimer);
-        game.powerTimer = null;
-    }
-}
-
-
-function updatePower() {
-
-    $("needle").style.left =
-        game.power + "%";
-
-    $("powerValue").textContent =
-        Math.round(game.power) + "%";
-}
-
-
-// ============================================================
-// TIR
-// ============================================================
+// ================= TIR =================
 
 function shoot() {
 
     if (!game.playing) return;
 
-    stopPower();
+    clearInterval(game.timer);
 
-    const power =
-        game.power;
+    game.playing = false;
 
-    const perfect =
-        power >= 78 &&
-        power <= 92;
-
-    const good =
-        power >= 58 &&
-        power <= 97;
+    const power = game.power;
 
     const target =
-        $("targetDot");
+        moveTarget();
 
-    const ball =
-        $("ball");
-
-    // Le gardien choisit une zone
-    // proche mais pas toujours parfaite
-    const keeperDirection =
-        Math.random();
-
-    let keeperX;
-
-    if (keeperDirection < .33) {
-        keeperX = 28;
-    } else if (keeperDirection < .66) {
-        keeperX = 50;
-    } else {
-        keeperX = 72;
-    }
-
-    const distance =
-        Math.abs(
-            game.targetX - keeperX
-        );
-
-    let saved = false;
-
-    // Le gardien a davantage de chances
-    // si le tir arrive dans sa zone
-    if (distance < 12) {
-
-        const saveChance =
-            perfect ? .18 : .48;
-
-        saved =
-            Math.random() < saveChance;
-    }
-
-    // animation cible
-    target.style.opacity = "0";
-
-    // animation du ballon
-    ball.style.transition =
-        "all .55s cubic-bezier(.15,.8,.25,1)";
+    const ball = $("ball");
 
     ball.style.left =
-        game.targetX + "%";
+        target.x + "%";
 
     ball.style.bottom =
-        "62%";
+        "63%";
 
     ball.style.transform =
         "translateX(-50%) scale(.45)";
 
-    // mouvement gardien
-    const keeper =
-        $("keeper");
 
-    if (saved) {
+    // déplacement du gardien
+    const keeperSide =
+        Math.random() < .5 ? -1 : 1;
 
-        const direction =
-            game.targetX < 50
-                ? -1
-                : 1;
+    const keeperMoves =
+        Math.random() < .55;
 
-        keeper.style.transform =
-            `translateX(calc(-50% + ${direction * 75}px)) rotate(${direction * 15}deg)`;
+    if (keeperMoves) {
 
-    } else {
-
-        keeper.style.transform =
-            `translateX(-50%)`;
+        $("keeper").style.transform =
+            `translateX(calc(-50% + ${keeperSide * 70}px)) rotate(${keeperSide * 12}deg)`;
     }
+
 
     setTimeout(() => {
 
-        target.style.opacity = "1";
+        const saved =
+            keeperMoves &&
+            Math.random() < .55;
 
         if (saved) {
 
-            onSave();
+            $("message").textContent =
+                "🧤 ARRÊT DU GARDIEN !";
 
         } else {
 
-            onGoal(perfect, good);
+            let points = 100;
+
+            if (
+                power >= 78 &&
+                power <= 92
+            ) {
+                points += 100;
+
+                $("message").textContent =
+                    "🎯 TIR PARFAIT !";
+            } else {
+                $("message").textContent =
+                    "⚽ BUT !";
+            }
+
+            game.score += points;
+
+            $("score").textContent =
+                game.score;
         }
+
+
+        setTimeout(() => {
+
+            if (
+                game.shot >= game.maxShots
+            ) {
+                finish();
+                return;
+            }
+
+            game.shot++;
+
+            $("shot").textContent =
+                `${game.shot} / ${game.maxShots}`;
+
+            resetShot();
+
+        }, 800);
 
     }, 600);
 }
 
 
-// ============================================================
-// BUT
-// ============================================================
+// ================= NOUVEAU TIR =================
 
-function onGoal(perfect, good) {
+function resetShot() {
 
-    game.combo++;
+    game.playing = true;
 
-    save.goals++;
-    save.shots++;
+    const ball = $("ball");
 
-    if (game.combo > save.bestCombo) {
-        save.bestCombo =
-            game.combo;
-    }
+    ball.style.left = "50%";
+    ball.style.bottom = "7%";
 
-    let points = 100;
-
-    if (good) {
-        points += 50;
-    }
-
-    if (perfect) {
-        points += 150;
-        save.daily.perfect++;
-    }
-
-    points +=
-        game.combo * 25;
-
-    game.score += points;
-
-    $("score").textContent =
-        game.score;
-
-    $("combo").textContent =
-        game.combo + "🔥";
+    ball.style.transform =
+        "translateX(-50%) scale(1)";
 
     $("message").textContent =
-        perfect
-            ? "🎯 TIR PARFAIT ! +"+points
-            : "⚽ BUT ! +"+points;
+        "🎯 Choisis ta zone de tir";
 
-    addXP(
-        perfect ? 20 : 10
-    );
+    resetKeeper();
 
-    save.daily.goals++;
+    moveTarget();
 
-    saveGame();
-    updateDaily();
-
-    setTimeout(() => {
-
-        if (game.training) {
-
-            nextShot();
-
-        } else {
-
-            nextShot();
-        }
-
-    }, 850);
+    startPower();
 }
 
 
-// ============================================================
-// ARRET
-// ============================================================
+// ================= FIN =================
 
-function onSave() {
+function finish() {
 
-    game.combo = 0;
-
-    save.saves++;
-    save.shots++;
-
-    $("combo").textContent =
-        "0🔥";
-
-    $("message").textContent =
-        "🧤 ARRÊT DU GARDIEN !";
-
-    saveGame();
-
-    setTimeout(() => {
-        nextShot();
-    }, 850);
-}
-
-
-// ============================================================
-// FIN DE PARTIE
-// ============================================================
-
-function finishGame() {
-
-    game.playing = false;
-
-    stopPower();
-
-    if (
-        game.score >
-        save.bestScore
-    ) {
-        save.bestScore =
-            game.score;
-
-        $("resultTitle").textContent =
-            "🏆 NOUVEAU RECORD !";
-
-    } else {
-
-        $("resultTitle").textContent =
-            "BIEN JOUÉ !";
-    }
+    clearInterval(game.timer);
 
     $("finalScore").textContent =
         game.score;
 
-    $("bestScore").textContent =
-        save.bestScore;
-
-    saveGame();
-
-    updateMenu();
-
     $("result").classList.remove(
-        "hidden-result"
+        "hidden"
     );
 }
 
 
-// ============================================================
-// MESSAGE
-// ============================================================
+// ================= REJOUER =================
 
-function showFloatingMessage(text) {
+function restart() {
 
-    $("message").textContent =
-        text;
+    $("result").classList.add(
+        "hidden"
+    );
+
+    game = {
+        shot: 1,
+        maxShots: 5,
+        score: 0,
+        power: 50,
+        direction: 1,
+        timer: null,
+        playing: true
+    };
+
+    $("shot").textContent = "1 / 5";
+    $("score").textContent = "0";
+
+    resetShot();
 }
 
 
-// ============================================================
-// QUETES
-// ============================================================
+// ================= EVENTS =================
 
-function updateDailyShots() {
-
-    save.daily.shots++;
-
-    saveGame();
-    updateDaily();
-}
-
-
-// ============================================================
-// SON
-// ============================================================
-
-let audioContext = null;
-
-function playSound(type) {
-
-    if (!save.sound) return;
-
-    try {
-
-        if (!audioContext) {
-            audioContext =
-                new (
-                    window.AudioContext ||
-                    window.webkitAudioContext
-                )();
-        }
-
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-
-        if (type === "goal") {
-
-            oscillator.frequency.value = 620;
-
-        } else {
-
-            oscillator.frequency.value = 180;
-        }
-
-        gain.gain.value = .04;
-
-        oscillator.start();
-
-        oscillator.stop(
-            audioContext.currentTime + .12
-        );
-
-    } catch (e) {}
-}
-
-
-// ============================================================
-// EVENEMENTS MENU
-// ============================================================
-
-$("playButton").addEventListener(
-    "click",
-    () => startGame(false)
-);
-
-$("trainingButton").addEventListener(
-    "click",
-    () => showScreen(screens.training)
-);
-
-$("dailyButton").addEventListener(
-    "click",
-    () => {
-        updateDaily();
-        showScreen(screens.daily);
-    }
-);
-
-$("statsButton").addEventListener(
-    "click",
-    () => {
-        updateStats();
-        showScreen(screens.stats);
-    }
-);
-
-$("settingsButton").addEventListener(
-    "click",
-    () => showScreen(screens.settings)
-);
-
-
-// ============================================================
-// RETOURS MENU
-// ============================================================
-
-$("backToMenuButton").addEventListener(
-    "click",
-    goMenu
-);
-
-document
-    .querySelectorAll("[data-back-menu]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            goMenu
-        );
-    });
-
-$("resultMenuButton").addEventListener(
-    "click",
-    goMenu
-);
-
-
-// ============================================================
-// REJOUER
-// ============================================================
-
-$("restartButton").addEventListener(
-    "click",
-    () => startGame(game.training)
-);
-
-
-// ============================================================
-// TIR
-// ============================================================
-
-$("shootButton").addEventListener(
+$("shoot").addEventListener(
     "click",
     shoot
 );
 
-$("powerMeter").addEventListener(
+$("powerBar").addEventListener(
     "click",
     shoot
 );
 
-
-// ============================================================
-// ENTRAINEMENT
-// ============================================================
-
-$("startTrainingButton").addEventListener(
+$("restart").addEventListener(
     "click",
-    () => startGame(true)
+    restart
 );
 
 
-// ============================================================
-// SON
-// ============================================================
+// ================= START =================
 
-$("soundButton").addEventListener(
-    "click",
-    () => {
-
-        save.sound =
-            !save.sound;
-
-        saveGame();
-
-        $("soundButton").textContent =
-            save.sound ? "🔊" : "🔇";
-    }
-);
-
-$("settingsSoundButton").addEventListener(
-    "click",
-    () => {
-
-        save.sound =
-            !save.sound;
-
-        saveGame();
-
-        $("settingsSoundButton").textContent =
-            save.sound
-                ? "🔊 SON : ACTIVÉ"
-                : "🔇 SON : DÉSACTIVÉ";
-    }
-);
-
-
-// ============================================================
-// RESET
-// ============================================================
-
-$("resetStatsButton").addEventListener(
-    "click",
-    () => {
-
-        const confirmed =
-            confirm(
-                "Réinitialiser toute ta progression ?"
-            );
-
-        if (!confirmed) return;
-
-        save = {
-            level: 1,
-            xp: 0,
-            bestScore: 0,
-
-            goals: 0,
-            saves: 0,
-            shots: 0,
-            bestCombo: 0,
-
-            sound: true,
-
-            daily: {
-                goals: 0,
-                shots: 0,
-                perfect: 0
-            }
-        };
-
-        saveGame();
-        updateMenu();
-
-        alert(
-            "Progression réinitialisée."
-        );
-    }
-);
-
-
-// ============================================================
-// INITIALISATION
-// ============================================================
-
-updateMenu();
-
-showScreen(screens.menu);
+resetShot();
