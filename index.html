@@ -1,375 +1,700 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>PenaltyMind</title>
+<title>PenaltyMind</title>
 
-    <link rel="stylesheet" href="style.css">
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: Arial, sans-serif;
+    background: #101828;
+    color: white;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.screen {
+    min-height: 100vh;
+    width: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* MENU */
+
+#menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(#162b4a, #07101d);
+}
+
+.menu {
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.logo {
+    font-size: 42px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.logo span {
+    color: #00d9ff;
+}
+
+.subtitle {
+    color: #9db0c5;
+    margin-bottom: 35px;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    margin: 7px 0;
+    border: 0;
+    border-radius: 12px;
+    background: #17304d;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+.play {
+    background: #00aeea;
+}
+
+/* JEU */
+
+#game {
+    background: #071522;
+}
+
+.header {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: #102236;
+}
+
+.small {
+    width: auto;
+    padding: 9px 13px;
+    margin: 0;
+    font-size: 13px;
+}
+
+.score {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 15px;
+    text-align: center;
+}
+
+.score div {
+    display: flex;
+    flex-direction: column;
+}
+
+.score span {
+    color: #7f96ad;
+    font-size: 11px;
+}
+
+.score strong {
+    font-size: 22px;
+}
+
+/* STADE */
+
+.stadium {
+    position: relative;
+    height: 430px;
+    overflow: hidden;
+    background: linear-gradient(
+        #65c8f5 0%,
+        #a7e4ff 45%,
+        #278947 45%,
+        #17662e 100%
+    );
+}
+
+.goal {
+    position: absolute;
+    width: 75%;
+    height: 48%;
+    left: 12.5%;
+    top: 14%;
+    border: 7px solid white;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 18px,
+            rgba(255,255,255,.2) 18px 20px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 18px,
+            rgba(255,255,255,.2) 18px 20px
+        );
+}
+
+.keeper {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 60px;
+    transition: left .35s;
+}
+
+.ball {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 42px;
+    transition: all .5s;
+}
+
+.target {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #00e5ff;
+    border: 3px solid white;
+    box-shadow: 0 0 15px #00e5ff;
+    transform: translate(-50%, -50%);
+}
+
+.message {
+    text-align: center;
+    min-height: 45px;
+    padding: 12px;
+    font-weight: bold;
+}
+
+/* PUISSANCE */
+
+.power {
+    padding: 15px;
+    background: #0a1725;
+    text-align: center;
+}
+
+.meter {
+    height: 25px;
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.zone {
+    flex: 1;
+}
+
+.red {
+    background: #d63d3d;
+}
+
+.yellow {
+    background: #e4bd3e;
+}
+
+.green {
+    background: #32c968;
+}
+
+.needle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: white;
+    left: 0;
+}
+
+.shoot {
+    background: #00aeea;
+}
+
+/* RESULTAT */
+
+.result {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.result-box {
+    width: 90%;
+    max-width: 400px;
+    background: #12263d;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+}
+
+.result-box h2 {
+    font-size: 32px;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .logo {
+        font-size: 34px;
+    }
+
+    .stadium {
+        height: 350px;
+    }
+
+    .score {
+        gap: 30px;
+    }
+}
+</style>
 </head>
 
 <body>
 
-    <!-- ==================== MENU PRINCIPAL ==================== -->
+<!-- MENU -->
 
-    <section id="mainMenu" class="screen">
+<section id="menu" class="screen">
 
-        <div class="menu-container">
+    <div class="menu">
 
-            <div class="logo-area">
-                <div class="logo-ball">⚽</div>
-                <h1>PENALTY<span>MIND</span></h1>
-                <p>DEVINE. TIRE. MARQUE.</p>
-            </div>
+        <div class="logo">
+            PENALTY<span>MIND</span>
+        </div>
 
-            <!-- NIVEAU / XP -->
+        <div class="subtitle">
+            DEVINE. TIRE. MARQUE.
+        </div>
 
-            <div class="level-panel">
+        <button id="play" class="play">
+            ⚽ JOUER
+        </button>
 
-                <div class="level-top">
-                    <span>NIVEAU <strong id="menuLevel">1</strong></span>
-                    <span>
-                        <strong id="menuXP">0</strong> /
-                        <strong id="menuXPNeeded">100</strong> XP
-                    </span>
-                </div>
+        <button id="training">
+            🎯 ENTRAÎNEMENT
+        </button>
 
-                <div class="xp-bar">
-                    <div id="menuXPFill" class="xp-fill"></div>
-                </div>
+        <button id="daily">
+            🏆 QUÊTES
+        </button>
 
-            </div>
+        <button id="stats">
+            📊 STATISTIQUES
+        </button>
 
-            <!-- BOUTONS -->
+    </div>
 
-            <div class="menu-buttons">
+</section>
 
-                <button id="playButton" class="main-button">
-                    ⚽ JOUER
-                </button>
 
-                <button id="trainingButton" class="menu-button">
-                    🎯 ENTRAÎNEMENT
-                </button>
+<!-- JEU -->
 
-                <button id="dailyButton" class="menu-button">
-                    🏆 QUÊTES QUOTIDIENNES
-                </button>
+<section id="game" class="screen hidden">
 
-                <button id="statsButton" class="menu-button">
-                    📊 STATISTIQUES
-                </button>
+    <div class="header">
 
-                <button id="settingsButton" class="menu-button">
-                    ⚙️ PARAMÈTRES
-                </button>
+        <button id="back" class="small">
+            ← MENU
+        </button>
 
-            </div>
+        <strong>PENALTYMIND</strong>
 
-            <div class="best-score">
-                MEILLEUR SCORE :
-                <strong id="menuBestScore">0</strong>
+        <span>⚽</span>
+
+    </div>
+
+    <div class="score">
+
+        <div>
+            <span>TIR</span>
+            <strong id="shot">1</strong>
+        </div>
+
+        <div>
+            <span>SCORE</span>
+            <strong id="points">0</strong>
+        </div>
+
+        <div>
+            <span>COMBO</span>
+            <strong id="combo">0</strong>
+        </div>
+
+    </div>
+
+    <div class="stadium">
+
+        <div class="goal">
+
+            <div id="target" class="target"></div>
+
+            <div id="keeper" class="keeper">
+                🧤
             </div>
 
         </div>
 
-    </section>
+        <div id="ball" class="ball">
+            ⚽
+        </div>
 
+    </div>
 
-    <!-- ==================== JEU ==================== -->
+    <div id="message" class="message">
+        Choisis ta puissance !
+    </div>
 
-    <section id="gameScreen" class="screen hidden-screen">
+    <div class="power">
 
-        <header class="game-header">
+        <div class="meter">
 
-            <button id="backToMenuButton" class="small-button">
-                ← MENU
-            </button>
+            <div class="zone red"></div>
+            <div class="zone yellow"></div>
+            <div class="zone green"></div>
+            <div class="zone yellow"></div>
+            <div class="zone red"></div>
 
-            <div class="game-title">
-                <strong>PENALTYMIND</strong>
-                <span id="gameSubtitle">Trouve le bon côté</span>
-            </div>
-
-            <button id="soundButton" class="small-button">
-                🔊
-            </button>
-
-        </header>
-
-
-        <div class="score-panel">
-
-            <div>
-                <span>TIR</span>
-                <strong id="shotNumber">1</strong>
-            </div>
-
-            <div>
-                <span>SCORE</span>
-                <strong id="score">0</strong>
-            </div>
-
-            <div>
-                <span>COMBO</span>
-                <strong id="combo">0</strong>
-            </div>
+            <div id="needle" class="needle"></div>
 
         </div>
 
+        <button id="shoot" class="shoot">
+            ⚡ TIRER !
+        </button>
 
-        <div class="stadium">
+    </div>
 
-            <div class="sky"></div>
-            <div class="crowd"></div>
+</section>
 
-            <div class="field">
 
-                <div class="goal">
-                    <div class="goal-net"></div>
+<!-- RESULTAT -->
 
-                    <div id="keeper" class="keeper">
-                        🧤
-                    </div>
+<div id="result" class="result hidden">
 
-                    <div id="targetDot" class="target-dot"></div>
+    <div class="result-box">
 
-                </div>
+        <h2 id="resultTitle">
+            FIN DU MATCH
+        </h2>
 
-                <div id="ball" class="ball">
-                    ⚽
-                </div>
+        <p>
+            Score :
+            <strong id="finalScore">0</strong>
+        </p>
 
-                <div class="player">
-                    🧍
-                </div>
+        <button id="again" class="play">
+            🔄 REJOUER
+        </button>
 
-            </div>
+        <button id="resultMenu">
+            🏠 MENU
+        </button>
 
-        </div>
+    </div>
 
+</div>
 
-        <!-- PUISSANCE -->
 
-        <div class="power-panel">
+<script>
+document.addEventListener("DOMContentLoaded", function() {
 
-            <p>CHOISIS TA PUISSANCE</p>
+    const menu = document.getElementById("menu");
+    const game = document.getElementById("game");
 
-            <div id="powerMeter" class="power-meter">
+    const play = document.getElementById("play");
+    const back = document.getElementById("back");
+    const shoot = document.getElementById("shoot");
 
-                <div class="power-zone weak"></div>
-                <div class="power-zone good"></div>
-                <div class="power-zone perfect"></div>
-                <div class="power-zone good"></div>
-                <div class="power-zone weak"></div>
+    const result = document.getElementById("result");
+    const again = document.getElementById("again");
+    const resultMenu = document.getElementById("resultMenu");
 
-                <div id="needle" class="needle"></div>
+    const keeper = document.getElementById("keeper");
+    const target = document.getElementById("target");
+    const ball = document.getElementById("ball");
 
-            </div>
+    const shotText = document.getElementById("shot");
+    const pointsText = document.getElementById("points");
+    const comboText = document.getElementById("combo");
+    const message = document.getElementById("message");
+    const finalScore = document.getElementById("finalScore");
+    const resultTitle = document.getElementById("resultTitle");
 
-            <button id="shootButton" class="shoot-button">
-                TIRER !
-            </button>
+    const needle = document.getElementById("needle");
 
-        </div>
+    let shot = 1;
+    let score = 0;
+    let combo = 0;
 
+    let targetSide = "center";
+    let keeperSide = "center";
 
-        <div id="message" class="message">
-            Observe le gardien...
-        </div>
+    let power = 0;
+    let direction = 1;
 
+    let timer = null;
+    let waiting = false;
 
-        <!-- RESULTAT -->
 
-        <div id="result" class="result hidden-result">
+    function showMenu() {
 
-            <div class="result-card">
+        menu.classList.remove("hidden");
+        game.classList.add("hidden");
+        result.classList.add("hidden");
 
-                <h2 id="resultTitle">BUT !</h2>
+        stopMeter();
+    }
 
-                <p>
-                    SCORE :
-                    <strong id="finalScore">0</strong>
-                </p>
 
-                <p>
-                    MEILLEUR SCORE :
-                    <strong id="bestScore">0</strong>
-                </p>
+    function showGame() {
 
-                <button id="restartButton" class="main-button">
-                    🔄 REJOUER
-                </button>
+        menu.classList.add("hidden");
+        game.classList.remove("hidden");
+        result.classList.add("hidden");
+    }
 
-                <button id="resultMenuButton" class="menu-button">
-                    🏠 MENU
-                </button>
 
-            </div>
+    function sidePosition(side) {
 
-        </div>
+        if (side === "left") return "25%";
+        if (side === "right") return "75%";
 
-    </section>
+        return "50%";
+    }
 
 
-    <!-- ==================== ENTRAÎNEMENT ==================== -->
+    function randomSide() {
 
-    <section id="trainingScreen" class="screen hidden-screen">
+        const sides = ["left", "center", "right"];
 
-        <div class="simple-screen">
+        return sides[
+            Math.floor(Math.random() * sides.length)
+        ];
+    }
 
-            <button class="back-button" data-back-menu>
-                ← RETOUR
-            </button>
 
-            <h1>🎯 ENTRAÎNEMENT</h1>
+    function newShot() {
 
-            <p>
-                Entraîne-toi tranquillement et améliore ton adresse.
-            </p>
+        waiting = false;
 
-            <div class="training-stats">
+        targetSide = randomSide();
+        keeperSide = randomSide();
 
-                <div>
-                    <span>BUTS</span>
-                    <strong id="trainingGoals">0</strong>
-                </div>
+        target.style.left =
+            sidePosition(targetSide);
 
-                <div>
-                    <span>TIRS</span>
-                    <strong id="trainingShots">0</strong>
-                </div>
+        target.style.top =
+            ["30%", "45%", "60%"][
+                Math.floor(Math.random() * 3)
+            ];
 
-            </div>
+        keeper.style.left =
+            sidePosition(keeperSide);
 
-            <button id="startTrainingButton" class="main-button">
-                COMMENCER
-            </button>
+        ball.style.left = "50%";
+        ball.style.bottom = "20px";
 
-        </div>
+        shotText.textContent = shot;
 
-    </section>
+        message.textContent =
+            "🎯 Vise la cible et tire !";
+    }
 
 
-    <!-- ==================== QUÊTES ==================== -->
+    function startMeter() {
 
-    <section id="dailyScreen" class="screen hidden-screen">
+        stopMeter();
 
-        <div class="simple-screen">
+        power = 0;
+        direction = 1;
 
-            <button class="back-button" data-back-menu>
-                ← RETOUR
-            </button>
+        timer = setInterval(function() {
 
-            <h1>🏆 QUÊTES QUOTIDIENNES</h1>
+            power += direction * 2;
 
-            <p class="daily-subtitle">
-                Termine les défis du jour pour gagner de l'XP.
-            </p>
+            if (power >= 100) {
+                power = 100;
+                direction = -1;
+            }
 
-            <div class="daily-progress">
+            if (power <= 0) {
+                power = 0;
+                direction = 1;
+            }
 
-                <span>
-                    QUÊTES TERMINÉES
-                </span>
+            needle.style.left = power + "%";
 
-                <strong id="dailyCompletedCount">
-                    0 / 3
-                </strong>
+        }, 25);
+    }
 
-            </div>
 
-            <div id="dailyChallengesList" class="daily-challenges">
+    function stopMeter() {
 
-                <!-- Les quêtes seront créées automatiquement par game.js -->
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    }
 
-            </div>
 
-        </div>
+    function startGame() {
 
-    </section>
+        shot = 1;
+        score = 0;
+        combo = 0;
 
+        pointsText.textContent = "0";
+        comboText.textContent = "0";
 
-    <!-- ==================== STATISTIQUES ==================== -->
+        showGame();
 
-    <section id="statsScreen" class="screen hidden-screen">
+        newShot();
+        startMeter();
+    }
 
-        <div class="simple-screen">
 
-            <button class="back-button" data-back-menu>
-                ← RETOUR
-            </button>
+    function shootBall() {
 
-            <h1>📊 STATISTIQUES</h1>
+        if (waiting) return;
 
-            <div class="stats-grid">
+        waiting = true;
 
-                <div class="stat-card">
-                    <span>MEILLEUR SCORE</span>
-                    <strong id="statBestScore">0</strong>
-                </div>
+        stopMeter();
 
-                <div class="stat-card">
-                    <span>BUTS</span>
-                    <strong id="statGoals">0</strong>
-                </div>
+        ball.style.left =
+            sidePosition(targetSide);
 
-                <div class="stat-card">
-                    <span>ARRÊTS</span>
-                    <strong id="statSaves">0</strong>
-                </div>
+        ball.style.bottom = "50%";
 
-                <div class="stat-card">
-                    <span>MEILLEUR COMBO</span>
-                    <strong id="statCombo">0</strong>
-                </div>
+        setTimeout(function() {
 
-                <div class="stat-card">
-                    <span>TIRS</span>
-                    <strong id="statShots">0</strong>
-                </div>
+            const saved =
+                targetSide === keeperSide;
 
-                <div class="stat-card">
-                    <span>PRÉCISION</span>
-                    <strong id="statAccuracy">0%</strong>
-                </div>
+            if (saved) {
 
-            </div>
+                combo = 0;
 
-        </div>
+                comboText.textContent = "0";
 
-    </section>
+                message.textContent =
+                    "🧤 ARRÊT DU GARDIEN !";
 
+                resultTitle.textContent =
+                    "🧤 ARRÊT !";
 
-    <!-- ==================== PARAMÈTRES ==================== -->
+            } else {
 
-    <section id="settingsScreen" class="screen hidden-screen">
+                const bonus =
+                    power >= 35 && power <= 70
+                    ? 5
+                    : 0;
 
-        <div class="simple-screen">
+                const gained =
+                    10 + combo * 2 + bonus;
 
-            <button class="back-button" data-back-menu>
-                ← RETOUR
-            </button>
+                score += gained;
+                combo++;
 
-            <h1>⚙️ PARAMÈTRES</h1>
+                pointsText.textContent = score;
+                comboText.textContent = combo;
 
-            <button id="settingsSoundButton" class="menu-button">
-                🔊 SON : ACTIVÉ
-            </button>
+                message.textContent =
+                    "⚽ BUT ! +" + gained;
 
-            <button id="resetStatsButton" class="danger-button">
-                🗑️ RÉINITIALISER LES DONNÉES
-            </button>
+                resultTitle.textContent =
+                    "⚽ BUT !";
+            }
 
-        </div>
 
-    </section>
+            setTimeout(function() {
 
+                shot++;
 
-    <!-- ==================== JAVASCRIPT ==================== -->
+                if (shot > 5) {
 
-    <script src="./game.js"></script>
+                    finalScore.textContent = score;
+
+                    result.classList.remove("hidden");
+
+                } else {
+
+                    newShot();
+                    startMeter();
+
+                }
+
+            }, 800);
+
+        }, 500);
+    }
+
+
+    play.addEventListener("click", startGame);
+
+    again.addEventListener("click", startGame);
+
+    shoot.addEventListener("click", shootBall);
+
+    back.addEventListener("click", showMenu);
+
+    resultMenu.addEventListener("click", showMenu);
+
+
+    document.addEventListener("keydown", function(event) {
+
+        if (
+            event.code === "Space" &&
+            !game.classList.contains("hidden")
+        ) {
+            shootBall();
+        }
+
+    });
+
+
+    // Démarrage
+    showMenu();
+
+});
+</script>
 
 </body>
 </html>
