@@ -1,6 +1,6 @@
-/* =========================================
+/* ================================
    RESET
-========================================= */
+================================ */
 
 * {
   box-sizing: border-box;
@@ -10,54 +10,61 @@
 
 html,
 body {
+  width: 100%;
   min-height: 100%;
 }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: #07111f;
+  background:
+    radial-gradient(circle at top, #162b45 0%, #07111f 55%, #030812 100%);
   color: white;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 
-/* =========================================
-   CONTENEUR PRINCIPAL
-========================================= */
+/* ================================
+   GAME
+================================ */
 
 .game {
   width: min(1200px, 100%);
-  margin: 0 auto;
-  padding: 20px;
+  margin: auto;
+  padding: 18px;
 }
 
 
-/* =========================================
-   BARRE DU HAUT
-========================================= */
+/* ================================
+   TOP BAR
+================================ */
 
 .topbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
-
-  margin-bottom: 18px;
+  margin-bottom: 15px;
 }
 
 .topbar h1 {
-  font-size: 32px;
-  margin-bottom: 5px;
+  font-size: clamp(25px, 4vw, 42px);
+  font-weight: 900;
+  letter-spacing: -1px;
 }
 
 .subtitle {
-  color: #aebbd0;
-  font-size: 15px;
+  margin-top: 5px;
+  color: #a9b8ca;
+  font-size: 14px;
 }
 
 
-/* =========================================
+/* ================================
    STATS
-========================================= */
+================================ */
 
 .stats {
   display: flex;
@@ -65,184 +72,156 @@ body {
 }
 
 .stats > div {
-  min-width: 85px;
+  min-width: 75px;
+  padding: 10px 13px;
+  text-align: center;
 
-  padding: 10px 14px;
-
-  background: #101d30;
-  border: 1px solid #263852;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
 
-  text-align: center;
+  backdrop-filter: blur(8px);
 }
 
 .stats span {
   display: block;
-
-  color: #91a3bd;
-  font-size: 12px;
-
-  margin-bottom: 4px;
+  color: #9baabc;
+  font-size: 11px;
+  text-transform: uppercase;
 }
 
 .stats strong {
   display: block;
-
-  font-size: 22px;
+  margin-top: 3px;
+  font-size: 23px;
 }
 
 
-/* =========================================
+/* ================================
    MATCH
-========================================= */
+================================ */
 
 .match {
-  overflow: hidden;
-
-  border-radius: 20px;
-
-  background: #0d1929;
-  border: 1px solid #23354d;
-
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.35);
+  width: 100%;
 }
 
 
-/* =========================================
-   STADE
-========================================= */
+/* ================================
+   STADIUM
+================================ */
 
 .stadium {
   position: relative;
-
+  width: 100%;
   height: 680px;
 
   overflow: hidden;
 
-  background: #4caf50;
+  border-radius: 24px;
+
+  background: #102238;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 
-/* =========================================
-   CIEL
-========================================= */
+/* ================================
+   SKY
+================================ */
 
 .sky {
   position: absolute;
-
-  inset: 0 0 auto 0;
-
-  height: 42%;
+  inset: 0 0 52% 0;
 
   background:
     linear-gradient(
-      to bottom,
-      #65c9ff 0%,
-      #9fe3ff 65%,
-      #d5f4ff 100%
+      180deg,
+      #173c63 0%,
+      #2b6795 55%,
+      #79b7d9 100%
     );
-
-  z-index: 1;
 }
 
 
-/* =========================================
-   PUBLIC
-========================================= */
+/* ================================
+   CROWD
+================================ */
 
 .crowd {
   position: absolute;
-
   left: 0;
   right: 0;
-  top: 30%;
-
-  height: 18%;
+  top: 27%;
+  height: 23%;
 
   background:
-    repeating-linear-gradient(
-      90deg,
-      #263238 0 12px,
-      #37474f 12px 24px,
-      #455a64 24px 36px,
-      #1f2933 36px 48px
-    );
+    radial-gradient(circle, #e9eef4 0 2px, transparent 3px) 0 0 / 17px 17px,
+    radial-gradient(circle, #37475a 0 3px, transparent 4px) 8px 8px / 19px 19px,
+    linear-gradient(180deg, #17263a, #0c1727);
 
-  opacity: 0.95;
+  opacity: 0.9;
 
-  z-index: 3;
+  border-top: 2px solid rgba(255,255,255,0.08);
+  border-bottom: 2px solid rgba(0,0,0,0.35);
 }
 
 
-/* =========================================
-   TERRAIN
-========================================= */
+/* ================================
+   FIELD
+================================ */
 
 .field {
   position: absolute;
-
-  inset: 38% 0 0 0;
+  left: 0;
+  right: 0;
+  top: 47%;
+  bottom: 0;
 
   background:
     repeating-linear-gradient(
       90deg,
-      #159447 0 70px,
-      #18a34e 70px 140px
+      #08743e 0,
+      #08743e 9%,
+      #096c3a 9%,
+      #096c3a 18%
     );
 
-  z-index: 5;
+  box-shadow:
+    inset 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 
-/* =========================================
-   SURFACE DU TERRAIN
-========================================= */
-
-.field::before {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 0;
-
-  height: 3px;
-
-  background: rgba(255, 255, 255, 0.25);
-}
-
-
-/* =========================================
-   SURFACE DE REPARATION / LIGNES
-========================================= */
+/* ================================
+   PENALTY AREA
+================================ */
 
 .penalty-area {
   position: absolute;
 
   left: 50%;
-  top: 12%;
+  top: 5%;
 
-  width: min(600px, 75vw);
-  height: 280px;
+  width: min(550px, 70%);
+  height: 45%;
 
   transform: translateX(-50%);
 
-  border: 4px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 0;
+  border: 4px solid rgba(255,255,255,0.85);
+  border-bottom: none;
 
-  border-radius: 4px 4px 0 0;
+  border-radius: 50% 50% 0 0;
 }
 
 .penalty-spot {
   position: absolute;
 
   left: 50%;
-  top: 43%;
+  top: 31%;
 
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
 
   transform: translate(-50%, -50%);
 
@@ -250,19 +229,16 @@ body {
 
   background: white;
 
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 8px rgba(255,255,255,0.5);
 }
 
 
-/* =========================================
-   CAGE
-========================================= */
+/* ================================
+   GOAL
+================================ */
 
 .goal {
   position: absolute;
-
-  z-index: 10;
 
   left: 50%;
   top: 9%;
@@ -271,65 +247,86 @@ body {
   height: 350px;
 
   transform: translateX(-50%);
+
+  z-index: 10;
+
+  touch-action: manipulation;
+
+  cursor: crosshair;
+}
+
+@media (pointer: coarse) {
+  .goal {
+    cursor: pointer;
+  }
 }
 
 
-/* =========================================
-   FILET
-========================================= */
+/* ================================
+   NET
+================================ */
 
 .net {
   position: absolute;
-
-  z-index: 1;
 
   left: 10px;
   right: 10px;
   top: 10px;
   bottom: 0;
 
-  border: 7px solid white;
+  z-index: 1;
 
-  background-color: rgba(255, 255, 255, 0.08);
+  border: 7px solid rgba(255,255,255,0.95);
 
-  background-image:
+  background:
     linear-gradient(
-      rgba(255, 255, 255, 0.2) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.2) 1px,
-      transparent 1px
-    );
+      45deg,
+      transparent 48%,
+      rgba(255,255,255,0.3) 49%,
+      rgba(255,255,255,0.3) 51%,
+      transparent 52%
+    ) 0 0 / 24px 24px,
 
-  background-size: 25px 25px;
+    linear-gradient(
+      -45deg,
+      transparent 48%,
+      rgba(255,255,255,0.25) 49%,
+      rgba(255,255,255,0.25) 51%,
+      transparent 52%
+    ) 0 0 / 24px 24px;
+
+  background-color: rgba(255,255,255,0.07);
 
   box-shadow:
-    inset 0 0 30px rgba(0, 0, 0, 0.15);
+    inset 0 0 30px rgba(255,255,255,0.12);
 }
 
 
-/* =========================================
-   POTEAUX
-========================================= */
+/* ================================
+   POSTS
+================================ */
 
-.post {
+.post,
+.crossbar {
   position: absolute;
 
   z-index: 20;
 
-  top: 0;
-  bottom: 0;
-
-  width: 12px;
-
-  background: white;
-
-  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    #d8dde4,
+    #ffffff,
+    #d8dde4
+  );
 
   box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3);
+    0 0 8px rgba(0,0,0,0.35);
+}
+
+.post {
+  top: 0;
+  bottom: 0;
+  width: 12px;
 }
 
 .post-left {
@@ -340,39 +337,20 @@ body {
   right: 0;
 }
 
-
-/* =========================================
-   BARRE TRANSVERSALE
-========================================= */
-
 .crossbar {
-  position: absolute;
-
-  z-index: 20;
-
   left: 0;
   right: 0;
   top: 0;
-
   height: 12px;
-
-  background: white;
-
-  border-radius: 3px;
-
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 
-/* =========================================
-   GARDIEN
-========================================= */
+/* ================================
+   KEEPER
+================================ */
 
 .keeper {
   position: absolute;
-
-  z-index: 30;
 
   left: 50%;
   bottom: 9%;
@@ -380,23 +358,23 @@ body {
   width: 90px;
   height: 145px;
 
+  z-index: 30;
+
   transform:
     translateX(-50%)
     scale(1);
 
-  transform-origin: bottom center;
-
   transition:
-    left 0.45s ease,
-    transform 0.45s ease;
+    left 0.42s cubic-bezier(.2,.8,.2,1),
+    transform 0.42s cubic-bezier(.2,.8,.2,1);
 
-  pointer-events: none;
+  filter: drop-shadow(0 7px 5px rgba(0,0,0,0.3));
 }
 
 
-/* =========================================
-   TETE GARDIEN
-========================================= */
+/* ================================
+   KEEPER HEAD
+================================ */
 
 .keeper-head {
   position: absolute;
@@ -404,209 +382,194 @@ body {
   left: 50%;
   top: 0;
 
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
 
   transform: translateX(-50%);
 
   border-radius: 50%;
 
-  background: #f0b58f;
+  background:
+    radial-gradient(circle at 35% 30%, #ffd4b0 0 15%, #d99568 70%);
 
-  border: 3px solid #111827;
+  border: 3px solid #172033;
 }
 
 
-/* =========================================
-   CORPS GARDIEN
-========================================= */
+/* ================================
+   KEEPER BODY
+================================ */
 
 .keeper-body {
   position: absolute;
 
   left: 50%;
-  top: 34px;
+  top: 28px;
 
-  width: 48px;
+  width: 45px;
   height: 65px;
 
   transform: translateX(-50%);
 
   border-radius: 12px 12px 8px 8px;
 
-  background: #2563eb;
+  background:
+    linear-gradient(
+      90deg,
+      #153e9b,
+      #2772e9,
+      #153e9b
+    );
 
-  border: 3px solid #172554;
+  border: 3px solid #10295d;
 }
 
 
-/* =========================================
-   BRAS GARDIEN
-========================================= */
+/* ================================
+   KEEPER ARMS
+================================ */
 
 .keeper-arm {
   position: absolute;
 
-  top: 40px;
+  top: 33px;
 
-  width: 16px;
+  width: 17px;
   height: 65px;
 
   border-radius: 12px;
 
-  background: #2563eb;
+  background:
+    linear-gradient(
+      90deg,
+      #143b95,
+      #347fff
+    );
 
-  border: 3px solid #172554;
-
-  transform-origin: top center;
-
-  transition:
-    transform 0.45s ease;
+  transition: transform 0.35s ease;
 }
 
 .keeper-arm.left {
-  left: 5px;
-
-  transform: rotate(20deg);
+  left: 8px;
+  transform: rotate(22deg);
+  transform-origin: top center;
 }
 
 .keeper-arm.right {
-  right: 5px;
-
-  transform: rotate(-20deg);
+  right: 8px;
+  transform: rotate(-22deg);
+  transform-origin: top center;
 }
 
 
-/* =========================================
-   JAMBES GARDIEN
-========================================= */
+/* ================================
+   KEEPER LEGS
+================================ */
 
 .keeper-leg {
   position: absolute;
 
-  top: 92px;
+  top: 87px;
 
-  width: 18px;
-  height: 52px;
+  width: 17px;
+  height: 58px;
 
   border-radius: 10px;
 
-  background: #172554;
+  background: #17244d;
 }
 
 .keeper-leg.left {
   left: 25px;
+  transform: rotate(5deg);
 }
 
 .keeper-leg.right {
   right: 25px;
+  transform: rotate(-5deg);
 }
 
 
-/* =========================================
-   PLONGEON GAUCHE
-========================================= */
+/* ================================
+   KEEPER DIVES
+================================ */
 
 .keeper.dive-left {
-  left: 25%;
-
+  left: 24%;
   transform:
     translateX(-50%)
-    rotate(-65deg)
-    scale(0.95);
+    rotate(-16deg)
+    scale(1.03);
 }
-
-.keeper.dive-left .keeper-arm.left {
-  transform: rotate(-75deg);
-}
-
-
-/* =========================================
-   PLONGEON DROIT
-========================================= */
 
 .keeper.dive-right {
-  left: 75%;
-
+  left: 76%;
   transform:
     translateX(-50%)
-    rotate(65deg)
-    scale(0.95);
+    rotate(16deg)
+    scale(1.03);
 }
-
-.keeper.dive-right .keeper-arm.right {
-  transform: rotate(75deg);
-}
-
-
-/* =========================================
-   CENTRE
-========================================= */
 
 .keeper.dive-center {
   left: 50%;
-
   transform:
     translateX(-50%)
-    scale(1.08);
+    translateY(-5px)
+    scale(1.05);
 }
 
 
-/* =========================================
-   CIBLE
-========================================= */
+/* ================================
+   TARGET
+================================ */
 
 .target-dot {
   position: absolute;
 
   z-index: 40;
 
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 
   transform:
-    translate(-50%, -50%);
-
-  border-radius: 50%;
-
-  background: rgba(255, 60, 60, 0.85);
-
-  border: 3px solid white;
-
-  box-shadow:
-    0 0 0 5px rgba(255, 60, 60, 0.2),
-    0 0 18px rgba(255, 60, 60, 0.7);
+    translate(-50%, -50%)
+    scale(0.5);
 
   opacity: 0;
 
-  pointer-events: none;
+  border-radius: 50%;
 
-  transition:
-    opacity 0.15s ease;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,255,0.9) 0 12%,
+      #ff4242 14% 40%,
+      rgba(255,65,65,0.35) 42% 100%
+    );
+
+  box-shadow:
+    0 0 20px rgba(255,60,60,0.8);
+
+  pointer-events: none;
 }
 
 .target-dot.visible {
   opacity: 1;
+  animation: targetPop 0.22s ease-out;
 }
 
 
-/* =========================================
-   BALLE
-========================================= */
+/* ================================
+   BALL
+================================ */
 
 .ball {
   position: absolute;
 
-  z-index: 50;
-
-  /*
-    IMPORTANT :
-    La balle est enfant de .goal.
-    Elle reste donc positionnée dans la cage.
-  */
-
   left: 50%;
   bottom: 6%;
+
+  z-index: 50;
 
   width: 42px;
   height: 42px;
@@ -615,32 +578,33 @@ body {
   line-height: 42px;
 
   transform:
-    translate(-50%, 0);
+    translate(-50%, 0)
+    scale(1);
 
   transition:
-    left 0.65s ease,
-    bottom 0.65s ease,
-    transform 0.65s ease;
+    left 0.65s cubic-bezier(.12,.72,.2,1),
+    bottom 0.65s cubic-bezier(.12,.72,.2,1),
+    transform 0.65s cubic-bezier(.12,.72,.2,1);
 
   filter:
-    drop-shadow(
-      0 5px 4px rgba(0, 0, 0, 0.35)
-    );
+    drop-shadow(0 6px 5px rgba(0,0,0,0.35));
 
   pointer-events: none;
+}
 
-  user-select: none;
+.ball.shooting {
+  filter:
+    drop-shadow(0 0 10px rgba(255,255,255,0.9))
+    drop-shadow(0 8px 8px rgba(0,0,0,0.3));
 }
 
 
-/* =========================================
-   JOUEUR
-========================================= */
+/* ================================
+   PLAYER
+================================ */
 
 .player {
   position: absolute;
-
-  z-index: 15;
 
   left: 50%;
   bottom: 2%;
@@ -648,15 +612,17 @@ body {
   width: 100px;
   height: 205px;
 
+  z-index: 15;
+
   transform: translateX(-50%);
 
-  pointer-events: none;
+  filter: drop-shadow(0 10px 5px rgba(0,0,0,0.35));
 }
 
 
-/* =========================================
-   TETE JOUEUR
-========================================= */
+/* ================================
+   PLAYER HEAD
+================================ */
 
 .player-head {
   position: absolute;
@@ -664,209 +630,229 @@ body {
   left: 50%;
   top: 0;
 
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 
   transform: translateX(-50%);
 
   border-radius: 50%;
 
-  background: #d99a72;
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #ffd9ba 0 15%,
+      #d99568 75%
+    );
 
-  border: 3px solid #111827;
+  border: 3px solid #40261c;
 }
 
 
-/* =========================================
-   CORPS JOUEUR
-========================================= */
+/* ================================
+   PLAYER BODY
+================================ */
 
 .player-body {
   position: absolute;
 
   left: 50%;
-  top: 43px;
+  top: 37px;
 
   width: 58px;
-  height: 78px;
+  height: 82px;
 
   transform: translateX(-50%);
 
-  border-radius: 14px 14px 8px 8px;
+  border-radius: 15px 15px 8px 8px;
 
-  background: #ef4444;
+  background:
+    linear-gradient(
+      90deg,
+      #101010,
+      #f2f2f2 20%,
+      #f2f2f2 80%,
+      #101010
+    );
 
-  border: 3px solid #7f1d1d;
+  border: 3px solid #222;
 }
 
 
-/* =========================================
-   BRAS JOUEUR
-========================================= */
+/* ================================
+   PLAYER ARMS
+================================ */
 
 .player-arm {
   position: absolute;
 
-  top: 50px;
+  top: 44px;
 
-  width: 18px;
-  height: 80px;
+  width: 19px;
+  height: 75px;
 
   border-radius: 12px;
 
-  background: #d99a72;
-
-  border: 3px solid #7f1d1d;
+  background: #eeeeee;
 }
 
 .player-arm.left {
-  left: 10px;
-
-  transform: rotate(18deg);
+  left: 7px;
+  transform: rotate(20deg);
 }
 
 .player-arm.right {
-  right: 10px;
-
-  transform: rotate(-18deg);
+  right: 7px;
+  transform: rotate(-20deg);
 }
 
 
-/* =========================================
-   JAMBES JOUEUR
-========================================= */
+/* ================================
+   PLAYER LEGS
+================================ */
 
 .player-leg {
   position: absolute;
 
-  top: 112px;
+  top: 113px;
 
   width: 22px;
-  height: 90px;
+  height: 92px;
 
   border-radius: 12px;
 
-  background: #111827;
+  background:
+    linear-gradient(
+      90deg,
+      #111,
+      #303030,
+      #111
+    );
 }
 
 .player-leg.left {
-  left: 27px;
-
-  transform: rotate(5deg);
+  left: 28px;
+  transform: rotate(3deg);
 }
 
 .player-leg.right {
-  right: 27px;
-
-  transform: rotate(-5deg);
+  right: 28px;
+  transform: rotate(-3deg);
 }
 
 
-/* =========================================
+/* ================================
+   PLAYER ANIMATIONS
+================================ */
+
+.player.celebrate {
+  animation: celebrate 0.6s ease-in-out 2;
+}
+
+.player.disappointed {
+  animation: disappointed 0.5s ease;
+}
+
+
+/* ================================
    MESSAGE
-========================================= */
+================================ */
 
 .message {
   position: absolute;
 
-  z-index: 100;
-
   left: 50%;
   top: 3%;
 
+  z-index: 100;
+
   transform: translateX(-50%);
 
-  padding: 12px 20px;
+  padding: 12px 22px;
 
-  max-width: 90%;
+  border-radius: 999px;
 
-  border-radius: 12px;
+  background: rgba(5, 13, 25, 0.82);
 
-  background: rgba(7, 17, 31, 0.85);
+  border: 1px solid rgba(255,255,255,0.12);
 
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.25);
 
-  color: white;
-
-  font-size: 18px;
-  font-weight: bold;
-
-  text-align: center;
+  font-weight: 800;
 
   white-space: nowrap;
 
-  backdrop-filter: blur(5px);
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
 .message.goal-message {
-  background: rgba(16, 120, 60, 0.92);
-
-  transform:
-    translateX(-50%)
-    scale(1.05);
+  background: rgba(8, 130, 65, 0.92);
 }
 
 .message.save {
-  background: rgba(180, 45, 45, 0.92);
+  background: rgba(175, 36, 45, 0.92);
+}
 
-  transform:
-    translateX(-50%)
-    scale(1.05);
+.message.goal-message,
+.message.save {
+  animation: messagePop 0.25s ease-out;
 }
 
 
-/* =========================================
-   CONTROLES
-========================================= */
+/* ================================
+   GOAL EFFECTS
+================================ */
+
+.goal.goal-scored {
+  animation: goalFlash 0.5s ease;
+}
+
+.goal.goal-saved {
+  animation: goalShake 0.32s ease;
+}
+
+
+/* ================================
+   CONTROLS
+================================ */
 
 .controls {
-  padding: 22px;
+  margin-top: 15px;
 
-  background: #0d1929;
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.055);
+
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 
-/* =========================================
+/* ================================
    INSTRUCTIONS
-========================================= */
+================================ */
 
 .instructions {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  gap: 25px;
 
-  gap: 10px;
+  margin-bottom: 18px;
 
-  margin-bottom: 20px;
-}
-
-.instructions span {
-  padding: 9px 14px;
-
-  background: #142238;
-
-  border: 1px solid #263b56;
-
-  border-radius: 999px;
-
-  color: #dbe7f7;
+  color: #c4cfdd;
 
   font-size: 14px;
 }
 
 
-/* =========================================
-   JAUGE DE PUISSANCE
-========================================= */
+/* ================================
+   POWER
+================================ */
 
 .power-panel {
-  width: min(700px, 100%);
-
-  margin: 0 auto;
+  max-width: 700px;
+  margin: auto;
 }
 
 .power-labels {
@@ -875,75 +861,77 @@ body {
 
   margin-bottom: 7px;
 
-  color: #93a4bb;
+  color: #9faabd;
 
-  font-size: 11px;
-  font-weight: bold;
+  font-size: 10px;
+  font-weight: 800;
 }
-
-
-/* =========================================
-   BARRE
-========================================= */
 
 .power-bar {
   position: relative;
 
-  display: flex;
-
   width: 100%;
-  height: 22px;
+  height: 18px;
 
   overflow: hidden;
 
   border-radius: 999px;
 
-  background: #111827;
+  background: #182334;
 
-  border: 2px solid #26364c;
+  box-shadow:
+    inset 0 2px 5px rgba(0,0,0,0.35);
 }
-
-
-/* =========================================
-   ZONES
-========================================= */
 
 .power-zone {
-  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
 }
 
-.power-zone.red {
-  width: 15%;
-
-  background: #dc2626;
+.left-red {
+  left: 0;
+  width: 17%;
+  background: #e3343f;
 }
 
-.power-zone.orange {
-  width: 15%;
-
-  background: #f59e0b;
+.left-orange {
+  left: 17%;
+  width: 18%;
+  background: #f09a31;
 }
 
-.power-zone.green {
-  width: 40%;
+.green {
+  left: 35%;
+  width: 30%;
+  background: #24bd69;
+}
 
-  background: #22c55e;
+.right-orange {
+  left: 65%;
+  width: 18%;
+  background: #f09a31;
+}
+
+.right-red {
+  left: 83%;
+  width: 17%;
+  background: #e3343f;
 }
 
 
-/* =========================================
-   AIGUILLE
-========================================= */
+/* ================================
+   NEEDLE
+================================ */
 
 .needle {
   position: absolute;
 
-  top: -5px;
-  bottom: -5px;
-
   left: 50%;
+  top: -4px;
 
-  width: 4px;
+  width: 5px;
+  height: 26px;
 
   transform: translateX(-50%);
 
@@ -952,78 +940,135 @@ body {
   background: white;
 
   box-shadow:
-    0 0 8px rgba(255, 255, 255, 0.9);
+    0 0 8px rgba(255,255,255,0.9);
 
   pointer-events: none;
 }
 
 
-/* =========================================
-   RESULTAT
-========================================= */
+/* ================================
+   SOUND BUTTON
+================================ */
+
+.sound-button {
+  display: block;
+
+  margin: 18px auto 0;
+
+  min-height: 44px;
+
+  padding: 9px 17px;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.08);
+
+  color: white;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.sound-button:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.sound-button:active {
+  transform: scale(0.95);
+}
+
+
+/* ================================
+   RESULT
+================================ */
 
 .result {
-  width: min(420px, 100%);
-
   margin: 25px auto 0;
 
-  padding: 25px;
+  max-width: 420px;
+
+  padding: 24px;
 
   text-align: center;
 
-  background: #142238;
+  border-radius: 20px;
 
-  border: 1px solid #2b405c;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(24,40,62,0.98),
+      rgba(8,16,29,0.98)
+    );
 
-  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+
+  box-shadow:
+    0 15px 45px rgba(0,0,0,0.35);
+
+  animation: resultAppear 0.35s ease;
 }
 
 .result h2 {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 
-  font-size: 24px;
+  font-size: 27px;
 }
 
 .result p {
-  margin: 8px 0;
+  margin: 7px 0;
 
-  color: #b7c5d8;
+  color: #b7c4d4;
 }
 
 .result strong {
   color: white;
 }
 
-
-/* =========================================
-   CACHÉ
-========================================= */
-
 .hidden {
   display: none !important;
 }
 
 
-/* =========================================
-   BOUTON REJOUER
-========================================= */
+/* ================================
+   RESTART
+================================ */
 
 .restart-button {
   margin-top: 18px;
 
-  padding: 12px 24px;
+  min-height: 48px;
 
-  border: 0;
-  border-radius: 10px;
+  padding: 12px 28px;
 
-  background: #22c55e;
+  border: none;
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2f83ff,
+      #1555c7
+    );
 
   color: white;
 
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 900;
 
   cursor: pointer;
+
+  touch-action: manipulation;
+
+  box-shadow:
+    0 8px 20px rgba(21,85,199,0.35);
 
   transition:
     transform 0.15s ease,
@@ -1032,38 +1077,146 @@ body {
 
 .restart-button:hover {
   filter: brightness(1.1);
-
-  transform:
-    translateY(-2px);
 }
 
 .restart-button:active {
-  transform:
-    translateY(0);
+  transform: scale(0.95);
 }
 
 
-/* =========================================
-   RESPONSIVE
-========================================= */
+/* ================================
+   ANIMATIONS
+================================ */
 
-@media (max-width: 800px) {
+@keyframes targetPop {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      scale(0.25);
+  }
+
+  65% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1.25);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+}
+
+
+@keyframes goalFlash {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter:
+      brightness(1.25)
+      saturate(1.3);
+  }
+}
+
+
+@keyframes goalShake {
+  0%,
+  100% {
+    transform: translateX(-50%);
+  }
+
+  25% {
+    transform: translateX(calc(-50% - 5px));
+  }
+
+  75% {
+    transform: translateX(calc(-50% + 5px));
+  }
+}
+
+
+@keyframes messagePop {
+  0% {
+    opacity: 0;
+    transform:
+      translateX(-50%)
+      scale(0.7);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translateX(-50%)
+      scale(1);
+  }
+}
+
+
+@keyframes celebrate {
+  0%,
+  100% {
+    transform:
+      translateX(-50%)
+      translateY(0)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translateX(-50%)
+      translateY(-10px)
+      scale(1.05);
+  }
+}
+
+
+@keyframes disappointed {
+  0%,
+  100% {
+    transform:
+      translateX(-50%);
+  }
+
+  25% {
+    transform:
+      translateX(calc(-50% - 6px));
+  }
+
+  75% {
+    transform:
+      translateX(calc(-50% + 6px));
+  }
+}
+
+
+@keyframes resultAppear {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* ================================
+   TABLETTE
+================================ */
+
+@media (max-width: 900px) {
 
   .game {
-    padding: 10px;
-  }
-
-  .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .stats {
-    width: 100%;
-  }
-
-  .stats > div {
-    flex: 1;
+    padding: 12px;
   }
 
   .stadium {
@@ -1072,130 +1225,168 @@ body {
 
   .goal {
     width: 92vw;
-    height: 300px;
-  }
-
-  .player {
-    transform:
-      translateX(-50%)
-      scale(0.85);
-
-    transform-origin: bottom center;
+    height: 310px;
   }
 
   .keeper {
-    transform:
-      translateX(-50%)
-      scale(0.85);
-
-    transform-origin: bottom center;
-  }
-
-  .keeper.dive-left {
-    transform:
-      translateX(-50%)
-      rotate(-65deg)
-      scale(0.8);
-  }
-
-  .keeper.dive-right {
-    transform:
-      translateX(-50%)
-      rotate(65deg)
-      scale(0.8);
-  }
-
-  .keeper.dive-center {
     transform:
       translateX(-50%)
       scale(0.9);
   }
 
-  .message {
-    font-size: 15px;
+  .player {
+    transform:
+      translateX(-50%)
+      scale(0.9);
+  }
 
-    padding: 10px 14px;
+  .instructions {
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+  .game {
+    padding: 8px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .stats {
+    justify-content: center;
+  }
+
+  .stats > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stadium {
+    height: 540px;
+    border-radius: 18px;
+  }
+
+  .goal {
+    width: 94vw;
+    height: 275px;
+    top: 10%;
+  }
+
+  .net {
+    left: 7px;
+    right: 7px;
+    border-width: 5px;
+    background-size: 19px 19px;
+  }
+
+  .post {
+    width: 9px;
+  }
+
+  .crossbar {
+    height: 9px;
   }
 
   .ball {
     width: 34px;
     height: 34px;
-
     font-size: 34px;
     line-height: 34px;
-  }
-
-}
-
-
-@media (max-width: 500px) {
-
-  .topbar h1 {
-    font-size: 26px;
-  }
-
-  .subtitle {
-    font-size: 13px;
-  }
-
-  .stadium {
-    height: 540px;
-  }
-
-  .goal {
-    top: 10%;
-
-    width: 94vw;
-    height: 275px;
-  }
-
-  .net {
-    background-size: 18px 18px;
-  }
-
-  .instructions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .instructions span {
-    text-align: center;
-  }
-
-  .controls {
-    padding: 15px;
-  }
-
-  .player {
-    transform:
-      translateX(-50%)
-      scale(0.72);
   }
 
   .keeper {
     transform:
       translateX(-50%)
+      scale(0.78);
+  }
+
+  .player {
+    transform:
+      translateX(-50%)
       scale(0.75);
+    transform-origin: bottom center;
   }
 
-  .keeper.dive-left {
-    transform:
-      translateX(-50%)
-      rotate(-65deg)
-      scale(0.7);
+  .message {
+    max-width: 90%;
+    padding: 9px 14px;
+
+    font-size: 13px;
+
+    white-space: normal;
+    text-align: center;
   }
 
-  .keeper.dive-right {
-    transform:
-      translateX(-50%)
-      rotate(65deg)
-      scale(0.7);
+  .instructions {
+    flex-direction: column;
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 12px;
   }
 
-  .keeper.dive-center {
-    transform:
-      translateX(-50%)
-      scale(0.8);
+  .controls {
+    padding: 14px;
   }
 
+  .power-bar {
+    height: 16px;
+  }
+
+  .needle {
+    height: 24px;
+  }
+}
+
+
+/* ================================
+   PETITS TELEPHONES
+================================ */
+
+@media (max-width: 380px) {
+
+  .stadium {
+    height: 500px;
+  }
+
+  .goal {
+    height: 250px;
+  }
+
+  .topbar h1 {
+    font-size: 25px;
+  }
+
+  .stats strong {
+    font-size: 19px;
+  }
+}
+
+
+/* ================================
+   REDUCTION DES ANIMATIONS
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
