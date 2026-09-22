@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#07111f">
   <title>PenaltyMind</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -17,14 +16,10 @@
 
       <div>
         <h1>⚽ PenaltyMind</h1>
-
-        <p class="subtitle">
-          Clique dans la cage pour tirer
-        </p>
+        <p class="subtitle">Vise la cage et trompe le gardien</p>
       </div>
 
       <div class="stats">
-
         <div>
           <span>Tir</span>
           <strong id="shotNumber">1</strong>
@@ -39,7 +34,6 @@
           <span>Combo</span>
           <strong id="combo">0</strong>
         </div>
-
       </div>
 
     </header>
@@ -50,15 +44,11 @@
       <div class="stadium">
 
         <div class="sky"></div>
-
         <div class="crowd"></div>
 
         <div class="field">
-
           <div class="penalty-area"></div>
-
           <div class="penalty-spot"></div>
-
         </div>
 
 
@@ -69,9 +59,7 @@
           <div class="net"></div>
 
           <div class="post post-left"></div>
-
           <div class="post post-right"></div>
-
           <div class="crossbar"></div>
 
 
@@ -96,7 +84,7 @@
           <div id="targetDot" class="target-dot"></div>
 
 
-          <!-- BALLE -->
+          <!-- BALLON -->
 
           <div id="ball" class="ball">⚽</div>
 
@@ -122,7 +110,7 @@
         <!-- MESSAGE -->
 
         <div id="message" class="message">
-          Clique dans la cage pour tirer ⚽
+          Tape dans la cage pour tirer ⚽
         </div>
 
       </div>
@@ -134,14 +122,14 @@
 
         <div class="instructions">
 
-          <span>🎯 Clique dans la cage</span>
+          <span>🎯 Vise la cage</span>
           <span>⚽ Le tir part automatiquement</span>
           <span>🧤 Évite le gardien</span>
 
         </div>
 
 
-        <!-- JAUGE -->
+        <!-- PUISSANCE -->
 
         <div class="power-panel">
 
@@ -166,13 +154,23 @@
         </div>
 
 
-        <!-- RESULTAT -->
+        <!-- SON -->
+
+        <button
+          id="soundButton"
+          class="sound-button"
+          type="button"
+          aria-pressed="true"
+        >
+          🔊 Son
+        </button>
+
+
+        <!-- FIN DE MATCH -->
 
         <div id="result" class="result hidden">
 
-          <h2 id="resultTitle">
-            🏁 Fin du match
-          </h2>
+          <h2 id="resultTitle">🏁 Match terminé</h2>
 
           <p>
             Score :
@@ -184,7 +182,7 @@
             <strong id="bestScore">0</strong>
           </p>
 
-          <button id="restartButton" class="restart-button">
+          <button id="restartButton" class="restart-button" type="button">
             Rejouer
           </button>
 
@@ -196,9 +194,7 @@
 
   </main>
 
-
   <script src="game.js"></script>
 
 </body>
-
 </html>
