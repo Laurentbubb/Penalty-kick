@@ -1,39 +1,716 @@
-body {
-    margin: 0;
-    background: black;
-    color: white;
-    font-family: Arial, sans-serif;
+* {
+    box-sizing: border-box;
 }
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #07111f;
+    color: white;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+
+/* ==================== ÉCRANS ==================== */
+
 .screen {
-    display: block;
+    width: 100%;
+    min-height: 100vh;
 }
 
 .hidden-screen {
-    display: none;
+    display: none !important;
 }
+
+
+/* ==================== MENU ==================== */
 
 #mainMenu {
     min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    background:
+        radial-gradient(circle at top, #17345c 0%, #07111f 55%, #02060c 100%);
 }
 
 .menu-container {
+    width: min(92%, 500px);
     text-align: center;
+    padding: 30px 15px;
 }
+
+
+/* LOGO */
+
+.logo-area {
+    margin-bottom: 25px;
+}
+
+.logo-ball {
+    font-size: 70px;
+    margin-bottom: 5px;
+    animation: floatBall 2s ease-in-out infinite;
+}
+
+.logo-area h1 {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.logo-area h1 span {
+    color: #00e5ff;
+}
+
+.logo-area p {
+    margin: 8px 0 0;
+    color: #8fa9c7;
+    font-size: 13px;
+    letter-spacing: 4px;
+}
+
+
+/* ==================== XP ==================== */
+
+.level-panel {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 22px;
+}
+
+.level-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 9px;
+    color: #b9cbe0;
+}
+
+.level-top strong {
+    color: white;
+}
+
+.xp-bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 10px;
+    background: #18283d;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00c6ff, #00ff95);
+    transition: width 0.4s ease;
+}
+
+
+/* ==================== BOUTONS ==================== */
 
 .menu-buttons {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 11px;
 }
 
 button {
-    padding: 15px;
-    background: blue;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.main-button,
+.menu-button,
+.shoot-button,
+.small-button,
+.back-button,
+.danger-button {
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease,
+        background 0.15s ease;
+}
+
+.main-button:hover,
+.menu-button:hover,
+.shoot-button:hover,
+.small-button:hover,
+.back-button:hover,
+.danger-button:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+}
+
+.main-button:active,
+.menu-button:active,
+.shoot-button:active,
+.small-button:active,
+.back-button:active,
+.danger-button:active {
+    transform: scale(0.97);
+}
+
+
+.main-button {
+    width: 100%;
+    padding: 17px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, #00d4ff, #008cff);
     color: white;
-    border: 0;
+    font-size: 19px;
+    font-weight: 900;
+    box-shadow: 0 8px 25px rgba(0, 190, 255, 0.25);
+}
+
+
+.menu-button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: #13253b;
+    color: white;
+    border: 1px solid #24415f;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+.best-score {
+    margin-top: 25px;
+    color: #7188a3;
+    font-size: 12px;
+}
+
+.best-score strong {
+    color: #00e5ff;
+}
+
+
+/* ==================== JEU ==================== */
+
+#gameScreen {
+    background: #06101c;
+    min-height: 100vh;
+}
+
+.game-header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: #0b192a;
+    border-bottom: 1px solid #1b3048;
+}
+
+.game-title {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.game-title strong {
+    font-size: 18px;
+}
+
+.game-title span {
+    color: #7f99b6;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+
+.small-button {
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: #152b43;
+    color: white;
+    font-weight: 700;
+}
+
+
+/* SCORE */
+
+.score-panel {
+    display: flex;
+    justify-content: center;
+    gap: 45px;
+    padding: 15px;
+    background: #081625;
+}
+
+.score-panel div {
+    min-width: 60px;
+    text-align: center;
+}
+
+.score-panel span {
+    display: block;
+    color: #7890aa;
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.score-panel strong {
+    font-size: 21px;
+}
+
+
+/* ==================== STADE ==================== */
+
+.stadium {
+    position: relative;
+    width: 100%;
+    height: 430px;
+    overflow: hidden;
+    background: #72c9ff;
+}
+
+.sky {
+    position: absolute;
+    inset: 0 0 45% 0;
+    background: linear-gradient(#55bdf5, #b5e9ff);
+}
+
+.crowd {
+    position: absolute;
+    top: 38%;
+    left: 0;
+    width: 100%;
+    height: 25%;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #26374a 0 10px,
+            #344a60 10px 20px
+        );
+}
+
+.field {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 57%;
+    background: linear-gradient(#31964d, #176c32);
+    border-top: 4px solid #e8f6e9;
+}
+
+
+/* BUT */
+
+.goal {
+    position: absolute;
+    width: 72%;
+    height: 58%;
+    left: 14%;
+    top: 8%;
+    border: 8px solid white;
+    border-bottom-width: 12px;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 18px,
+            rgba(255,255,255,0.35) 18px 20px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 18px,
+            rgba(255,255,255,0.35) 18px 20px
+        );
+    box-shadow: 0 8px 15px rgba(0,0,0,0.25);
+}
+
+.goal-net {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+}
+
+
+/* GARDIEN */
+
+.keeper {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    font-size: 58px;
+    z-index: 5;
+    transition: left 0.35s ease, transform 0.35s ease;
+}
+
+
+/* CIBLE */
+
+.target-dot {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.9);
+    border: 3px solid white;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
+    z-index: 3;
+}
+
+
+/* BALLON */
+
+.ball {
+    position: absolute;
+    left: 50%;
+    bottom: 3%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    z-index: 10;
+    transition: left 0.5s ease, bottom 0.5s ease, transform 0.5s ease;
+}
+
+
+/* JOUEUR */
+
+.player {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 75px;
+    z-index: 8;
+}
+
+
+/* ==================== PUISSANCE ==================== */
+
+.power-panel {
+    padding: 18px 20px;
+    background: #081625;
+    text-align: center;
+}
+
+.power-panel p {
+    margin: 0 0 12px;
+    color: #8ba1ba;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.power-meter {
+    position: relative;
+    height: 28px;
+    display: flex;
+    max-width: 500px;
+    margin: auto;
+    overflow: hidden;
     border-radius: 8px;
+}
+
+.power-zone {
+    flex: 1;
+}
+
+.power-zone.weak {
+    background: #d94141;
+}
+
+.power-zone.good {
+    background: #e7b93d;
+}
+
+.power-zone.perfect {
+    background: #35d46b;
+}
+
+
+.needle {
+    position: absolute;
+    top: -5px;
+    width: 4px;
+    height: 38px;
+    background: white;
+    box-shadow: 0 0 8px black;
+    left: 0%;
+}
+
+
+.shoot-button {
+    margin-top: 15px;
+    padding: 13px 35px;
+    border-radius: 11px;
+    background: #00c6ff;
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+
+/* MESSAGE */
+
+.message {
+    min-height: 50px;
+    padding: 14px;
+    text-align: center;
+    color: #dce9f5;
+    font-weight: 700;
+}
+
+
+/* ==================== RESULTAT ==================== */
+
+.result {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 100;
+}
+
+.hidden-result {
+    display: none !important;
+}
+
+.result-card {
+    width: min(90%, 400px);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    background: #0d2035;
+    border: 1px solid #294765;
+}
+
+.result-card h2 {
+    margin-top: 0;
+    font-size: 32px;
+}
+
+
+/* ==================== ÉCRANS SIMPLES ==================== */
+
+.simple-screen {
+    width: min(92%, 600px);
+    margin: auto;
+    padding: 30px 0 50px;
+    text-align: center;
+}
+
+.simple-screen h1 {
+    margin-top: 40px;
+    font-size: 30px;
+}
+
+.simple-screen p {
+    color: #8fa7c0;
+    line-height: 1.6;
+}
+
+
+.back-button {
+    padding: 10px 15px;
+    border-radius: 9px;
+    background: #152b43;
+    color: white;
+    font-weight: 700;
+}
+
+
+/* ==================== QUÊTES ==================== */
+
+.daily-subtitle {
+    margin-bottom: 25px;
+}
+
+.daily-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 13px;
+    background: #10243a;
+    border: 1px solid #203d59;
+}
+
+.daily-progress span {
+    color: #8fa7c0;
+    font-size: 13px;
+}
+
+.daily-progress strong {
+    color: #00e5ff;
+}
+
+
+.daily-challenges {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.challenge-card {
+    padding: 17px;
+    border-radius: 14px;
+    background: #10243a;
+    border: 1px solid #203d59;
+    text-align: left;
+}
+
+.challenge-card.completed {
+    border-color: #35d46b;
+    background: rgba(53, 212, 107, 0.08);
+}
+
+.challenge-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.challenge-title {
+    font-weight: 800;
+}
+
+.challenge-reward {
+    color: #ffd84d;
+    white-space: nowrap;
+    font-weight: 800;
+}
+
+.challenge-description {
+    margin-top: 7px;
+    color: #91a8bf;
+    font-size: 13px;
+}
+
+.challenge-progress {
+    margin-top: 12px;
+    height: 7px;
+    background: #1a3047;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.challenge-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #00e5ff;
+    border-radius: 10px;
+}
+
+.challenge-status {
+    margin-top: 9px;
+    color: #35d46b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+
+/* ==================== STATS ==================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.stat-card {
+    padding: 20px 10px;
+    border-radius: 14px;
+    background: #10243a;
+    border: 1px solid #203d59;
+}
+
+.stat-card span {
+    display: block;
+    color: #7f98b2;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.stat-card strong {
+    font-size: 25px;
+    color: #00e5ff;
+}
+
+
+/* ==================== PARAMÈTRES ==================== */
+
+#settingsScreen .menu-button,
+#settingsScreen .danger-button {
+    margin-top: 15px;
+}
+
+.danger-button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: #6e2630;
+    color: white;
+    font-weight: 800;
+}
+
+
+/* ==================== ANIMATIONS ==================== */
+
+@keyframes floatBall {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 600px) {
+
+    .logo-area h1 {
+        font-size: 34px;
+    }
+
+    .logo-ball {
+        font-size: 55px;
+    }
+
+    .stadium {
+        height: 350px;
+    }
+
+    .goal {
+        width: 82%;
+        left: 9%;
+    }
+
+    .score-panel {
+        gap: 25px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
