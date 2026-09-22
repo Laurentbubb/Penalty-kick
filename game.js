@@ -1,4 +1,3 @@
-javascript
 const MAX_SHOTS = 10;
 
 const state = {
@@ -6,321 +5,185 @@ const state = {
   score: 0,
   combo: 0,
   locked: false,
+
   aim: null,
+  power: 0.5,
 
-  // Sert à la jauge de précision
-  power: 0,
-  direction: 1,
-
-  best: Number(
-    localStorage.getItem("penaltyMindBest") || 0
-  )
+  best: Number(localStorage.getItem("penaltyMindBest") || 0)
 };
 
 
-// ======================================
+// ===============================
 // ELEMENTS
-// ======================================
+// ===============================
 
-const goal =
-  document.getElementById("goal");
+const goal = document.getElementById("goal");
+const ball = document.getElementById("ball");
+const keeper = document.getElementById("keeper");
+const targetDot = document.getElementById("targetDot");
 
-const ball =
-  document.getElementById("ball");
+const message = document.getElementById("message");
+const needle = document.getElementById("needle");
 
-const keeper =
-  document.getElementById("keeper");
+const shotNumber = document.getElementById("shotNumber");
+const scoreElement = document.getElementById("score");
+const comboElement = document.getElementById("combo");
 
-const targetDot =
-  document.getElementById("targetDot");
+const result = document.getElementById("result");
+const resultTitle = document.getElementById("resultTitle");
 
-const message =
-  document.getElementById("message");
+const finalScore = document.getElementById("finalScore");
+const bestScore = document.getElementById("bestScore");
 
-const needle =
-  document.getElementById("needle");
-
-const result =
-  document.getElementById("result");
-
-const resultTitle =
-  document.getElementById("resultTitle");
-
-const finalScore =
-  document.getElementById("finalScore");
-
-const bestScore =
-  document.getElementById("bestScore");
-
-const shotNumber =
-  document.getElementById("shotNumber");
-
-const scoreElement =
-  document.getElementById("score");
-
-const comboElement =
-  document.getElementById("combo");
-
-const restartButton =
-  document.getElementById("restartButton");
+const restartButton = document.getElementById("restartButton");
 
 
-// ======================================
-// UI
-// ======================================
-
-function updateUI() {
-
-  shotNumber.textContent =
-    state.shot;
-
-  scoreElement.textContent =
-    state.score;
-
-  comboElement.textContent =
-    state.combo;
-}
-
-
-function setMessage(text) {
-
-  message.textContent =
-    text;
-}
-
-
-// ======================================
+// ===============================
 // JAUGE
-// ======================================
+// ===============================
 
-let lastTime =
-  performance.now();
+let meterTime = 0;
 
-
-function animateMeter(now) {
-
-  const delta =
-    Math.min(
-      (now - lastTime) / 1000,
-      0.05
-    );
-
-  lastTime = now;
-
+function animateMeter() {
 
   if (!state.locked) {
 
-    state.power +=
-      state.direction *
-      delta *
-      0.95;
+    meterTime += 0.04;
 
-
-    if (state.power >= 1) {
-
-      state.power = 1;
-
-      state.direction = -1;
-    }
-
-
-    if (state.power <= 0) {
-
-      state.power = 0;
-
-      state.direction = 1;
-    }
-
+    state.power =
+      (Math.sin(meterTime) + 1) / 2;
 
     needle.style.left =
       `${state.power * 100}%`;
   }
 
+  requestAnimationFrame(animateMeter);
+}
 
-  requestAnimationFrame(
-    animateMeter
-  );
+animateMeter();
+
+
+// ===============================
+// DIRECTION DU GARDIEN
+// ===============================
+
+function randomKeeperDirection() {
+
+  const directions = [
+    "left",
+    "center",
+    "right"
+  ];
+
+  return directions[
+    Math.floor(Math.random() * directions.length)
+  ];
 }
 
 
-// ======================================
-// BALLE
-// ======================================
+// ===============================
+// DIRECTION DU TIR
+// ===============================
 
-function resetBall() {
-
-  ball.style.left =
-    "50%";
-
-  ball.style.bottom =
-    "5%";
-
-  ball.style.transform =
-    "translate(-50%, 0) scale(1)";
-}
-
-
-// ======================================
-// GARDIEN
-// ======================================
-
-function resetKeeper() {
-
-  keeper.classList.remove(
-    "dive-left",
-    "dive-center",
-    "dive-right"
-  );
-
-  keeper.style.left =
-    "50%";
-}
-
-
-function getGoalkeeperChoice() {
-
-  const random =
-    Math.random();
-
-
-  if (random < 0.34) {
-
-    return "left";
-  }
-
-
-  if (random < 0.66) {
-
-    return "center";
-  }
-
-
-  return "right";
-}
-
-
-function getKeeperPosition(direction) {
-
-  if (direction === "left") {
-
-    return 27;
-  }
-
-
-  if (direction === "right") {
-
-    return 73;
-  }
-
-
-  return 50;
-}
-
-
-// ======================================
-// CIBLE
-// ======================================
-
-function resetTarget() {
-
-  state.aim = null;
-
-  targetDot.classList.remove(
-    "visible"
-  );
-}
-
-
-function getDirection(x) {
+function getAimDirection(x) {
 
   if (x < 0.34) {
-
     return "left";
   }
 
-
   if (x > 0.66) {
-
     return "right";
   }
-
 
   return "center";
 }
 
 
-// ======================================
+// ===============================
 // PRECISION
-// ======================================
+// ===============================
 
 function getAccuracy() {
 
   const distance =
-    Math.abs(
-      state.power - 0.5
-    );
+    Math.abs(state.power - 0.5);
 
+  /*
+    Plus la jauge est proche du centre,
+    plus le tir est précis.
+  */
 
-  const green =
-    0.15;
-
-
-  if (distance <= green) {
-
-    return (
-      1 -
-      distance / green
-    );
-  }
-
-
-  const orange =
-    0.33;
-
-
-  const progress =
-    Math.max(
-      0,
-      1 -
-      (distance - green) /
-      (orange - green)
-    );
-
-
-  return progress * 0.55;
+  return Math.max(
+    0.15,
+    1 - distance * 1.7
+  );
 }
 
 
-// ======================================
-// POSITION DE LA BALLE
-// ======================================
+// ===============================
+// ERREUR DU TIR
+// ===============================
 
-function shootBall(x, y) {
+function chooseActualAim(x, y) {
+
+  const accuracy = getAccuracy();
 
   /*
-   * IMPORTANT :
-   *
-   * La balle est maintenant DANS #goal.
-   *
-   * Donc les pourcentages sont calculés
-   * par rapport à la cage et non au stade.
-   */
+    Plus accuracy est faible,
+    plus la balle s'écarte du clic.
+  */
 
+  const error =
+    (1 - accuracy) * 0.20;
+
+  const randomX =
+    (Math.random() - 0.5) * error;
+
+  const randomY =
+    (Math.random() - 0.5) * error;
+
+  return {
+
+    x: Math.max(
+      0.12,
+      Math.min(0.88, x + randomX)
+    ),
+
+    y: Math.max(
+      0.15,
+      Math.min(0.78, y + randomY)
+    )
+  };
+}
+
+
+// ===============================
+// POSITION DE LA BALLE
+// ===============================
+
+function moveBall(x, y) {
+
+  /*
+    IMPORTANT :
+
+    .ball est enfant de .goal.
+
+    Donc les pourcentages ci-dessous
+    correspondent à la cage et NON
+    au terrain entier.
+  */
 
   const safeX =
-    Math.max(
-      10,
-      Math.min(
-        90,
-        x * 100
-      )
-    );
+    12 + x * 76;
 
+  /*
+    On limite volontairement la hauteur
+    pour que l'emoji ne puisse jamais
+    sortir par le haut de la cage.
+  */
 
   const safeY =
-    8 +
-    (1 - y) * 65;
-
+    10 + y * 58;
 
   ball.style.left =
     `${safeX}%`;
@@ -329,152 +192,31 @@ function shootBall(x, y) {
     `${safeY}%`;
 
   ball.style.transform =
-    "translate(-50%, 0) scale(.65)";
+    "translate(-50%, 0) scale(.72)";
 }
 
 
-// ======================================
-// TIR
-// ======================================
+// ===============================
+// ANIMATION GARDIEN
+// ===============================
 
-function shoot() {
+function moveKeeper(direction) {
 
-  if (
-    state.locked ||
-    !state.aim
-  ) {
-    return;
-  }
+  keeper.classList.remove(
+    "dive-left",
+    "dive-right",
+    "dive-center"
+  );
 
+  void keeper.offsetWidth;
 
-  state.locked =
-    true;
-
-
-  // --------------------------
-  // PRECISION
-  // --------------------------
-
-  const accuracy =
-    getAccuracy();
-
-
-  // --------------------------
-  // PETITE IMPRECISION
-  // --------------------------
-
-  const error =
-    (1 - accuracy) * 0.08;
-
-
-  const actualX =
-    Math.max(
-      0.08,
-      Math.min(
-        0.92,
-        state.aim.x +
-        (Math.random() * 2 - 1) *
-        error
-      )
-    );
-
-
-  const actualY =
-    Math.max(
-      0.08,
-      Math.min(
-        0.85,
-        state.aim.y +
-        (Math.random() * 2 - 1) *
-        error
-      )
-    );
-
-
-  // --------------------------
-  // DIRECTIONS
-  // --------------------------
-
-  const playerDirection =
-    getDirection(actualX);
-
-  const keeperDirection =
-    getGoalkeeperChoice();
-
-
-  // --------------------------
-  // ARRET
-  // --------------------------
-
-  const saved =
-    playerDirection ===
-      keeperDirection &&
-    Math.random() < 0.82;
-
-
-  // --------------------------
-  // SCORE
-  // --------------------------
-
-  if (saved) {
-
-    state.combo = 0;
-
-    setMessage(
-      "🧤 ARRÊT ! Le gardien plonge au bon endroit."
-    );
-
-  } else {
-
-    const precisionBonus =
-      Math.round(
-        accuracy * 80
-      );
-
-    const comboBonus =
-      state.combo * 25;
-
-    const points =
-      100 +
-      precisionBonus +
-      comboBonus;
-
-
-    state.score +=
-      points;
-
-    state.combo++;
-
-
-    setMessage(
-      `⚽ BUT ! +${points} points`
-    );
-  }
-
-
-  // --------------------------
-  // GARDIEN
-  // --------------------------
-
-  keeper.style.left =
-    `${getKeeperPosition(
-      keeperDirection
-    )}%`;
-
-
-  if (
-    keeperDirection ===
-    "left"
-  ) {
+  if (direction === "left") {
 
     keeper.classList.add(
       "dive-left"
     );
 
-  } else if (
-    keeperDirection ===
-    "right"
-  ) {
+  } else if (direction === "right") {
 
     keeper.classList.add(
       "dive-right"
@@ -486,84 +228,210 @@ function shoot() {
       "dive-center"
     );
   }
+}
 
 
-  // --------------------------
-  // BALLE
-  // --------------------------
+// ===============================
+// TIR
+// ===============================
 
-  shootBall(
-    actualX,
-    actualY
+function shoot() {
+
+  if (state.locked) {
+    return;
+  }
+
+  if (!state.aim) {
+    return;
+  }
+
+  if (state.shot > MAX_SHOTS) {
+    return;
+  }
+
+  state.locked = true;
+
+
+  // ============================
+  // PRECISION
+  // ============================
+
+  const accuracy =
+    getAccuracy();
+
+
+  // ============================
+  // POSITION REELLE
+  // ============================
+
+  const actual =
+    chooseActualAim(
+      state.aim.x,
+      state.aim.y
+    );
+
+
+  // ============================
+  // DIRECTION
+  // ============================
+
+  const targetDirection =
+    getAimDirection(actual.x);
+
+
+  const keeperDirection =
+    randomKeeperDirection();
+
+
+  // ============================
+  // SAUVE / BUT
+  // ============================
+
+  const saved =
+    targetDirection === keeperDirection;
+
+
+  // ============================
+  // POINTS
+  // ============================
+
+  let points = 0;
+
+  if (!saved) {
+
+    points = 100;
+
+    if (accuracy > 0.85) {
+      points += 50;
+    }
+
+    if (targetDirection === "center") {
+      points += 25;
+    }
+
+    state.combo++;
+
+    points += state.combo * 10;
+
+  } else {
+
+    state.combo = 0;
+  }
+
+
+  // ============================
+  // ANIMATION
+  // ============================
+
+  moveKeeper(
+    keeperDirection
+  );
+
+  moveBall(
+    actual.x,
+    actual.y
   );
 
 
-  // --------------------------
+  // ============================
   // CIBLE
-  // --------------------------
+  // ============================
 
   targetDot.style.left =
     `${state.aim.x * 100}%`;
 
   targetDot.style.top =
-    `${state.aim.y * 100}%`;
+    `${(1 - state.aim.y) * 100}%`;
 
   targetDot.classList.add(
     "visible"
   );
 
 
-  updateUI();
+  // ============================
+  // RESULTAT
+  // ============================
+
+  if (saved) {
+
+    message.textContent =
+      "🧤 ARRÊT !";
+
+    message.classList.add(
+      "save"
+    );
+
+  } else {
+
+    state.score += points;
+
+    message.textContent =
+      `⚽ BUT ! +${points}`;
+
+    message.classList.add(
+      "goal-message"
+    );
+  }
 
 
-  // --------------------------
+  scoreElement.textContent =
+    state.score;
+
+  comboElement.textContent =
+    state.combo;
+
+
+  // ============================
   // PROCHAIN TIR
-  // --------------------------
+  // ============================
 
   setTimeout(() => {
 
-    if (
-      state.shot >=
-      MAX_SHOTS
-    ) {
+    state.shot++;
+
+    if (state.shot > MAX_SHOTS) {
 
       finishGame();
 
       return;
     }
 
-
-    state.shot++;
-
-    state.locked =
-      false;
-
-
     resetBall();
 
-    resetKeeper();
+    state.locked = false;
 
-    resetTarget();
+    state.aim = null;
 
-
-    setMessage(
-      "Clique dans la cage pour tirer ⚽"
+    targetDot.classList.remove(
+      "visible"
     );
 
+    message.classList.remove(
+      "save",
+      "goal-message"
+    );
 
-    updateUI();
+    message.textContent =
+      "Clique dans la cage pour tirer ⚽";
 
-  }, 1150);
+    shotNumber.textContent =
+      state.shot;
+
+  }, 1100);
 }
 
 
-// ======================================
+// ===============================
 // CLIC DANS LA CAGE
-// ======================================
+// ===============================
 
 function aim(event) {
 
   if (state.locked) {
+    return;
+  }
+
+  if (state.shot > MAX_SHOTS) {
     return;
   }
 
@@ -572,84 +440,109 @@ function aim(event) {
     goal.getBoundingClientRect();
 
 
+  /*
+    Coordonnées du clic
+    entre 0 et 1.
+  */
+
   const x =
-    Math.max(
-      0,
-      Math.min(
-        1,
-        (event.clientX -
-          rect.left) /
-        rect.width
-      )
+    (event.clientX - rect.left)
+    / rect.width;
+
+  const y =
+    1 -
+    (
+      (event.clientY - rect.top)
+      / rect.height
     );
 
 
-  const y =
+  /*
+    On empêche le clic sur les
+    bords de sortir de la zone.
+  */
+
+  const safeX =
     Math.max(
-      0,
-      Math.min(
-        1,
-        (event.clientY -
-          rect.top) /
-        rect.height
-      )
+      0.08,
+      Math.min(0.92, x)
+    );
+
+  const safeY =
+    Math.max(
+      0.10,
+      Math.min(0.85, y)
     );
 
 
   state.aim = {
-    x,
-    y
+    x: safeX,
+    y: safeY
   };
 
 
+  // Affiche la cible
+
   targetDot.style.left =
-    `${x * 100}%`;
+    `${safeX * 100}%`;
 
   targetDot.style.top =
-    `${y * 100}%`;
+    `${(1 - safeY) * 100}%`;
 
   targetDot.classList.add(
     "visible"
   );
 
 
-  // Tir automatique
+  /*
+    Tir AUTOMATIQUE.
+  */
+
   shoot();
 }
 
 
-// ======================================
+// ===============================
+// RESET BALLE
+// ===============================
+
+function resetBall() {
+
+  ball.style.left =
+    "50%";
+
+  ball.style.bottom =
+    "6%";
+
+  ball.style.transform =
+    "translate(-50%, 0) scale(1)";
+
+
+  keeper.classList.remove(
+    "dive-left",
+    "dive-right",
+    "dive-center"
+  );
+}
+
+
+// ===============================
 // FIN DU MATCH
-// ======================================
+// ===============================
 
 function finishGame() {
 
-  state.locked =
-    true;
+  state.locked = true;
 
-
-  if (
-    state.score >
-    state.best
-  ) {
+  if (state.score > state.best) {
 
     state.best =
       state.score;
 
-
     localStorage.setItem(
       "penaltyMindBest",
-      String(state.best)
+      state.best
     );
-
-
-    resultTitle.textContent =
-      "🏆 Nouveau record !";
-
-  } else {
-
-    resultTitle.textContent =
-      "🏁 Fin du match";
   }
 
 
@@ -660,36 +553,35 @@ function finishGame() {
     state.best;
 
 
+  resultTitle.textContent =
+    state.score > 0
+      ? "🏆 Match terminé !"
+      : "🏁 Match terminé";
+
+
   result.classList.remove(
     "hidden"
-  );
-
-
-  setMessage(
-    "Match terminé !"
   );
 }
 
 
-// ======================================
+// ===============================
 // RESTART
-// ======================================
+// ===============================
 
-function restart() {
+function restartGame() {
 
   state.shot = 1;
-
   state.score = 0;
-
   state.combo = 0;
-
   state.locked = false;
-
   state.aim = null;
+  state.power = 0.5;
 
-  state.power = 0;
 
-  state.direction = 1;
+  shotNumber.textContent = "1";
+  scoreElement.textContent = "0";
+  comboElement.textContent = "0";
 
 
   result.classList.add(
@@ -697,55 +589,45 @@ function restart() {
   );
 
 
-  resetBall();
-
-  resetKeeper();
-
-  resetTarget();
-
-
-  setMessage(
-    "Clique dans la cage pour tirer ⚽"
+  targetDot.classList.remove(
+    "visible"
   );
 
 
-  updateUI();
+  message.classList.remove(
+    "save",
+    "goal-message"
+  );
+
+
+  message.textContent =
+    "Clique dans la cage pour tirer ⚽";
+
+
+  resetBall();
 }
 
 
-// ======================================
+// ===============================
 // EVENEMENTS
-// ======================================
+// ===============================
 
 goal.addEventListener(
   "click",
   aim
 );
 
-
 restartButton.addEventListener(
   "click",
-  restart
+  restartGame
 );
 
 
-// ======================================
-// DEMARRAGE
-// ======================================
-
-updateUI();
+// ===============================
+// INITIALISATION
+// ===============================
 
 resetBall();
 
-resetKeeper();
-
-resetTarget();
-
-setMessage(
-  "Clique dans la cage pour tirer ⚽"
-);
-
-requestAnimationFrame(
-  animateMeter
-);
-```
+bestScore.textContent =
+  state.best;
