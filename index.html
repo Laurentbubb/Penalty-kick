@@ -1,9 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>TEST</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PenaltyMind</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <h1>TEST PENALTYMIND</h1>
+
+<div id="game">
+
+    <header>
+        <div class="brand">
+            ⚽ <span>PENALTY</span>MIND
+        </div>
+
+        <div class="score">
+            <span>TIR</span>
+            <strong id="shot">1 / 5</strong>
+        </div>
+
+        <div class="score">
+            <span>SCORE</span>
+            <strong id="score">0</strong>
+        </div>
+    </header>
+
+
+    <main class="stadium">
+
+        <div class="sky">
+            <div class="sun"></div>
+        </div>
+
+        <div class="crowd">
+            <div class="crowd-lights"></div>
+        </div>
+
+        <div class="field">
+
+            <div class="penalty-area"></div>
+
+            <div class="goal">
+
+                <div class="net"></div>
+
+                <div class="post left"></div>
+                <div class="post right"></div>
+                <div class="post top"></div>
+
+                <div id="keeper">
+                    <div class="head"></div>
+                    <div class="body"></div>
+                    <div class="arm left"></div>
+                    <div class="arm right"></div>
+                    <div class="leg left"></div>
+                    <div class="leg right"></div>
+                </div>
+
+                <div id="target">
+                    <span></span>
+                </div>
+
+            </div>
+
+            <div id="ball">⚽</div>
+
+        </div>
+
+    </main>
+
+
+    <section class="controls">
+
+        <div id="message">
+            🎯 Choisis ta zone de tir
+        </div>
+
+        <div class="power-container">
+
+            <div class="power-label">
+                <span>PUISSANCE</span>
+                <strong id="power">50%</strong>
+            </div>
+
+            <div id="powerBar">
+                <div class="weak"></div>
+                <div class="good"></div>
+                <div class="perfect"></div>
+
+                <div id="needle"></div>
+            </div>
+
+        </div>
+
+        <button id="shoot">
+            TIRER ⚡
+        </button>
+
+    </section>
+
+
+    <div id="result" class="hidden">
+
+        <div class="result-card">
+
+            <div class="trophy">🏆</div>
+
+            <h2 id="resultTitle">
+                BIEN JOUÉ !
+            </h2>
+
+            <p>SCORE FINAL</p>
+
+            <strong id="finalScore">
+                0
+            </strong>
+
+            <button id="restart">
+                🔄 REJOUER
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="game.js"></script>
+
 </body>
 </html>
