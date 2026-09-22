@@ -1,6 +1,6 @@
-/* ================================
+/* =========================================
    RESET
-================================ */
+========================================= */
 
 * {
   box-sizing: border-box;
@@ -16,19 +16,32 @@ body {
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background:
-    radial-gradient(circle at top, #162b45 0%, #07111f 55%, #030812 100%);
+
   color: white;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #193b60 0%,
+      #081321 50%,
+      #030711 100%
+    );
+
   overflow-x: hidden;
+
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 
-/* ================================
-   GAME
-================================ */
+/* =========================================
+   GLOBAL
+========================================= */
+
+button {
+  font-family: inherit;
+}
 
 .game {
   width: min(1200px, 100%);
@@ -37,34 +50,264 @@ body {
 }
 
 
-/* ================================
-   TOP BAR
-================================ */
+/* =========================================
+   SCREENS
+========================================= */
+
+.screen {
+  display: none;
+  min-height: calc(100vh - 36px);
+}
+
+.screen.active-screen {
+  display: block;
+}
+
+
+/* =========================================
+   MENU PRINCIPAL
+========================================= */
+
+#mainMenu {
+  display: none;
+
+  min-height: calc(100vh - 36px);
+
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  text-align: center;
+}
+
+#mainMenu.active-screen {
+  display: flex;
+}
+
+
+.menu-logo {
+  margin-bottom: 35px;
+
+  animation:
+    menuLogoAppear
+    0.7s
+    ease-out;
+}
+
+.logo-ball {
+  font-size: 72px;
+
+  margin-bottom: 8px;
+
+  animation:
+    ballFloat
+    2.5s
+    ease-in-out
+    infinite;
+}
+
+.menu-logo h1 {
+  font-size: clamp(42px, 8vw, 78px);
+
+  font-weight: 900;
+
+  letter-spacing: -4px;
+}
+
+.menu-logo h1 span {
+  color: #3c91ff;
+}
+
+.menu-logo p {
+  margin-top: 10px;
+
+  color: #9eafc3;
+
+  font-size: 15px;
+}
+
+
+/* =========================================
+   MENU BUTTONS
+========================================= */
+
+.menu-buttons {
+  width: min(380px, 90%);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.main-button {
+  width: 100%;
+
+  min-height: 58px;
+
+  padding: 14px 20px;
+
+  border: 1px solid rgba(255,255,255,0.1);
+
+  border-radius: 15px;
+
+  background:
+    rgba(255,255,255,0.07);
+
+  color: white;
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.15);
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.main-button:hover {
+  background:
+    rgba(255,255,255,0.12);
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 12px 25px rgba(0,0,0,0.25);
+}
+
+.main-button:active {
+  transform:
+    scale(0.97);
+}
+
+.primary-button {
+  background:
+    linear-gradient(
+      135deg,
+      #338cff,
+      #1753c7
+    );
+
+  border-color:
+    rgba(255,255,255,0.2);
+
+  box-shadow:
+    0 10px 30px rgba(24,94,210,0.35);
+}
+
+.primary-button:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #4899ff,
+      #1b61dd
+    );
+}
+
+
+/* =========================================
+   MENU BEST SCORE
+========================================= */
+
+.menu-best {
+  margin-top: 25px;
+
+  color: #91a2b8;
+
+  font-size: 14px;
+}
+
+.menu-best strong {
+  color: #fff;
+}
+
+
+/* =========================================
+   TOPBAR
+========================================= */
 
 .topbar {
   display: flex;
+
   justify-content: space-between;
   align-items: center;
+
   gap: 20px;
+
   margin-bottom: 15px;
 }
 
 .topbar h1 {
-  font-size: clamp(25px, 4vw, 42px);
+  margin-top: 8px;
+
+  font-size:
+    clamp(25px, 4vw, 42px);
+
   font-weight: 900;
+
   letter-spacing: -1px;
 }
 
 .subtitle {
   margin-top: 5px;
+
   color: #a9b8ca;
+
   font-size: 14px;
 }
 
 
-/* ================================
-   STATS
-================================ */
+/* =========================================
+   PETIT BOUTON
+========================================= */
+
+.small-button,
+.back-button {
+  border: none;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color: #cbd6e4;
+
+  padding: 8px 14px;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.small-button:hover,
+.back-button:hover {
+  background:
+    rgba(255,255,255,0.14);
+}
+
+.small-button:active,
+.back-button:active {
+  transform: scale(0.95);
+}
+
+
+/* =========================================
+   STATS TOP
+========================================= */
 
 .stats {
   display: flex;
@@ -73,11 +316,17 @@ body {
 
 .stats > div {
   min-width: 75px;
+
   padding: 10px 13px;
+
   text-align: center;
 
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    rgba(255,255,255,0.07);
+
+  border:
+    1px solid rgba(255,255,255,0.1);
+
   border-radius: 12px;
 
   backdrop-filter: blur(8px);
@@ -85,34 +334,32 @@ body {
 
 .stats span {
   display: block;
+
   color: #9baabc;
+
   font-size: 11px;
+
   text-transform: uppercase;
 }
 
 .stats strong {
   display: block;
+
   margin-top: 3px;
+
   font-size: 23px;
 }
 
 
-/* ================================
-   MATCH
-================================ */
-
-.match {
-  width: 100%;
-}
-
-
-/* ================================
+/* =========================================
    STADIUM
-================================ */
+========================================= */
 
 .stadium {
   position: relative;
+
   width: 100%;
+
   height: 680px;
 
   overflow: hidden;
@@ -122,17 +369,18 @@ body {
   background: #102238;
 
   box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    0 25px 60px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
 }
 
 
-/* ================================
+/* =========================================
    SKY
-================================ */
+========================================= */
 
 .sky {
   position: absolute;
+
   inset: 0 0 52% 0;
 
   background:
@@ -145,37 +393,59 @@ body {
 }
 
 
-/* ================================
+/* =========================================
    CROWD
-================================ */
+========================================= */
 
 .crowd {
   position: absolute;
+
   left: 0;
   right: 0;
+
   top: 27%;
+
   height: 23%;
 
   background:
-    radial-gradient(circle, #e9eef4 0 2px, transparent 3px) 0 0 / 17px 17px,
-    radial-gradient(circle, #37475a 0 3px, transparent 4px) 8px 8px / 19px 19px,
-    linear-gradient(180deg, #17263a, #0c1727);
+    radial-gradient(
+      circle,
+      #e9eef4 0 2px,
+      transparent 3px
+    ) 0 0 / 17px 17px,
+
+    radial-gradient(
+      circle,
+      #37475a 0 3px,
+      transparent 4px
+    ) 8px 8px / 19px 19px,
+
+    linear-gradient(
+      180deg,
+      #17263a,
+      #0c1727
+    );
 
   opacity: 0.9;
 
-  border-top: 2px solid rgba(255,255,255,0.08);
-  border-bottom: 2px solid rgba(0,0,0,0.35);
+  border-top:
+    2px solid rgba(255,255,255,0.08);
+
+  border-bottom:
+    2px solid rgba(0,0,0,0.35);
 }
 
 
-/* ================================
-   FIELD
-================================ */
+/* =========================================
+   TERRAIN
+========================================= */
 
 .field {
   position: absolute;
+
   left: 0;
   right: 0;
+
   top: 47%;
   bottom: 0;
 
@@ -189,13 +459,8 @@ body {
     );
 
   box-shadow:
-    inset 0 15px 30px rgba(0, 0, 0, 0.2);
+    inset 0 15px 30px rgba(0,0,0,0.2);
 }
-
-
-/* ================================
-   PENALTY AREA
-================================ */
 
 .penalty-area {
   position: absolute;
@@ -203,15 +468,19 @@ body {
   left: 50%;
   top: 5%;
 
-  width: min(550px, 70%);
+  width: min(550px,70%);
   height: 45%;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
-  border: 4px solid rgba(255,255,255,0.85);
+  border:
+    4px solid rgba(255,255,255,0.85);
+
   border-bottom: none;
 
-  border-radius: 50% 50% 0 0;
+  border-radius:
+    50% 50% 0 0;
 }
 
 .penalty-spot {
@@ -223,19 +492,21 @@ body {
   width: 14px;
   height: 14px;
 
-  transform: translate(-50%, -50%);
+  transform:
+    translate(-50%,-50%);
 
   border-radius: 50%;
 
   background: white;
 
-  box-shadow: 0 0 8px rgba(255,255,255,0.5);
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.5);
 }
 
 
-/* ================================
+/* =========================================
    GOAL
-================================ */
+========================================= */
 
 .goal {
   position: absolute;
@@ -243,10 +514,11 @@ body {
   left: 50%;
   top: 9%;
 
-  width: min(780px, 82vw);
+  width: min(780px,82vw);
   height: 350px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   z-index: 10;
 
@@ -256,27 +528,31 @@ body {
 }
 
 @media (pointer: coarse) {
+
   .goal {
     cursor: pointer;
   }
+
 }
 
 
-/* ================================
+/* =========================================
    NET
-================================ */
+========================================= */
 
 .net {
   position: absolute;
 
   left: 10px;
   right: 10px;
+
   top: 10px;
   bottom: 0;
 
   z-index: 1;
 
-  border: 7px solid rgba(255,255,255,0.95);
+  border:
+    7px solid rgba(255,255,255,0.95);
 
   background:
     linear-gradient(
@@ -295,16 +571,14 @@ body {
       transparent 52%
     ) 0 0 / 24px 24px;
 
-  background-color: rgba(255,255,255,0.07);
-
-  box-shadow:
-    inset 0 0 30px rgba(255,255,255,0.12);
+  background-color:
+    rgba(255,255,255,0.07);
 }
 
 
-/* ================================
-   POSTS
-================================ */
+/* =========================================
+   POTEAUX
+========================================= */
 
 .post,
 .crossbar {
@@ -312,12 +586,13 @@ body {
 
   z-index: 20;
 
-  background: linear-gradient(
-    90deg,
-    #d8dde4,
-    #ffffff,
-    #d8dde4
-  );
+  background:
+    linear-gradient(
+      90deg,
+      #d8dde4,
+      #ffffff,
+      #d8dde4
+    );
 
   box-shadow:
     0 0 8px rgba(0,0,0,0.35);
@@ -326,6 +601,7 @@ body {
 .post {
   top: 0;
   bottom: 0;
+
   width: 12px;
 }
 
@@ -340,14 +616,16 @@ body {
 .crossbar {
   left: 0;
   right: 0;
+
   top: 0;
+
   height: 12px;
 }
 
 
-/* ================================
-   KEEPER
-================================ */
+/* =========================================
+   GARDIEN
+========================================= */
 
 .keeper {
   position: absolute;
@@ -368,13 +646,9 @@ body {
     left 0.42s cubic-bezier(.2,.8,.2,1),
     transform 0.42s cubic-bezier(.2,.8,.2,1);
 
-  filter: drop-shadow(0 7px 5px rgba(0,0,0,0.3));
+  filter:
+    drop-shadow(0 7px 5px rgba(0,0,0,0.3));
 }
-
-
-/* ================================
-   KEEPER HEAD
-================================ */
 
 .keeper-head {
   position: absolute;
@@ -385,20 +659,21 @@ body {
   width: 30px;
   height: 30px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   border-radius: 50%;
 
   background:
-    radial-gradient(circle at 35% 30%, #ffd4b0 0 15%, #d99568 70%);
+    radial-gradient(
+      circle at 35% 30%,
+      #ffd4b0 0 15%,
+      #d99568 70%
+    );
 
-  border: 3px solid #172033;
+  border:
+    3px solid #172033;
 }
-
-
-/* ================================
-   KEEPER BODY
-================================ */
 
 .keeper-body {
   position: absolute;
@@ -409,9 +684,11 @@ body {
   width: 45px;
   height: 65px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
-  border-radius: 12px 12px 8px 8px;
+  border-radius:
+    12px 12px 8px 8px;
 
   background:
     linear-gradient(
@@ -421,13 +698,9 @@ body {
       #153e9b
     );
 
-  border: 3px solid #10295d;
+  border:
+    3px solid #10295d;
 }
-
-
-/* ================================
-   KEEPER ARMS
-================================ */
 
 .keeper-arm {
   position: absolute;
@@ -445,26 +718,27 @@ body {
       #143b95,
       #347fff
     );
-
-  transition: transform 0.35s ease;
 }
 
 .keeper-arm.left {
   left: 8px;
-  transform: rotate(22deg);
-  transform-origin: top center;
+
+  transform:
+    rotate(22deg);
+
+  transform-origin:
+    top center;
 }
 
 .keeper-arm.right {
   right: 8px;
-  transform: rotate(-22deg);
-  transform-origin: top center;
+
+  transform:
+    rotate(-22deg);
+
+  transform-origin:
+    top center;
 }
-
-
-/* ================================
-   KEEPER LEGS
-================================ */
 
 .keeper-leg {
   position: absolute;
@@ -481,21 +755,21 @@ body {
 
 .keeper-leg.left {
   left: 25px;
-  transform: rotate(5deg);
+
+  transform:
+    rotate(5deg);
 }
 
 .keeper-leg.right {
   right: 25px;
-  transform: rotate(-5deg);
+
+  transform:
+    rotate(-5deg);
 }
-
-
-/* ================================
-   KEEPER DIVES
-================================ */
 
 .keeper.dive-left {
   left: 24%;
+
   transform:
     translateX(-50%)
     rotate(-16deg)
@@ -504,6 +778,7 @@ body {
 
 .keeper.dive-right {
   left: 76%;
+
   transform:
     translateX(-50%)
     rotate(16deg)
@@ -512,6 +787,7 @@ body {
 
 .keeper.dive-center {
   left: 50%;
+
   transform:
     translateX(-50%)
     translateY(-5px)
@@ -519,9 +795,9 @@ body {
 }
 
 
-/* ================================
-   TARGET
-================================ */
+/* =========================================
+   CIBLE
+========================================= */
 
 .target-dot {
   position: absolute;
@@ -532,8 +808,8 @@ body {
   height: 30px;
 
   transform:
-    translate(-50%, -50%)
-    scale(0.5);
+    translate(-50%,-50%)
+    scale(.5);
 
   opacity: 0;
 
@@ -555,13 +831,17 @@ body {
 
 .target-dot.visible {
   opacity: 1;
-  animation: targetPop 0.22s ease-out;
+
+  animation:
+    targetPop
+    .22s
+    ease-out;
 }
 
 
-/* ================================
-   BALL
-================================ */
+/* =========================================
+   BALLON
+========================================= */
 
 .ball {
   position: absolute;
@@ -578,13 +858,13 @@ body {
   line-height: 42px;
 
   transform:
-    translate(-50%, 0)
+    translate(-50%,0)
     scale(1);
 
   transition:
-    left 0.65s cubic-bezier(.12,.72,.2,1),
-    bottom 0.65s cubic-bezier(.12,.72,.2,1),
-    transform 0.65s cubic-bezier(.12,.72,.2,1);
+    left .65s cubic-bezier(.12,.72,.2,1),
+    bottom .65s cubic-bezier(.12,.72,.2,1),
+    transform .65s cubic-bezier(.12,.72,.2,1);
 
   filter:
     drop-shadow(0 6px 5px rgba(0,0,0,0.35));
@@ -599,9 +879,9 @@ body {
 }
 
 
-/* ================================
-   PLAYER
-================================ */
+/* =========================================
+   JOUEUR
+========================================= */
 
 .player {
   position: absolute;
@@ -614,15 +894,12 @@ body {
 
   z-index: 15;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
-  filter: drop-shadow(0 10px 5px rgba(0,0,0,0.35));
+  filter:
+    drop-shadow(0 10px 5px rgba(0,0,0,0.35));
 }
-
-
-/* ================================
-   PLAYER HEAD
-================================ */
 
 .player-head {
   position: absolute;
@@ -633,7 +910,8 @@ body {
   width: 40px;
   height: 40px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   border-radius: 50%;
 
@@ -644,13 +922,9 @@ body {
       #d99568 75%
     );
 
-  border: 3px solid #40261c;
+  border:
+    3px solid #40261c;
 }
-
-
-/* ================================
-   PLAYER BODY
-================================ */
 
 .player-body {
   position: absolute;
@@ -661,9 +935,11 @@ body {
   width: 58px;
   height: 82px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
-  border-radius: 15px 15px 8px 8px;
+  border-radius:
+    15px 15px 8px 8px;
 
   background:
     linear-gradient(
@@ -674,13 +950,9 @@ body {
       #101010
     );
 
-  border: 3px solid #222;
+  border:
+    3px solid #222;
 }
-
-
-/* ================================
-   PLAYER ARMS
-================================ */
 
 .player-arm {
   position: absolute;
@@ -692,23 +964,22 @@ body {
 
   border-radius: 12px;
 
-  background: #eeeeee;
+  background: #eee;
 }
 
 .player-arm.left {
   left: 7px;
-  transform: rotate(20deg);
+
+  transform:
+    rotate(20deg);
 }
 
 .player-arm.right {
   right: 7px;
-  transform: rotate(-20deg);
+
+  transform:
+    rotate(-20deg);
 }
-
-
-/* ================================
-   PLAYER LEGS
-================================ */
 
 .player-leg {
   position: absolute;
@@ -731,31 +1002,37 @@ body {
 
 .player-leg.left {
   left: 28px;
-  transform: rotate(3deg);
+
+  transform:
+    rotate(3deg);
 }
 
 .player-leg.right {
   right: 28px;
-  transform: rotate(-3deg);
+
+  transform:
+    rotate(-3deg);
 }
 
-
-/* ================================
-   PLAYER ANIMATIONS
-================================ */
-
 .player.celebrate {
-  animation: celebrate 0.6s ease-in-out 2;
+  animation:
+    celebrate
+    .6s
+    ease-in-out
+    2;
 }
 
 .player.disappointed {
-  animation: disappointed 0.5s ease;
+  animation:
+    disappointed
+    .5s
+    ease;
 }
 
 
-/* ================================
+/* =========================================
    MESSAGE
-================================ */
+========================================= */
 
 .message {
   position: absolute;
@@ -765,15 +1042,18 @@ body {
 
   z-index: 100;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   padding: 12px 22px;
 
   border-radius: 999px;
 
-  background: rgba(5, 13, 25, 0.82);
+  background:
+    rgba(5,13,25,0.82);
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border:
+    1px solid rgba(255,255,255,0.12);
 
   box-shadow:
     0 8px 30px rgba(0,0,0,0.25);
@@ -782,39 +1062,46 @@ body {
 
   white-space: nowrap;
 
-  backdrop-filter: blur(8px);
+  backdrop-filter:
+    blur(8px);
 }
 
 .message.goal-message {
-  background: rgba(8, 130, 65, 0.92);
+  background:
+    rgba(8,130,65,0.92);
 }
 
 .message.save {
-  background: rgba(175, 36, 45, 0.92);
+  background:
+    rgba(175,36,45,0.92);
 }
 
 .message.goal-message,
 .message.save {
-  animation: messagePop 0.25s ease-out;
+  animation:
+    messagePop
+    .25s
+    ease-out;
 }
 
-
-/* ================================
-   GOAL EFFECTS
-================================ */
-
 .goal.goal-scored {
-  animation: goalFlash 0.5s ease;
+  animation:
+    goalFlash
+    .5s
+    ease;
 }
 
 .goal.goal-saved {
-  animation: goalShake 0.32s ease;
+  animation:
+    goalShake
+    .32s
+    ease;
 }
 
 
-/* ================================
-   CONTROLS
-================================ */
+/* =========================================
+   CONTROLES
+========================================= */
 
 .controls {
   margin-top: 15px;
@@ -823,19 +1110,18 @@ body {
 
   border-radius: 18px;
 
-  background: rgba(255,255,255,0.055);
+  background:
+    rgba(255,255,255,0.055);
 
-  border: 1px solid rgba(255,255,255,0.08);
+  border:
+    1px solid rgba(255,255,255,0.08);
 }
-
-
-/* ================================
-   INSTRUCTIONS
-================================ */
 
 .instructions {
   display: flex;
+
   justify-content: center;
+
   gap: 25px;
 
   margin-bottom: 18px;
@@ -846,17 +1132,19 @@ body {
 }
 
 
-/* ================================
+/* =========================================
    POWER
-================================ */
+========================================= */
 
 .power-panel {
   max-width: 700px;
+
   margin: auto;
 }
 
 .power-labels {
   display: flex;
+
   justify-content: space-between;
 
   margin-bottom: 7px;
@@ -864,6 +1152,7 @@ body {
   color: #9faabd;
 
   font-size: 10px;
+
   font-weight: 800;
 }
 
@@ -885,6 +1174,7 @@ body {
 
 .power-zone {
   position: absolute;
+
   top: 0;
   bottom: 0;
 }
@@ -892,37 +1182,37 @@ body {
 .left-red {
   left: 0;
   width: 17%;
+
   background: #e3343f;
 }
 
 .left-orange {
   left: 17%;
   width: 18%;
+
   background: #f09a31;
 }
 
 .green {
   left: 35%;
   width: 30%;
+
   background: #24bd69;
 }
 
 .right-orange {
   left: 65%;
   width: 18%;
+
   background: #f09a31;
 }
 
 .right-red {
   left: 83%;
   width: 17%;
+
   background: #e3343f;
 }
-
-
-/* ================================
-   NEEDLE
-================================ */
 
 .needle {
   position: absolute;
@@ -933,7 +1223,8 @@ body {
   width: 5px;
   height: 26px;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   border-radius: 5px;
 
@@ -941,14 +1232,12 @@ body {
 
   box-shadow:
     0 0 8px rgba(255,255,255,0.9);
-
-  pointer-events: none;
 }
 
 
-/* ================================
-   SOUND BUTTON
-================================ */
+/* =========================================
+   SON
+========================================= */
 
 .sound-button {
   display: block;
@@ -959,10 +1248,13 @@ body {
 
   padding: 9px 17px;
 
-  border: 1px solid rgba(255,255,255,0.12);
+  border:
+    1px solid rgba(255,255,255,0.12);
+
   border-radius: 999px;
 
-  background: rgba(255,255,255,0.08);
+  background:
+    rgba(255,255,255,0.08);
 
   color: white;
 
@@ -971,24 +1263,12 @@ body {
   cursor: pointer;
 
   touch-action: manipulation;
-
-  transition:
-    transform 0.15s ease,
-    background 0.15s ease;
-}
-
-.sound-button:hover {
-  background: rgba(255,255,255,0.14);
-}
-
-.sound-button:active {
-  transform: scale(0.95);
 }
 
 
-/* ================================
-   RESULT
-================================ */
+/* =========================================
+   RESULTAT
+========================================= */
 
 .result {
   margin: 25px auto 0;
@@ -1004,16 +1284,20 @@ body {
   background:
     linear-gradient(
       145deg,
-      rgba(24,40,62,0.98),
-      rgba(8,16,29,0.98)
+      rgba(24,40,62,.98),
+      rgba(8,16,29,.98)
     );
 
-  border: 1px solid rgba(255,255,255,0.1);
+  border:
+    1px solid rgba(255,255,255,0.1);
 
   box-shadow:
-    0 15px 45px rgba(0,0,0,0.35);
+    0 15px 45px rgba(0,0,0,.35);
 
-  animation: resultAppear 0.35s ease;
+  animation:
+    resultAppear
+    .35s
+    ease;
 }
 
 .result h2 {
@@ -1036,86 +1320,371 @@ body {
   display: none !important;
 }
 
+.restart-button,
+.secondary-button {
+  display: block;
 
-/* ================================
-   RESTART
-================================ */
-
-.restart-button {
-  margin-top: 18px;
+  width: min(300px,100%);
 
   min-height: 48px;
 
-  padding: 12px 28px;
+  margin: 12px auto 0;
+
+  padding: 12px 25px;
 
   border: none;
+
   border-radius: 999px;
 
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
+}
+
+.restart-button {
   background:
     linear-gradient(
       135deg,
       #2f83ff,
       #1555c7
     );
+}
+
+.secondary-button {
+  background:
+    rgba(255,255,255,0.09);
+}
+
+
+/* =========================================
+   SOUS-ECRANS
+========================================= */
+
+.subscreen {
+  width: min(850px,100%);
+
+  margin:
+    20px auto;
+
+  padding: 15px;
+}
+
+.back-button {
+  margin-bottom: 35px;
+}
+
+.subscreen-title {
+  text-align: center;
+
+  margin-bottom: 35px;
+}
+
+.subscreen-title > span {
+  display: block;
+
+  font-size: 60px;
+
+  margin-bottom: 8px;
+}
+
+.subscreen-title h2 {
+  font-size: clamp(32px,6vw,50px);
+}
+
+.subscreen-title p {
+  margin-top: 8px;
+
+  color: #9eafc3;
+}
+
+
+/* =========================================
+   TRAINING
+========================================= */
+
+.training-info {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 14px;
+
+  margin-bottom: 25px;
+}
+
+.info-card {
+  padding: 25px 15px;
+
+  text-align: center;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255,255,255,.06);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+}
+
+.info-card strong {
+  display: block;
+
+  font-size: 34px;
+
+  color: #48a0ff;
+}
+
+.info-card span {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #9eafc3;
+
+  font-size: 13px;
+}
+
+#startTrainingButton {
+  display: block;
+
+  width: min(380px,100%);
+
+  margin: auto;
+}
+
+
+/* =========================================
+   STATISTIQUES
+========================================= */
+
+.statistics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 15px;
+}
+
+.stat-card {
+  padding: 25px 15px;
+
+  text-align: center;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255,255,255,.06);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  transition:
+    transform .2s ease,
+    background .2s ease;
+}
+
+.stat-card:hover {
+  transform:
+    translateY(-3px);
+
+  background:
+    rgba(255,255,255,.09);
+}
+
+.stat-card span {
+  display: block;
+
+  font-size: 30px;
+
+  margin-bottom: 8px;
+}
+
+.stat-card strong {
+  display: block;
+
+  font-size: 29px;
+}
+
+.stat-card small {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #91a2b8;
+}
+
+
+/* =========================================
+   PARAMETRES
+========================================= */
+
+.settings-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.setting-row {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 20px;
+
+  border-radius: 16px;
+
+  background:
+    rgba(255,255,255,.06);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+}
+
+.setting-row strong {
+  display: block;
+}
+
+.setting-row small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #8fa1b6;
+}
+
+.toggle-button {
+  min-width: 65px;
+
+  min-height: 40px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background:
+    #2fbf71;
 
   color: white;
 
-  font-size: 16px;
   font-weight: 900;
 
   cursor: pointer;
 
   touch-action: manipulation;
-
-  box-shadow:
-    0 8px 20px rgba(21,85,199,0.35);
-
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
 }
 
-.restart-button:hover {
-  filter: brightness(1.1);
+.danger-button {
+  min-height: 48px;
+
+  padding: 10px 18px;
+
+  border:
+    1px solid rgba(255,80,80,.2);
+
+  border-radius: 12px;
+
+  background:
+    rgba(190,40,50,.12);
+
+  color: #ff7b7b;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  touch-action: manipulation;
 }
 
-.restart-button:active {
-  transform: scale(0.95);
-}
 
-
-/* ================================
+/* =========================================
    ANIMATIONS
-================================ */
+========================================= */
+
+@keyframes menuLogoAppear {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px)
+      scale(.95);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+@keyframes ballFloat {
+
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  50% {
+    transform:
+      translateY(-10px)
+      rotate(8deg);
+  }
+
+}
 
 @keyframes targetPop {
+
   0% {
     opacity: 0;
+
     transform:
-      translate(-50%, -50%)
-      scale(0.25);
+      translate(-50%,-50%)
+      scale(.25);
   }
 
   65% {
     opacity: 1;
+
     transform:
-      translate(-50%, -50%)
+      translate(-50%,-50%)
       scale(1.25);
   }
 
   100% {
     opacity: 1;
+
     transform:
-      translate(-50%, -50%)
+      translate(-50%,-50%)
       scale(1);
   }
+
 }
 
-
 @keyframes goalFlash {
+
   0%,
   100% {
-    filter: brightness(1);
+    filter:
+      brightness(1);
   }
 
   50% {
@@ -1123,43 +1692,51 @@ body {
       brightness(1.25)
       saturate(1.3);
   }
+
 }
 
-
 @keyframes goalShake {
+
   0%,
   100% {
-    transform: translateX(-50%);
+    transform:
+      translateX(-50%);
   }
 
   25% {
-    transform: translateX(calc(-50% - 5px));
+    transform:
+      translateX(calc(-50% - 5px));
   }
 
   75% {
-    transform: translateX(calc(-50% + 5px));
+    transform:
+      translateX(calc(-50% + 5px));
   }
+
 }
 
-
 @keyframes messagePop {
-  0% {
+
+  from {
     opacity: 0;
+
     transform:
       translateX(-50%)
-      scale(0.7);
+      scale(.7);
   }
 
-  100% {
+  to {
     opacity: 1;
+
     transform:
       translateX(-50%)
       scale(1);
   }
+
 }
 
-
 @keyframes celebrate {
+
   0%,
   100% {
     transform:
@@ -1174,10 +1751,11 @@ body {
       translateY(-10px)
       scale(1.05);
   }
+
 }
 
-
 @keyframes disappointed {
+
   0%,
   100% {
     transform:
@@ -1193,25 +1771,33 @@ body {
     transform:
       translateX(calc(-50% + 6px));
   }
+
 }
 
-
 @keyframes resultAppear {
+
   from {
     opacity: 0;
-    transform: translateY(15px) scale(0.97);
+
+    transform:
+      translateY(15px)
+      scale(.97);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+
+    transform:
+      translateY(0)
+      scale(1);
   }
+
 }
 
 
-/* ================================
+/* =========================================
    TABLETTE
-================================ */
+========================================= */
 
 @media (max-width: 900px) {
 
@@ -1231,25 +1817,27 @@ body {
   .keeper {
     transform:
       translateX(-50%)
-      scale(0.9);
+      scale(.9);
   }
 
   .player {
     transform:
       translateX(-50%)
-      scale(0.9);
+      scale(.9);
   }
 
   .instructions {
     gap: 15px;
+
     flex-wrap: wrap;
   }
+
 }
 
 
-/* ================================
+/* =========================================
    MOBILE
-================================ */
+========================================= */
 
 @media (max-width: 600px) {
 
@@ -1259,8 +1847,18 @@ body {
 
   .topbar {
     flex-direction: column;
+
     align-items: stretch;
+
     text-align: center;
+  }
+
+  .topbar > div:first-child {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
   }
 
   .stats {
@@ -1269,25 +1867,29 @@ body {
 
   .stats > div {
     flex: 1;
+
     min-width: 0;
   }
 
   .stadium {
     height: 540px;
+
     border-radius: 18px;
   }
 
   .goal {
     width: 94vw;
     height: 275px;
-    top: 10%;
   }
 
   .net {
     left: 7px;
     right: 7px;
+
     border-width: 5px;
-    background-size: 19px 19px;
+
+    background-size:
+      19px 19px;
   }
 
   .post {
@@ -1301,35 +1903,42 @@ body {
   .ball {
     width: 34px;
     height: 34px;
+
     font-size: 34px;
+
     line-height: 34px;
   }
 
   .keeper {
     transform:
       translateX(-50%)
-      scale(0.78);
+      scale(.78);
   }
 
   .player {
     transform:
       translateX(-50%)
-      scale(0.75);
-    transform-origin: bottom center;
+      scale(.75);
+
+    transform-origin:
+      bottom center;
   }
 
   .message {
     max-width: 90%;
+
     padding: 9px 14px;
 
     font-size: 13px;
 
     white-space: normal;
+
     text-align: center;
   }
 
   .instructions {
     flex-direction: column;
+
     align-items: center;
 
     gap: 7px;
@@ -1341,19 +1950,26 @@ body {
     padding: 14px;
   }
 
-  .power-bar {
-    height: 16px;
+  .training-info,
+  .statistics-grid {
+    grid-template-columns:
+      repeat(2,1fr);
   }
 
-  .needle {
-    height: 24px;
+  .subscreen {
+    padding: 5px;
   }
+
+  .subscreen-title > span {
+    font-size: 50px;
+  }
+
 }
 
 
-/* ================================
+/* =========================================
    PETITS TELEPHONES
-================================ */
+========================================= */
 
 @media (max-width: 380px) {
 
@@ -1372,21 +1988,33 @@ body {
   .stats strong {
     font-size: 19px;
   }
+
+  .training-info,
+  .statistics-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
 }
 
 
-/* ================================
+/* =========================================
    REDUCTION DES ANIMATIONS
-================================ */
+========================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    animation-duration:
+      .01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      .01ms !important;
   }
+
 }
